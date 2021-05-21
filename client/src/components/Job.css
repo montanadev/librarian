@@ -1,0 +1,12 @@
+.Job {
+    display: flex;
+    width: 100%
+}
+
+.JobProgress {
+    flex-grow: 99;
+}
+
+.JobFilename {
+    flex-grow: 1;
+}
