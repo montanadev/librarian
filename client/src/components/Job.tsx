@@ -1,6 +1,6 @@
 import './Sidebar.css';
 import './Job.css';
-import React, {useState} from "react";
+import React from "react";
 import {useInterval} from "../utils/setInterval";
 import {useDispatch} from "react-redux";
 import {refreshJob} from "../actions/Library";

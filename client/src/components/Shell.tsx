@@ -1,13 +1,10 @@
 import React from 'react';
 import './Shell.css';
-import Uploader from "./Uploader";
 
 import {Breadcrumb, Layout, Menu} from 'antd';
 import Sidebar from "./Sidebar";
-
-import {HashRouter, Route, Switch} from "react-router-dom";
 import {RootState} from "../stores";
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 
 const {Header, Content} = Layout;
 

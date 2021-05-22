@@ -3,7 +3,7 @@ import './Uploader.css';
 import {useDropzone} from "react-dropzone";
 import {useDispatch, useSelector} from "react-redux";
 import {addToLibrary} from "../actions/Library";
-import {Divider, List} from 'antd';
+import {List} from 'antd';
 import {FileAddOutlined} from '@ant-design/icons';
 import Job from "./Job";
 import {RootState, SET_BREADCRUMB} from "../stores";

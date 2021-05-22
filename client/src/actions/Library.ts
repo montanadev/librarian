@@ -1,6 +1,5 @@
 import {Dispatch, Store} from 'redux';
 import {ADD_JOB, LOAD_DOCUMENT, LOAD_LIBRARY, REFRESH_JOB} from "../stores";
-import * as pdfjs from "pdfjs-dist";
 
 export const refreshLibrary = async (dispatch: Dispatch, store: Store) => {
     const data = await fetch("http://localhost:8000/api/documents/").then(d => d.json());

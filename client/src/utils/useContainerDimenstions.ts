@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 export function useContainerDimensions(myRef: React.RefObject<any>) {
     const [dimensions, setDimensions] = useState({width: 0, height: 0});

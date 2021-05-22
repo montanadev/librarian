@@ -1,6 +1,6 @@
 import './Sidebar.css';
 import {Progress as ProgressT} from "antd";
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 export interface ProgressProps {
     percent: number;

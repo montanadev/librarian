@@ -1,3 +1,5 @@
+![tests](https://github.com/de1ux/librarian/actions/workflows/test.yml/badge.svg)
+
 # About
 
 Librarian is a high-quality, self-hosted app for your documents.
@@ -7,6 +9,8 @@ Features
 * configurable, automatic backups to a NAS (over NFS)
 * document OCR (via Google Compute Vision)
 * document search
+
+![demo](demo.gif)
 
 ## Contributing
 
