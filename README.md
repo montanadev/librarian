@@ -1,4 +1,4 @@
-## About
+# About
 
 Librarian is a high-quality, self-hosted app for your documents.
 
@@ -8,7 +8,7 @@ Features
 * document OCR (via Google Compute Vision)
 * document search
 
-## Getting Started
+## Contributing
 
 ### Prerequisites
 
@@ -51,6 +51,8 @@ $ npm i
 $ npm start
 ```
 
+See [Makefile](Makefile) for additional commands.
+
 ### Environment variables
 
 | Name | Default | Example | Description |
@@ -61,22 +63,12 @@ $ npm start
 
 ### Scripts
 
-To test uploads without drag-n-dropping on the frontend
+Test uploads without drag-n-dropping on the frontend
 
 ```
 $ curl 'http://0.0.0.0:8000/api/documents/home-title.pdf' -H 'Content-Type: application/pdf' --data-binary  '@home-title.pdf'
 ```
 
-### Known issues
+### Roadmap
 
-#### Viewer performance
-
-Perf is pretty bad on PDFs >10 pages. Probably need a virtualized list https://github.com/michaeldzjap/react-pdf-sample
-
-#### Images not supported
-
-Only PDFs are supported -- jpg/png should also be accepted.
-
-#### No search
-
-GCV results are stored, but not in a way that's easily searchable.
+See [roadmap.md](ROADMAP.md)

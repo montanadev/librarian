@@ -26,13 +26,13 @@ const Viewer = () => {
     }
 
     const containerRef = useRef<any>()
-    const { width } = useContainerDimensions(containerRef)
+    //const { width } = useContainerDimensions(containerRef)
 
     return <div ref={containerRef}>
         <Document file={`http://0.0.0.0:8000/api/documents/${documentId}/data`}
                   onLoadSuccess={onDocumentLoadSuccess}>
             {Array.from(new Array(numPages), (el, index) => (
-                <Page width={width} key={`page_${index + 1}`}
+                <Page width={500} key={`page_${index + 1}`}
                       pageNumber={index + 1}/>
             ))}
         </Document>

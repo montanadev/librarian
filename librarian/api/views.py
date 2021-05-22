@@ -1,5 +1,3 @@
-import libnfs
-from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -24,11 +22,7 @@ class DocumentView(RetrieveAPIView):
 class DocumentDataView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         dc = get_object_or_404(Document.objects, id=self.kwargs['id'])
-        nfs = libnfs.NFS(settings.NFS_PATH)
-
-        nfs_f = nfs.open("/" + dc.filestore_path, mode="rb")
-        data = nfs_f.read()
-        nfs_f.close()
+        data = dc.get_bytes_from_filestore()
 
         return HttpResponse(bytes(data), headers={"Content-Type": "application/pdf"}, status=status.HTTP_200_OK)
 
