@@ -11,3 +11,6 @@ makemigrations:
 
 format:
 	poetry run black .
+
+test:
+	poetry run ./manage.py test
