@@ -1,6 +1,6 @@
 ![tests](https://github.com/de1ux/librarian/actions/workflows/test.yml/badge.svg)
 
-# About
+# Librarian
 
 Librarian is a high-quality, self-hosted app for your documents.
 
