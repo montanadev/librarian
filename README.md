@@ -33,14 +33,6 @@ $ brew install node python@3.9 poetry libnfs imagemagick
 
 ### Installation
 
-The following secrets need to be set in the environment
-
-```bash
-export NFS_PATH="nfs://192.168.1.1/volume1/librarian"
-export GOOGLE_APPLICATION_CREDENTIALS="service-account"
-export SECRET_KEY="nvm5k(6t%ybnfd+8*)9r9p@hatnm#1%w3yx(#o1+zo44x2b3yd"
-```
-
 For the backend
 
 ```bash
