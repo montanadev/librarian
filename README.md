@@ -31,6 +31,19 @@ On macOS via Homebrew
 $ brew install node python@3.9 poetry libnfs imagemagick 
 ```
 
+### Google Cloud Vision API
+
+To perform OCR, create a service account with Google Cloud Platform that has permissions to the Cloud Vision API.
+
+See https://cloud.google.com/docs/authentication/getting-started for more info.
+
+Steps:
+
+1. Follow the "Creating a service account > Cloud Console" instructions. Create a new project, if necessary.
+2. After downloading the JSON key file, move it into this folder, rename it "service-account.json"
+3. Visit the [API library page](https://console.cloud.google.com/apis/library), search for "Cloud Vision API"
+4. Enable the "Cloud Vision API".
+
 ### Installation
 
 For the backend
