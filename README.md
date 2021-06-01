@@ -39,10 +39,10 @@ See https://cloud.google.com/docs/authentication/getting-started for more info.
 
 Steps:
 
-1. Follow the "Creating a service account > Cloud Console" instructions. Create a new project, if necessary.
-2. After downloading the JSON key file, move it into this folder, rename it "service-account.json"
-3. Visit the [API library page](https://console.cloud.google.com/apis/library), search for "Cloud Vision API"
-4. Enable the "Cloud Vision API".
+1. Follow the `Creating a service account > Cloud Console` instructions. Create a new project, if necessary.
+2. After downloading the JSON key file, move it into this folder, rename it `service-account.json`
+3. Visit the [API library page](https://console.cloud.google.com/apis/library), search for `Cloud Vision API`
+4. Enable the `Cloud Vision API`
 
 ### Installation
 
