@@ -37,7 +37,7 @@ The following secrets need to be set in the environment
 
 ```bash
 export NFS_PATH="nfs://192.168.1.1/volume1/librarian"
-export GOOGLE_APPLICATION_CREDENTIALS="/Users/nathan/gcv-key.json"
+export GOOGLE_APPLICATION_CREDENTIALS="service-account"
 export SECRET_KEY="nvm5k(6t%ybnfd+8*)9r9p@hatnm#1%w3yx(#o1+zo44x2b3yd"
 ```
 
@@ -62,7 +62,7 @@ See [Makefile](Makefile) for additional commands.
 | Name | Default | Example | Description |
 | --- | --- | --- | --- |
 | NFS_PATH | None | nfs://192.168.1.1/volume1/librarian | Path to an NFS folder to backup documents to |
-| GOOGLE_APPLICATION_CREDENTIALS | None | /Users/nathan/gcv-key.json | Path a JSON file containing service account credentials for Google Compute Vision |
+| GOOGLE_APPLICATION_CREDENTIALS | None | service-account.json | Path a JSON file containing service account credentials for Google Compute Vision |
 | SECRET_KEY | None | nvm5k(6t%ybnfd+8*)9r9p@hatnm#1%w3yx(#o1+zo44x2b3yd | Secret key for Django -- can generate one with `python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'` |
 
 ### Scripts

@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env("SECRET_KEY")
+SECRET_KEY = get_env("SECRET_KEY", "nvm5k(6t%ybnfd+8*)9r9p@hatnm#1%w3yx(#o1+zo44x2b3yd")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -122,5 +122,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-GOOGLE_APPLICATION_CREDENTIALS = get_env("GOOGLE_APPLICATION_CREDENTIALS")
-NFS_PATH = get_env("NFS_PATH")
+GOOGLE_APPLICATION_CREDENTIALS = get_env("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
+NFS_PATH = get_env("NFS_PATH", "nfs://192.168.1.1/volume1/librarian")
