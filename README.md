@@ -33,11 +33,7 @@ $ brew install node python@3.9 poetry libnfs imagemagick
 
 ### Google Cloud Vision API
 
-To perform OCR, create a service account with Google Cloud Platform that has permissions to the Cloud Vision API.
-
-See  for more info.
-
-Steps:
+Librarian's OCR is performed by GCV. It can't detect text without credentials to talk to GCV. To get your own credentials for Librarian to use:
 
 1. Go to https://cloud.google.com/docs/authentication/getting-started
 2. Follow the `Creating a service account > Cloud Console` instructions. Create a new project, if necessary.
