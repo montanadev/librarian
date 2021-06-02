@@ -1,4 +1,3 @@
-import enum
 import logging
 import os
 import subprocess
@@ -9,46 +8,13 @@ import libnfs
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from google.cloud import vision
 
-from librarian.utils import setattrs
+from librarian import annotate
+from librarian.api.models import DocumentStatus
+from librarian.utils.attrs import setattrs
+from librarian.utils.enum import BaseEnum
 
 logger = logging.getLogger(__name__)
-
-
-def annotate(content):
-    client = vision.ImageAnnotatorClient.from_service_account_file(
-        settings.GOOGLE_APPLICATION_CREDENTIALS
-    )
-    image = vision.Image(content=content)
-    pb_response = client.text_detection(image=image)
-
-    return pb_response.full_text_annotation.text, str(pb_response)
-
-
-class BaseEnum(enum.Enum):
-    @classmethod
-    def choices(cls):
-        return list((i.value, i.value) for i in cls.__members__.values())
-
-    def __str__(self):
-        return self.value
-
-    def __eq__(self, other):
-        return str(self) == str(other)
-
-
-class DocumentStatus(BaseEnum):
-    created = "CREATED"
-
-    persisting = "PERSISTING"
-    persisted = "PERSISTED"
-
-    translating_pdf_to_images = "TRANSLATING_PDF_TO_IMAGES"
-    translated_pdf_to_images = "TRANSLATED_PDF_TO_IMAGES"
-
-    annotating = "ANNOTATING"
-    annotated = "ANNOTATED"
 
 
 class DocumentJobJobs(BaseEnum):
@@ -57,76 +23,8 @@ class DocumentJobJobs(BaseEnum):
     annotate = "ANNOTATE"
 
 
-class Document(models.Model):
-    filename = models.TextField()
-    hash = models.TextField(null=True)
-    temp_path = models.TextField(null=True)
-    filestore_path = models.TextField(null=True)
-
-    status = models.TextField(choices=DocumentStatus.choices())
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def get_bytes_from_filestore(self):
-        nfs = libnfs.NFS(settings.NFS_PATH)
-
-        nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
-        b = nfs_f.read()
-        nfs_f.close()
-
-        return b
-
-    @classmethod
-    def create_from_filename(cls, filename):
-        return cls.objects.create(filename=filename, status=DocumentStatus.created)
-
-    def persist_to_filestore(self, content):
-        # store file uploaded by user to tempfile until persistence to blob store is
-        # complete
-        fd, path = tempfile.mkstemp()
-        with open(fd, "w+b") as f:
-            f.write(content)
-
-        self.temp_path = path
-        self.save()
-
-        DocumentJob.objects.create(
-            job=DocumentJobJobs.persist,
-            document=self,
-            current_status=DocumentStatus.persisting,
-            desired_status=DocumentStatus.persisted,
-        )
-
-    def translate_pdf_to_images(self):
-        DocumentJob.objects.create(
-            job=DocumentJobJobs.translate_pdf_to_images,
-            document=self,
-            current_status=DocumentStatus.translating_pdf_to_images,
-            desired_status=DocumentStatus.translated_pdf_to_images,
-        )
-
-    def annotate(self):
-        DocumentJob.objects.create(
-            job=DocumentJobJobs.annotate,
-            document=self,
-            current_status=DocumentStatus.annotating,
-            desired_status=DocumentStatus.annotated,
-        )
-
-
-class DocumentPageImage(models.Model):
-    document = models.ForeignKey(Document, on_delete=models.CASCADE)
-    page_number = models.IntegerField()
-
-    temp_path = models.TextField(null=True)
-
-    text = models.TextField(null=True)
-    metadata = models.TextField(null=True)
-
-
 class DocumentJob(models.Model):
-    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    document = models.ForeignKey('Document', on_delete=models.CASCADE)
     job = models.TextField(choices=DocumentJobJobs.choices())
 
     current_status = models.TextField(choices=DocumentStatus.choices())

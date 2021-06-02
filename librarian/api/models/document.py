@@ -1,0 +1,69 @@
+import logging
+import tempfile
+
+import libnfs
+from django.conf import settings
+from django.db import models
+
+from librarian.api.models import DocumentJob, DocumentJobJobs
+from librarian.api.models import DocumentStatus
+
+logger = logging.getLogger(__name__)
+
+
+class Document(models.Model):
+    filename = models.TextField()
+    hash = models.TextField(null=True)
+    temp_path = models.TextField(null=True)
+    filestore_path = models.TextField(null=True)
+
+    status = models.TextField(choices=DocumentStatus.choices())
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_bytes_from_filestore(self):
+        nfs = libnfs.NFS(settings.NFS_PATH)
+
+        nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
+        b = nfs_f.read()
+        nfs_f.close()
+
+        return b
+
+    @classmethod
+    def create_from_filename(cls, filename):
+        return cls.objects.create(filename=filename, status=DocumentStatus.created)
+
+    def persist_to_filestore(self, content):
+        # store file uploaded by user to tempfile until persistence to blob store is
+        # complete
+        fd, path = tempfile.mkstemp()
+        with open(fd, "w+b") as f:
+            f.write(content)
+
+        self.temp_path = path
+        self.save()
+
+        DocumentJob.objects.create(
+            job=DocumentJobJobs.persist,
+            document=self,
+            current_status=DocumentStatus.persisting,
+            desired_status=DocumentStatus.persisted,
+        )
+
+    def translate_pdf_to_images(self):
+        DocumentJob.objects.create(
+            job=DocumentJobJobs.translate_pdf_to_images,
+            document=self,
+            current_status=DocumentStatus.translating_pdf_to_images,
+            desired_status=DocumentStatus.translated_pdf_to_images,
+        )
+
+    def annotate(self):
+        DocumentJob.objects.create(
+            job=DocumentJobJobs.annotate,
+            document=self,
+            current_status=DocumentStatus.annotating,
+            desired_status=DocumentStatus.annotated,
+        )
