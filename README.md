@@ -37,7 +37,7 @@ Librarian's OCR is performed by GCV. It can't detect text without credentials to
 
 1. Go to https://cloud.google.com/docs/authentication/getting-started
 2. Follow the `Creating a service account > Cloud Console` instructions. Create a new project, if necessary.
-3. After downloading the JSON key file, move it into this folder, rename it `service-account.json`
+3. After downloading the JSON key file, move it into the librarian folder you just closed, rename it `service-account.json`
 4. Visit the [API library page](https://console.cloud.google.com/apis/library), search for `Cloud Vision API`
 5. Enable the `Cloud Vision API`
 
@@ -45,12 +45,19 @@ Librarian's OCR is performed by GCV. It can't detect text without credentials to
 
 For the backend
 
+Navigate to librarian folder and run the following:
+$ poetry install
+
+
+
 ```bash
 $ make migrate
 $ make run
 ```
 
 For the frontend
+
+Change direcory (cd) into the client and run the following:
 
 ```bash
 $ npm i
