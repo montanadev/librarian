@@ -4,13 +4,12 @@ import subprocess
 import tempfile
 from datetime import datetime
 
-import libnfs
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
 from librarian import annotate
-from librarian.api.models import DocumentStatus
+from librarian.api.models import DocumentStatus, DocumentPageImage
 from librarian.utils.attrs import setattrs
 from librarian.utils.enum import BaseEnum
 
@@ -46,12 +45,21 @@ class DocumentJob(models.Model):
 
         if self.job == DocumentJobJobs.persist:
             try:
-                # read temp file into nfs
-                nfs = libnfs.NFS(settings.NFS_PATH)
-                nfs_f = nfs.open("/" + dc.filename, mode="wb")
-                with open(dc.temp_path, "rb") as tmp_f:
-                    nfs_f.write(bytearray(tmp_f.read()))
-                nfs_f.close()
+                if settings.STORAGE_MODE == "local":
+                    # TODO - no need to open / write, just move from temp to filestore path
+                    with open(settings.LOCAL_STORAGE_PATH + "/" + dc.filename, mode="wb") as local_f, \
+                            open(dc.temp_path, "rb") as tmp_f:
+                        local_f.write(bytearray(tmp_f.read()))
+                elif settings.STORAGE_MODE == "nfs":
+                    import libnfs
+                    # read temp file into nfs
+                    nfs = libnfs.NFS(settings.NFS_PATH)
+                    nfs_f = nfs.open("/" + dc.filename, mode="wb")
+                    with open(dc.temp_path, "rb") as tmp_f:
+                        nfs_f.write(bytearray(tmp_f.read()))
+                    nfs_f.close()
+                else:
+                    raise Exception(f"Storage mode {settings.STORAGE_MODE} not recognized, quitting")
 
                 # cleanup temp file
                 os.remove(dc.temp_path)

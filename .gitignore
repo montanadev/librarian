@@ -4,3 +4,6 @@
 node_modules/
 *.pyc
 service-account.json
+local-storage/*.pdf
+local-storage/*.jpg
+local-storage/*.png

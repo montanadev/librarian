@@ -1,7 +1,6 @@
 import logging
 import tempfile
 
-import libnfs
 from django.conf import settings
 from django.db import models
 
@@ -23,11 +22,17 @@ class Document(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def get_bytes_from_filestore(self):
-        nfs = libnfs.NFS(settings.NFS_PATH)
-
-        nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
-        b = nfs_f.read()
-        nfs_f.close()
+        if settings.STORAGE_MODE == "local":
+            with open(settings.LOCAL_STORAGE_PATH + "/" + self.filestore_path, mode="rb") as f:
+                b = f.read()
+        elif settings.STORAGE_MODE == "nfs":
+            import libnfs
+            nfs = libnfs.NFS(settings.NFS_PATH)
+            nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
+            b = nfs_f.read()
+            nfs_f.close()
+        else:
+            raise Exception(f"Storage mode {settings.STORAGE_MODE} not recognized, quitting")
 
         return b
 

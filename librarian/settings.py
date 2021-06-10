@@ -124,3 +124,5 @@ REST_FRAMEWORK = {
 
 GOOGLE_APPLICATION_CREDENTIALS = get_env("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
 NFS_PATH = get_env("NFS_PATH", "nfs://192.168.1.1/volume1/librarian")
+LOCAL_STORAGE_PATH = get_env("LOCAL_STORAGE_PATH", "local-storage")
+STORAGE_MODE = get_env("STORAGE_MODE", "local")
