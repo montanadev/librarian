@@ -8,10 +8,10 @@ from rest_framework.decorators import api_view
 @api_view(["POST"])
 def config_create(request):
     data = json.loads(request.body)
-    print("Key for the config is", data['key'])
-    print("Value for the config is", data['value'])
+    gc_api_key = data['google_cloud_api_key']
+    nfs_path = data['nfs_path']
+    secret_key = data['secret_key']
 
     # TODO - create a database entry for the config
 
     return HttpResponse(status=status.HTTP_200_OK)
-
