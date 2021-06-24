@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Setup
+from librarian.api.models.config_models import Setup
 
 
 @api_view(["POST"])
@@ -13,6 +13,8 @@ def config_create(request):
     gc_api_key = data['google_cloud_api_key']
     nfs_path = data['nfs_path']
     secret_key = data['secret_key']
+
+    
 
 @api_view(["GET"])
 def config_get(request):
