@@ -2,12 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import 'antd/dist/antd.css';
-import Shell from './components/Shell';
+import App from './components/App';
 import {configureStore} from "./stores";
 import {Provider} from "react-redux";
 import Uploader from "./components/Uploader";
 import {HashRouter, Route, Switch} from "react-router-dom";
 import Viewer from "./components/Viewer";
+import {QueryClient, QueryClientProvider} from 'react-query';
 
 const store = configureStore({
     jobs: [],
@@ -21,20 +22,24 @@ const store = configureStore({
     breadcrumbs: [],
 });
 
+const queryClient = new QueryClient()
+
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
             <HashRouter>
-                <Shell>
-                    <Switch>
-                        <Route path="/documents/:documentId">
-                            <Viewer/>
-                        </Route>
-                        <Route path="/">
-                            <Uploader/>
-                        </Route>
-                    </Switch>
-                </Shell>
+                <QueryClientProvider client={queryClient}>
+                    <App>
+                        <Switch>
+                            <Route path="/documents/:documentId">
+                                <Viewer/>
+                            </Route>
+                            <Route path="/">
+                                <Uploader/>
+                            </Route>
+                        </Switch>
+                    </App>
+                </QueryClientProvider>
             </HashRouter>
         </Provider>
     </React.StrictMode>,
