@@ -29,4 +29,4 @@ def config_get(request):
     data = Setup.objects.first()
     read_data = SetupSerializer.data
 
-    return read_data, HttpResponse(status=status.HTTP_200_OK)
+    return JsonResponse(data=data, status=status.HTTP_200_OK)
