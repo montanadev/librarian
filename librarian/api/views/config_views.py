@@ -1,6 +1,6 @@
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 
@@ -18,7 +18,7 @@ def config_create(request):
 
     Setup.objects.all().delete()
 
-    Setup.objects.create(gc_api_key=google_cloud_api_key, nfs_path=nfs_path, secret_key=secret_key)
+    Setup.objects.create(gc_api_key=gc_api_key, nfs_path=nfs_path, secret_key=secret_key)
 
     return HttpResponse(status=status.HTTP_200_OK)
 
@@ -26,7 +26,7 @@ def config_create(request):
 def config_get(request):
 #get first line of data from database, serialize to make readable, and return
 
-    data = Setup.objects.first()
-    read_data = SetupSerializer.data
+    setup_data = Setup.objects.first()
+    read_data = SetupSerializer(setup_data).data
 
-    return JsonResponse(data=data, status=status.HTTP_200_OK)
+    return JsonResponse(data=read_data, status=status.HTTP_200_OK)
