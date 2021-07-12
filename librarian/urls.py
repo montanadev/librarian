@@ -6,8 +6,8 @@ from librarian.api.views import document_views, config_views
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    path("api/config/", config_views.config_create),
-    path("api/config/read", config_views.config_get),
+    path("api/config/", config_views.config_create, name='setup-data'),
+    path("api/config/read", config_views.config_get, name='get-data'),
 
     path("api/documents/", document_views.DocumentListView.as_view()),
     path("api/documents/<str:filename>", document_views.document_create, name='document-create'),
