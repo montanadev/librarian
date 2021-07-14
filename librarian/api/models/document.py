@@ -16,7 +16,7 @@ class Document(models.Model):
     temp_path = models.TextField(null=True)
     filestore_path = models.TextField(null=True)
 
-    status = models.TextField(choices=DocumentStatus.choices())
+    status = models.TextField(choices=DocumentStatus.choices(), default=DocumentStatus.created.value)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
