@@ -14,9 +14,12 @@ class TestConfigViews(TestCase):
                      'secret_key': 'test_key'
                      }
 
+
         # request is sending data to the model
         url = reverse('setup-data')
-        response = client.post(url, test_data, format="json")
+        url_with_query_parameters = url + "?hello=world"
+
+        response = client.post(url_with_query_parameters, test_data, format="json")
         self.assertEqual(response.status_code, 200)
 
         setup_content = Setup.objects.all()
