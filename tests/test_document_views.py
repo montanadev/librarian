@@ -50,6 +50,19 @@ class TestDocumentViews(TestCase):
         no_tax_documents = Document.objects.exclude(filename__contains="tax")
         self.assertEqual(len(no_tax_documents), 3)
 
+    def test_document_search(self):
+        client = APIClient()
+
+        Document.objects.create(filename="taxes 2020", status=DocumentStatus.annotated.value)
+        Document.objects.create(filename="taxes 2021", status=DocumentStatus.created.value)
+        Document.objects.create(filename="Refi Loan Doc")
+        Document.objects.create(filename="dog vaccine record")
+        Document.objects.create(filename="birth certificate")
+
+        url = reverse('document-search')
+        url_with_query_parameters = url + "?q=taxes"
+        response = client.get(url_with_query_parameters)
+        self.assertEqual(response.status_code, 200)
 
 
 

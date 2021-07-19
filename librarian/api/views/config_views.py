@@ -31,8 +31,5 @@ def config_get(request):
 
     return JsonResponse(data=read_data, status=status.HTTP_200_OK)
 
-@api_view(retrieveAPIView)
-def config_search(query):
 
-    return HttpResponse(status=status.HTTP_200_OK)
 
