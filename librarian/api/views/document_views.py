@@ -44,11 +44,13 @@ def document_create(request, filename):
 
 @api_view(["GET"])
 def document_search(request):
-
-
     search_term = request.query_params['q']
 
     search_results = Document.objects.filter(filename__contains=search_term)
+    serializer = DocumentSerializer(search_results, many=True)
     import pdb;pdb.set_trace()
+    serializer.data
 
-    return HttpResponse(status=status.HTTP_200_OK)
+
+
+    return JsonResponse(data, status=status.HTTP_200_OK)
