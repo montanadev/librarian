@@ -1,10 +1,12 @@
 import React from 'react';
-import './Shell.css';
+import './App.css';
 
 import {Breadcrumb, Layout, Menu} from 'antd';
 import Sidebar from "./Sidebar";
 import {RootState} from "../stores";
 import {useSelector} from 'react-redux';
+import { useQuery } from 'react-query';
+import {SetupWizard} from "./SetupWizard";
 
 const {Header, Content} = Layout;
 
@@ -12,7 +14,7 @@ interface AppProps {
     children: any
 }
 
-function Shell(props: AppProps) {
+function App(props: AppProps) {
     const {breadcrumbs} = useSelector((state: RootState) => {
         if (!state) {
             return {}
@@ -22,8 +24,17 @@ function Shell(props: AppProps) {
         };
     });
 
+    const { isLoading, error, data } = useQuery('config', () =>
+        fetch('http://0.0.0.0:8000/api/config/').then(res => res.json())
+    , {retry: false});
+
+    if (error) {
+        console.log(error);
+    }
+
     return (
         <Layout>
+            <SetupWizard visible={true} />
             <Header className="header AppHeader">
                 <div className="AppLogo">
                     librarian
@@ -51,4 +62,4 @@ function Shell(props: AppProps) {
     );
 }
 
-export default Shell;
+export default App;
