@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 
 import {Breadcrumb, Button, Input, Layout, Menu} from 'antd';
@@ -9,7 +9,8 @@ import {useQuery} from 'react-query';
 import {SetupWizard} from "./SetupWizard";
 import {useState} from 'react';
 import {SearchOutlined} from '@ant-design/icons';
-import { useHistory } from 'react-router';
+import {useHistory} from 'react-router';
+import {Link} from 'react-router-dom';
 
 const {Header, Content} = Layout;
 
@@ -57,7 +58,7 @@ function App(props: AppProps) {
                     librarian
                 </div>
                 <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-                    <Menu.Item key="1">Home</Menu.Item>
+                    <Menu.Item key="1"><Link to={'/'}>Home</Link></Menu.Item>
                     <Menu.Item key="2">Docs</Menu.Item>
                     <Menu.Item key="3">Search</Menu.Item>
                     <Menu.Item onClick={() => setWizardOpen(true)} key="4">Settings</Menu.Item>
