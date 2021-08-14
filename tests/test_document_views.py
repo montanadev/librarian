@@ -1,17 +1,17 @@
 from django.test import TestCase
-from django.urls import reverse
 from rest_framework.test import APIClient
 
-from librarian.api.models import Document, DocumentStatus
+from librarian.api.models import Document, DocumentStatus, DocumentPageImage
+from tests.helpers import reverse
 
 
 class TestDocumentViews(TestCase):
+    def setUp(self):
+        self.client = APIClient()
 
     def test_create_document(self):
-        client = APIClient()
-
         url = reverse('document-create', args=('testfile',))
-        response = client.post(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
 
         documents = Document.objects.all()
@@ -20,6 +20,30 @@ class TestDocumentViews(TestCase):
 
         document = documents[0]
         self.assertEqual(document.filename, "testfile")
+
+    def test_search_document_pages(self):
+        doc_a = Document.objects.create(filename='a')
+        doc_a_page_1 = DocumentPageImage.objects.create(document=doc_a, page_number=1, text='my egg is dirty, please may i have a new one')
+
+        doc_b = Document.objects.create(filename='b')
+        doc_b_page_1 = DocumentPageImage.objects.create(document=doc_b, page_number=1, text='this omelette is eggcellent')
+
+        url = reverse('document-text-search', query_params={'q': 'egg'})
+        response = self.client.get(url)
+        # should return two results
+        self.assertTrue(len(response.json()), 2)
+
+        # should contain both page ids
+        page_ids = [i['id'] for i in response.json()]
+        self.assertTrue(all([i.id in page_ids for i in [doc_a_page_1, doc_b_page_1]]))
+
+        url = reverse('document-text-search', query_params={'q': 'dirt'})
+        response = self.client.get(url)
+        # should return one result
+        self.assertTrue(len(response.json()), 1)
+
+        # should contain the single page id
+        self.assertTrue(response.json()[0]['id'] == doc_a_page_1.id)
 
     def test_find_document(self):
         Document.objects.create(filename="tax 2020", status=DocumentStatus.annotated.value)

@@ -7,6 +7,7 @@ import {RootState} from "../stores";
 import {useSelector} from 'react-redux';
 import { useQuery } from 'react-query';
 import {SetupWizard} from "./SetupWizard";
+import { useState } from 'react';
 
 const {Header, Content} = Layout;
 
@@ -15,6 +16,8 @@ interface AppProps {
 }
 
 function App(props: AppProps) {
+    const [wizardOpen, setWizardOpen] = useState(false)
+
     const {breadcrumbs} = useSelector((state: RootState) => {
         if (!state) {
             return {}
@@ -34,7 +37,7 @@ function App(props: AppProps) {
 
     return (
         <Layout>
-            <SetupWizard visible={true} />
+            <SetupWizard visible={wizardOpen} onClose={() => setWizardOpen(false)} />
             <Header className="header AppHeader">
                 <div className="AppLogo">
                     librarian
@@ -43,6 +46,7 @@ function App(props: AppProps) {
                     <Menu.Item key="1">Home</Menu.Item>
                     <Menu.Item key="2">Docs</Menu.Item>
                     <Menu.Item key="3">Search</Menu.Item>
+                    <Menu.Item onClick={() => setWizardOpen(true)} key="4">Settings</Menu.Item>
                 </Menu>
             </Header>
             <Layout>

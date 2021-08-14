@@ -4,9 +4,10 @@ import {Note} from "./Note";
 
 interface Props {
     visible: boolean;
+    onClose: () => void;
 }
 
-export function SetupWizard({visible}: Props) {
+export function SetupWizard({visible, onClose}: Props) {
     const {register, handleSubmit, control} = useForm();
 
     const onSubmit = (data: any) => {
@@ -18,6 +19,7 @@ export function SetupWizard({visible}: Props) {
 
     return <Modal
         visible={visible}
+        onCancel={onClose}
         title="Setup Wizard"
         footer={[]}
     >
@@ -60,7 +62,7 @@ export function SetupWizard({visible}: Props) {
                 )} />
             
             <br />
-            <Button key="back">
+            <Button onClick={onClose}>
                 Return
             </Button>
             <button type="submit">
