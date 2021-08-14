@@ -1,4 +1,8 @@
+import pdb
+import json
+
 from django.http import HttpResponse, JsonResponse
+
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
@@ -38,3 +42,16 @@ def document_create(request, filename):
     data = DocumentSerializer(dc).data
 
     return JsonResponse(data=data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def document_search(request):
+    search_term = request.query_params['q']
+
+    search_results = Document.objects.filter(filename__contains=search_term)
+
+    serializer = DocumentSerializer(search_results, many=True)
+
+    data = serializer.data
+
+    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
