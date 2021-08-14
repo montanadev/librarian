@@ -12,7 +12,7 @@ urlpatterns = [
 
     # search endpoints
     path("api/documents/search", document_views.document_search, name='document-search'),
-    path("api/documents/text/search", document_views.DocumentTextSearchView.as_view(), name='document-text-search')
+    path("api/documents/text/search", document_views.DocumentTextSearchView.as_view(), name='document-text-search'),
 
     # document endpoints
     path("api/documents/", document_views.DocumentListView.as_view()),
