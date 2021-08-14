@@ -13,7 +13,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 class DocumentPageImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentPageImage
-        fields = ('document', 'text')
+        fields = ('id', 'document', 'text')
 
 
 class SetupSerializer(serializers.ModelSerializer):
