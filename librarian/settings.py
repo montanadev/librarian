@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -62,7 +63,9 @@ ROOT_URLCONF = "librarian.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, 'client')
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -114,6 +117,9 @@ USE_TZ = True
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5000000000 # 5GB
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'client', 'build', 'static'),
+)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

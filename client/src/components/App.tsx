@@ -25,7 +25,7 @@ function App(props: AppProps) {
     });
 
     const { isLoading, error, data } = useQuery('config', () =>
-        fetch('http://0.0.0.0:8000/api/config/').then(res => res.json())
+        fetch('/api/config/').then(res => res.json())
     , {retry: false});
 
     if (error) {
