@@ -9,6 +9,7 @@ import Uploader from "./components/Uploader";
 import {HashRouter, Route, Switch} from "react-router-dom";
 import Viewer from "./components/Viewer";
 import {QueryClient, QueryClientProvider} from 'react-query';
+import Search from "./components/Search";
 
 const store = configureStore({
     jobs: [],
@@ -33,6 +34,9 @@ ReactDOM.render(
                         <Switch>
                             <Route path="/documents/:documentId">
                                 <Viewer/>
+                            </Route>
+                            <Route path="/search">
+                                <Search/>
                             </Route>
                             <Route path="/">
                                 <Uploader/>
