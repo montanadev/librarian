@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from env_utils import get_env
+from env_utils import get_env, get_bool
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -127,6 +127,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
 }
+
+LOCAL_FRONTEND = get_bool("LOCAL_FRONTEND", False)
 
 GOOGLE_APPLICATION_CREDENTIALS = get_env("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
 NFS_PATH = get_env("NFS_PATH", "nfs://192.168.1.1/volume1/librarian")
