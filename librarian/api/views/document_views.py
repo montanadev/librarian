@@ -7,8 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
 
-from librarian.api.models import Document
-from librarian.api.serializers import DocumentSerializer
+from librarian.api.models import Document, DocumentPageImage
+from librarian.api.serializers import DocumentSerializer, DocumentPageImageSerializer
 
 
 class DocumentListView(ListAPIView):
@@ -29,6 +29,14 @@ class DocumentDataView(RetrieveAPIView):
         data = dc.get_bytes_from_filestore()
 
         return HttpResponse(bytes(data), headers={"Content-Type": "application/pdf"}, status=status.HTTP_200_OK)
+
+
+class DocumentTextSearchView(RetrieveAPIView):
+    def get(self, request, *args, **kwargs):
+        pages = DocumentPageImage.objects.filter(text__contains=request.query_params['q'])
+
+        serializer = DocumentPageImageSerializer(pages, many=True)
+        return JsonResponse(data=serializer.data, safe=False)
 
 
 @api_view(["POST"])
