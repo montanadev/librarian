@@ -1,18 +1,7 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim
 
-RUN apk update && \
-    apk add --no-cache \
-        musl-dev \
-        python3-dev \
-        openssl-dev \
-        postgresql-dev \
-        ca-certificates \
-        wget \
-        libffi-dev \
-        gcc \
-        g++ \
-        rust \
-        cargo
+RUN apt-get update
+RUN apt-get install make
 
 RUN pip install -U pip && \
     pip install poetry
