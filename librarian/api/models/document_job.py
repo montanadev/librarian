@@ -141,18 +141,18 @@ class DocumentJob(models.Model):
 
         if self.job == DocumentJobJobs.annotate:
             try:
-                logger.debug(f"Annotating {dc.documentpageimage_set.count()} pages...")
-                for page in dc.documentpageimage_set.all():
+                logger.debug(f"Annotating {dc.pages.count()} pages...")
+                for page in dc.pages.all():
                     with open(page.temp_path, mode="r+b") as tmp_f:
                         text, metadata = annotate(tmp_f.read())
                         setattrs(page, text=text, metadata=metadata)
                         page.save()
 
-                logger.debug(f"Annotating {dc.documentpageimage_set.count()} pages...done")
+                logger.debug(f"Annotating {dc.pages.count()} pages...done")
 
                 logger.debug(f"Freeing up /tmp image files...")
 
-                for page in dc.documentpageimage_set.all():
+                for page in dc.pages.all():
                     os.remove(page.temp_path)
                     page.temp_path = None
                     page.save()
