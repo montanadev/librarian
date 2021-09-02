@@ -34,7 +34,7 @@ class DocumentDataView(RetrieveAPIView):
 class DocumentTextSearchView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         pages = DocumentPageImage.objects.filter(text__contains=request.query_params['q'])
-
+        import pdb;pdb.set_trace()
         serializer = DocumentPageImageSerializer(pages, many=True)
         return JsonResponse(data=serializer.data, safe=False)
 
