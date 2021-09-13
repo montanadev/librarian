@@ -14,9 +14,13 @@ from librarian.api.serializers import DocumentSerializer, DocumentPageImageSeria
 def text_search(metadata, q):
     textAnnotations = metadata['textAnnotations']
 
+    bounding_vertices = []
+
     for item in textAnnotations:
         if item['description'] == q:
-            return item['boundingPoly']['vertices']
+            bounding_vertices.append(item['boundingPoly']['vertices'])
+
+    return bounding_vertices
 
 
 class DocumentListView(ListAPIView):
