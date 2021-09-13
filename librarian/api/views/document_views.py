@@ -11,6 +11,14 @@ from librarian.api.models import Document, DocumentPageImage
 from librarian.api.serializers import DocumentSerializer, DocumentPageImageSerializer
 
 
+def text_search(metadata, q):
+    textAnnotations = metadata['textAnnotations']
+
+    for item in textAnnotations:
+        if item['description'] == q:
+            return item['boundingPoly']['vertices']
+
+
 class DocumentListView(ListAPIView):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer

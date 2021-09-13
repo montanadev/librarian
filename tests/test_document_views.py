@@ -2,6 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from librarian.api.models import Document, DocumentStatus, DocumentPageImage
+from librarian.api.views.document_views import text_search
 from tests.helpers import reverse
 
 
@@ -126,10 +127,10 @@ class TestDocumentViews(TestCase):
     def test_document_text_search(self):
         client = APIClient()
 
-        url = reverse('document-text-search')
-        url_with_query_parameters = url + "?q=file"
-        response = client.get(url_with_query_parameters)
-        self.assertEqual(response.status_code, 200)
+        # url = reverse('document-text-search')
+        # url_with_query_parameters = url + "?q=file"
+        # response = client.get(url_with_query_parameters)
+        # self.assertEqual(response.status_code, 200)
 
 
         fake_metadata = {'faceAnnotations': [],
@@ -489,28 +490,44 @@ class TestDocumentViews(TestCase):
                                               'mid': '',
                                               'properties': [],
                                               'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 327, 'y': 151},
+                                                                            {'x': 373, 'y': 150},
+                                                                            {'x': 373, 'y': 174},
+                                                                            {'x': 327, 'y': 175}]},
+                                              'confidence': 0.0,
+                                              'description': 'file',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 327, 'y': 151},
+                                                                            {'x': 373, 'y': 150},
+                                                                            {'x': 373, 'y': 174},
+                                                                            {'x': 327, 'y': 175}]},
+                                              'confidence': 0.0,
+                                              'description': 'file',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
                                               'topicality': 0.0}]}
 
         q = "file"
-        #return fake_metadata(dict_name['boundingPoly']
-        #traverse dictionary - for loop
-            #for x,metadata in dict.items:
-            # for key,value in metadata.items():
-        #...etc...
+
+        vertices = text_search(fake_metadata, q)
+        self.assertEqual(len(vertices), 4)
+
+        q = 'nothing'
+        description = text_search(fake_metadata, q)
+        self.assertEqual(description, None)
 
 
-    #    q = fake_metadata['faceAnnotation']
-    #    self.assertEqual(q, [])
 
-    #dictionary = fake_metdata - contains 7 keys, text contained in key: 'textAnnotations' under key: 'description'
 
-#first brain dump:
-    for metadata in fake_metadata.keys():
-        if key == 'textAnnotations':
-            for key,value in metadata.items(): #there is a list here
-                if key == 'description':
-                    return(value)
-
-   # fake_metadata[]...['textAnnotations'][0]
-    #description == 'file'
 
