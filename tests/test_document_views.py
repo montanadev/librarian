@@ -508,7 +508,7 @@ class TestDocumentViews(TestCase):
     for metadata in fake_metadata.keys():
         if key == 'textAnnotations':
             for key,value in metadata.items(): #there is a list here
-                if key == 'description'
+                if key == 'description':
                     return(value)
 
    # fake_metadata[]...['textAnnotations'][0]
