@@ -529,3 +529,11 @@ class TestDocumentViews(TestCase):
         q = 'nothing'
         description = text_search(fake_metadata, q)
         self.assertEqual(description, [])
+
+        q = "fil"
+        vertices = text_search(fake_metadata, q)
+        self.assertEqual(len(vertices), 3)
+        self.assertEqual(len(vertices[0]), 4)
+        self.assertEqual(vertices[0][0]['x'], 327)
+        self.assertEqual(vertices[0][1]['y'], 150)
+        self.assertEqual(vertices[1][0]['x'], 227)
