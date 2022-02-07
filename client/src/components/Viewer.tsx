@@ -3,7 +3,7 @@ import './Uploader.css';
 import {useParams} from "react-router-dom";
 import {Spin} from "antd";
 
-import {Document, Page} from 'react-pdf/dist/esm/entry.webpack';
+import {Document, Page} from 'react-pdf';
 import {useContainerDimensions} from "../utils/useContainerDimenstions";
 import {SET_BREADCRUMB} from "../stores";
 import {useDispatch} from "react-redux";

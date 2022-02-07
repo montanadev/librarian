@@ -7,7 +7,6 @@ from librarian.api.views import document_views, config_views
 from librarian.api.views.static_views import index
 
 urlpatterns = [
-    path("", index),
 
     path("admin/", admin.site.urls),
 
@@ -24,6 +23,8 @@ urlpatterns = [
     path("api/documents/<int:id>/details", document_views.DocumentView.as_view()),
     path("api/documents/<int:id>/data", document_views.DocumentDataView.as_view()),
 
+    path("<path:resource>", index),
+    path("", index),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
