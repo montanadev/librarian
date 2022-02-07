@@ -1,6 +1,9 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {useLocation} from "react-router";
+import {DocumentModel} from "../models/Document";
+import {Link} from 'react-router-dom';
+import {DocumentTextModel} from "../models/DocumentText";
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -23,12 +26,25 @@ function Search() {
         }).then(d => setDocumentTextSearch(d.data))
     }, [q])
 
+    const formatDocumentLinks = (links: Array<DocumentModel>) => {
+        return <ul>{links.map(l => {
+            return <li><Link to={`documents/${l.id}`}>{l.filename}</Link></li>;
+        })}</ul>;
+    }
+
+    const formatDocumentTextLinks = (links: Array<DocumentTextModel>) => {
+        return <ul>{links.map(l => {
+            return <li><Link to={`documents/${l.id}`}>{l.text}</Link></li>;
+        })}</ul>;
+    }
+
     return <div>
         <h1>Document Search</h1>
-        <p>{JSON.stringify(documentSearch)}</p>
+        {documentSearch.length ? <div>{formatDocumentLinks(documentSearch)}</div> : <p>No document titles found...</p>}
+
 
         <h1>Document Text Search</h1>
-        <p>{JSON.stringify(documentTextSearch)}</p>
+        {documentTextSearch.length ? <div>{formatDocumentTextLinks(documentTextSearch)}</div> : <p>No documents titles found...</p>}
     </div>
 }
 

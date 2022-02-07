@@ -20,4 +20,4 @@ COPY client/build /srv/librarian/static
 # see https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
 COPY policy.xml /etc/ImageMagick-6/policy.xml
 
-CMD ["/usr/bin/supervisord"]
+CMD ["bash", "-c", "cd /srv && make migrate && supervisord"]
