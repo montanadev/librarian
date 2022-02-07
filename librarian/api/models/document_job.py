@@ -62,7 +62,7 @@ class DocumentJob(models.Model):
                     raise Exception(f"Storage mode {settings.STORAGE_MODE} not recognized, quitting")
 
                 # cleanup temp file
-                os.remove(dc.temp_path)
+                #os.remove(dc.temp_path)
 
                 setattrs(
                     dc,
@@ -93,23 +93,26 @@ class DocumentJob(models.Model):
                 b = dc.get_bytes_from_filestore()
 
                 d = tempfile.mkdtemp()
-                with tempfile.NamedTemporaryFile() as f:
-                    f.write(b)
+                f = tempfile.mktemp()
+                with open(f, "wb") as content:
+                    content.write(b)
 
-                    cmd = f"convert -density 150 {f.name} -quality 90 {d}/output.png"
+                cmd = f"convert -density 150 {f} -quality 90 {d}/output.png"
 
-                    start_time = datetime.now()
-                    logger.debug(f"Starting conversion...: \n{cmd}")
+                start_time = datetime.now()
+                logger.debug(f"Starting conversion...: \n{cmd}")
 
-                    subprocess.call(cmd.split(" "))
+                subprocess.call(cmd.split(" "))
 
-                    duration = (datetime.now() - start_time).total_seconds()
-                    logger.debug(
-                        f"Starting conversion...done in {duration}s: \n{cmd}"
-                    )
+                duration = (datetime.now() - start_time).total_seconds()
+                logger.debug(
+                    f"Starting conversion...done in {duration}s: \n{cmd}"
+                )
 
+                seen = 0
                 # list images from pdf split
                 for filename in os.listdir(d):
+                    seen += 1
                     page_number = 0
 
                     if filename != "output.png":
@@ -120,6 +123,10 @@ class DocumentJob(models.Model):
 
                     DocumentPageImage.objects.create(document=dc, temp_path=f"{d}/{filename}",
                                                      page_number=int(page_number))
+
+                if not seen:
+                    logger.warning(f"No images detected from imagemagick convert command: '{cmd}'")
+                logger.debug(f"Stored {seen} pages from imagemagick convert command")
 
                 dc.status = self.desired_status
                 dc.save()
@@ -153,9 +160,10 @@ class DocumentJob(models.Model):
                 logger.debug(f"Freeing up /tmp image files...")
 
                 for page in dc.pages.all():
-                    os.remove(page.temp_path)
-                    page.temp_path = None
-                    page.save()
+                    pass
+                    #os.remove(page.temp_path)
+                    #page.temp_path = None
+                    #page.save()
 
                 logger.debug(f"Freeing up /tmp image files...done")
 

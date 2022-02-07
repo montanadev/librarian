@@ -1,0 +1,4 @@
+samples/
+local-storage/
+tests/
+node_modules/
