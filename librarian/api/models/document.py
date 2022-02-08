@@ -37,8 +37,8 @@ class Document(models.Model):
         return b
 
     @classmethod
-    def create_from_filename(cls, filename):
-        return cls.objects.create(filename=filename, status=DocumentStatus.created)
+    def create_from_filename(cls, filename, hash):
+        return cls.objects.create(filename=filename, hash=hash, status=DocumentStatus.created)
 
     def persist_to_filestore(self, content):
         # store file uploaded by user to tempfile until persistence to blob store is

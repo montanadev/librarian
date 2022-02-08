@@ -132,5 +132,13 @@ LOCAL_FRONTEND = get_bool("LOCAL_FRONTEND", False)
 
 GOOGLE_APPLICATION_CREDENTIALS = get_env("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
 NFS_PATH = get_env("NFS_PATH", "nfs://192.168.1.1/volume1/librarian")
-LOCAL_STORAGE_PATH = get_env("LOCAL_STORAGE_PATH", "local-storage")
+LOCAL_STORAGE_PATH = get_env("LOCAL_STORAGE_PATH", str(BASE_DIR.joinpath(Path('local-storage'))))
 STORAGE_MODE = get_env("STORAGE_MODE", "local")
+
+# make local folder if not exists
+# TODO - this may be dangerous
+if STORAGE_MODE == "local":
+    try:
+        os.mkdir(LOCAL_STORAGE_PATH)
+    except FileExistsError:
+        pass

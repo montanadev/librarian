@@ -3,6 +3,9 @@
 run:
 	poetry run ./manage.py runserver
 
+run-worker:
+	poetry run ./manage.py worker
+
 migrate:
 	poetry run ./manage.py migrate
 

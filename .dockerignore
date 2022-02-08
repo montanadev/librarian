@@ -1,0 +1,6 @@
+samples/
+local-storage/
+tests/
+node_modules/
+
+*.sqlite3

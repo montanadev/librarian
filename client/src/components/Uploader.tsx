@@ -15,7 +15,7 @@ const Uploader = () => {
     useEffect(() => {
         dispatch({
             type: SET_BREADCRUMB,
-            payload: ["Docs", "Upload"]
+            payload: ["Home", "Upload"]
         })
     }, [])
 

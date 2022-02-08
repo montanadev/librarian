@@ -3,6 +3,7 @@
 *.sqlite3
 node_modules/
 *.pyc
+build/
 service-account.json
 local-storage/*.pdf
 local-storage/*.jpg

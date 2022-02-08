@@ -23,12 +23,6 @@ export function SetupWizard({visible, onClose}: Props) {
         title="Setup Wizard"
         footer={[]}
     >
-        <Note>
-            Can also edit these on the Settings page
-        </Note>
-
-        <br/>
-
         <form onSubmit={handleSubmit(onSubmit)}>
             <h3>Storage Options</h3>
             <Controller

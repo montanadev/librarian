@@ -21,6 +21,10 @@ class TestDocumentViews(TestCase):
         document = documents[0]
         self.assertEqual(document.filename, "testfile")
 
+        # reposting same empty body generates the same hash, returns 400
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 400)
+
     def test_search_document_pages(self):
         doc_a = Document.objects.create(filename='a')
         doc_a_page_1 = DocumentPageImage.objects.create(document=doc_a, page_number=1, text='my egg is dirty, please may i have a new one')
@@ -120,15 +124,3 @@ class TestDocumentViews(TestCase):
         self.assertEqual(len(created_taxes_documents), 1)
         self.assertEqual(created_taxes_documents[0].filename, "taxes 2021")
         self.assertEqual(created_taxes_documents[0].status, DocumentStatus.created.value)
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,10 +3,11 @@ import './Uploader.css';
 import {useParams} from "react-router-dom";
 import {Spin} from "antd";
 
-import {Document, Page} from 'react-pdf/dist/esm/entry.webpack';
+import {Document, Page} from 'react-pdf';
 import {useContainerDimensions} from "../utils/useContainerDimenstions";
 import {SET_BREADCRUMB} from "../stores";
 import {useDispatch} from "react-redux";
+import {DocumentModel} from "../models/Document";
 //import {VariableSizeList} from 'react-window';
 
 
@@ -18,8 +19,15 @@ const Viewer = () => {
     useEffect(() => {
         dispatch({
             type: SET_BREADCRUMB,
-            payload: ["Docs", "Recent"]
+            payload: ["Docs"]
         })
+
+        fetch(`http://0.0.0.0:8000/api/documents/${documentId}/details`).then(d => d.json()).then((document: DocumentModel) => {
+            dispatch({
+                type: SET_BREADCRUMB,
+                payload: ["Docs", document.filename]
+            })
+        });
     }, [])
 
     const [numPages, setNumPages] = useState(null);

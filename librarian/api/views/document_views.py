@@ -1,14 +1,15 @@
-import pdb
-import json
+import logging
 
 from django.http import HttpResponse, JsonResponse
-
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
 
 from librarian.api.models import Document, DocumentPageImage
 from librarian.api.serializers import DocumentSerializer, DocumentPageImageSerializer
+from librarian.utils.hash import md5_for_bytes
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentListView(ListAPIView):
@@ -41,15 +42,15 @@ class DocumentTextSearchView(RetrieveAPIView):
 
 @api_view(["POST"])
 def document_create(request, filename):
-    dc = Document.create_from_filename(filename)
+    doc_hash = md5_for_bytes(request.body)
+    if Document.objects.filter(hash=doc_hash).exists():
+        logger.warning("Document hash already uploaded, skipping")
+        return HttpResponse("Document already uploaded", status=status.HTTP_400_BAD_REQUEST)
+
+    dc = Document.create_from_filename(filename, doc_hash)
     dc.persist_to_filestore(request.body)
 
-    if request.content_type == "application/pdf":
-        pass
-
-    data = DocumentSerializer(dc).data
-
-    return JsonResponse(data=data, status=status.HTTP_200_OK)
+    return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -59,7 +60,4 @@ def document_search(request):
     search_results = Document.objects.filter(filename__contains=search_term)
 
     serializer = DocumentSerializer(search_results, many=True)
-
-    data = serializer.data
-
-    return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+    return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
