@@ -62,7 +62,7 @@ class DocumentJob(models.Model):
                     raise Exception(f"Storage mode {settings.STORAGE_MODE} not recognized, quitting")
 
                 # cleanup temp file
-                #os.remove(dc.temp_path)
+                os.remove(dc.temp_path)
 
                 setattrs(
                     dc,
@@ -93,11 +93,10 @@ class DocumentJob(models.Model):
                 b = dc.get_bytes_from_filestore()
 
                 d = tempfile.mkdtemp()
-                f = tempfile.mktemp()
-                with open(f, "wb") as content:
-                    content.write(b)
+                with tempfile.NamedTemporaryFile() as f:
+                    f.write(b)
 
-                cmd = f"convert -density 150 {f} -quality 90 {d}/output.png"
+                cmd = f"convert -density 150 {f.name} -quality 90 {d}/output.png"
 
                 start_time = datetime.now()
                 logger.debug(f"Starting conversion...: \n{cmd}")
@@ -160,10 +159,9 @@ class DocumentJob(models.Model):
                 logger.debug(f"Freeing up /tmp image files...")
 
                 for page in dc.pages.all():
-                    pass
-                    #os.remove(page.temp_path)
-                    #page.temp_path = None
-                    #page.save()
+                    os.remove(page.temp_path)
+                    page.temp_path = None
+                    page.save()
 
                 logger.debug(f"Freeing up /tmp image files...done")
 
