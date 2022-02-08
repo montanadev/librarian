@@ -37,7 +37,6 @@ export const addToLibrary = (acceptedFiles: any) => async (dispatch: Dispatch, s
             body: file,
         }).then(d => d.json())
         .then(((document: any) => {
-                console.log('here!');
                 dispatch({
                     type: ADD_JOB,
                     payload: document,
