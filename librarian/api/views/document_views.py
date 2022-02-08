@@ -11,6 +11,7 @@ from librarian.utils.hash import md5_for_bytes
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentListView(ListAPIView):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
