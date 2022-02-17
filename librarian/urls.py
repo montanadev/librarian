@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from librarian.api.views import document_views, config_views
+from librarian.api.views import document_views, config_views, folder_views
 from librarian.api.views.static_views import index
 
 urlpatterns = [
@@ -18,11 +18,16 @@ urlpatterns = [
     path("api/documents/search", document_views.document_search, name='document-search'),
     path("api/documents/text/search", document_views.DocumentTextSearchView.as_view(), name='document-text-search'),
 
+    # document endpoints
     path("api/documents/", document_views.DocumentListView.as_view()),
     path("api/documents/<str:filename>", document_views.document_create, name='document-create'),
     path("api/documents/<int:id>/details", document_views.DocumentView.as_view()),
     path("api/documents/<int:id>/data", document_views.DocumentDataView.as_view()),
 
+    # folder endpoints
+    path("api/folders/", folder_views.FolderListView.as_view(), name='folder-create'),
+
+    # static file endpoints
     path("<path:resource>", index),
     path("", index),
 ]
