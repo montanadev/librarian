@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Document(models.Model):
+    id = models.BigAutoField(primary_key=True)
     filename = models.TextField()
     hash = models.TextField(null=True)
     temp_path = models.TextField(null=True)
