@@ -1,35 +1,18 @@
-import React, {useCallback, useEffect} from "react";
+import React, {useCallback, useState} from "react";
 import './Uploader.css';
 import {useDropzone} from "react-dropzone";
-import {useDispatch, useSelector} from "react-redux";
-import {addToLibrary} from "../actions/Library";
 import {List} from 'antd';
 import {FileAddOutlined} from '@ant-design/icons';
 import Job from "./Job";
-import {RootState, SET_BREADCRUMB} from "../stores";
+import {Api} from "../utils/Api";
 
 
 const Uploader = () => {
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch({
-            type: SET_BREADCRUMB,
-            payload: ["Home", "Upload"]
-        })
-    }, [])
-
-    const {jobs} = useSelector((state: RootState) => {
-        if (!state) {
-            return {}
-        }
-        return {
-            jobs: state.jobs,
-        };
-    });
+    const [jobs, setJobs] = useState([])
+    const api = new Api();
 
     const onDropInternal = useCallback(acceptedFiles => {
-        dispatch(addToLibrary(acceptedFiles));
+        Promise.all(api.createDocument(acceptedFiles)).then(docs => setJobs(prevJobs => prevJobs.concat(docs as any)));
     }, []);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop: onDropInternal} as any)
