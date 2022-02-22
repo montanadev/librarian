@@ -26,6 +26,10 @@ urlpatterns = [
 
     # folder endpoints
     path("api/folders/", folder_views.FolderListView.as_view(), name='folder-create'),
+    path("api/folders/<int:pk>", folder_views.FolderDetailView.as_view(), name='folder-detail'),
+    path("api/folders/<int:pk>/document", folder_views.FolderAddDocumentView.as_view(), name='folder-add-document'),
+    path("api/folders/<int:pk>/document/<int:doc_id>", folder_views.FolderDocumentDetailView.as_view(),
+         name='folder-document-detail'),
 
     # static file endpoints
     path("<path:resource>", index),

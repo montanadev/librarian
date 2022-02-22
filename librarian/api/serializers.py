@@ -44,3 +44,11 @@ class FolderSerializer(serializers.ModelSerializer):
             doc_obj.save()
 
         return folder
+
+
+class FolderAddDocumentViewSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+    class Meta:
+        model = Document
+        fields = ('id',)
