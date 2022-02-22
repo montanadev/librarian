@@ -1,29 +1,30 @@
 import {Modal, Button, Select, Input} from "antd";
 import {useForm, Controller} from "react-hook-form";
-import {Note} from "./Note";
+import {Api} from "../utils/Api";
 
 interface Props {
     visible: boolean;
     onClose: () => void;
 }
 
-export function SetupWizard({visible, onClose}: Props) {
+export function SetupWizardModal({visible, onClose}: Props) {
+    const api = new Api();
     const {register, handleSubmit, control} = useForm();
-
-    const onSubmit = (data: any) => {
-        fetch('http://0.0.0.0:8000/api/config/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        }).then(res => res.json())
-    };
 
     return <Modal
         visible={visible}
         onCancel={onClose}
         title="Setup Wizard"
-        footer={[]}
+        footer={[
+            <Button onClick={onClose}>
+                Return
+            </Button>,
+            <Button type="primary" htmlType="submit" onClick={handleSubmit(api.saveConfig)}>
+                Submit
+            </Button>
+        ]}
     >
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
             <h3>Storage Options</h3>
             <Controller
                 name="storageOption"
@@ -54,15 +55,6 @@ export function SetupWizard({visible, onClose}: Props) {
                         <Select.Option value="custom">Custom</Select.Option>
                     </Select>
                 )} />
-            
-            <br />
-            <Button onClick={onClose}>
-                Return
-            </Button>
-            <button type="submit">
-                Submit
-            </button>
-
         </form>
     </Modal>;
 }

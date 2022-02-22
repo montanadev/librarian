@@ -5,7 +5,7 @@ import {Breadcrumb, Button, Input, Layout, Menu} from 'antd';
 import Sidebar from "./Sidebar";
 import {RootState} from "../stores";
 import {useSelector} from 'react-redux';
-import {SetupWizard} from "./SetupWizard";
+import {SetupWizardModal} from "./SetupWizardModal";
 import {SearchOutlined} from '@ant-design/icons';
 import {useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
@@ -50,7 +50,7 @@ function App(props: AppProps) {
 
     return (
         <Layout>
-            <SetupWizard visible={wizardOpen} onClose={() => setWizardOpen(false)}/>
+            <SetupWizardModal visible={wizardOpen} onClose={() => setWizardOpen(false)}/>
             <Header className="header AppHeader">
                 <div className="AppLogo">
                     librarian

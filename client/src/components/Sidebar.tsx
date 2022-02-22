@@ -1,45 +1,66 @@
 import './Sidebar.css';
 import {Layout, Menu} from "antd";
-import {FileAddOutlined, ThunderboltOutlined} from "@ant-design/icons";
-import React, {useEffect} from "react";
+import {FileAddOutlined, ThunderboltOutlined, FolderAddOutlined} from "@ant-design/icons";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {Api} from "../utils/Api";
 import {DocumentModel} from "../models/Document";
+import {ResourceModel} from "../models/Resource";
+import {CreateFolderModal} from "./CreateFolderModal";
+import {FolderModel} from "../models/Folder";
 
 const {SubMenu} = Menu;
 const {Sider} = Layout;
 
 
 function Sidebar() {
-    const [documents, setLibrary] = React.useState<Array<DocumentModel>>([]);
+    const [recentDocuments, setRecentDocuments] = useState<ResourceModel<DocumentModel>>();
+    const [folders, setFolders] = useState<ResourceModel<FolderModel>>();
+    const [createFolderOpen, setCreateFolderOpen] = useState(false);
 
     useEffect(() => {
-        const api = new Api()
-        const getLibrary = async () => {
-            setLibrary(await api.getDocuments());
-        }
-        getLibrary();
-    }, [])
+        (async () => {
+            const api = new Api()
+            const docs = await api.getDocuments()
+            setRecentDocuments(docs);
+        })()
+    }, []);
 
-    return <Sider width={200} className="site-layout-background">
-        <Menu
-            mode="inline"
-            defaultOpenKeys={['sub1']}
+    useEffect(() => {
+        (async () => {
+            const api = new Api()
+            const folders = await api.getFolders()
+            setFolders(folders);
+        })()
+    }, [createFolderOpen])
 
-            style={{height: '100%', borderRight: 0}}
-        >
-            <Menu.Item key="link" icon={<FileAddOutlined/>}>
-                <Link to="/">Upload</Link>
-            </Menu.Item>
-            <SubMenu key="sub1" icon={<ThunderboltOutlined/>} title="Recent">
-                {documents.length ? documents.map(d =>
-                    <Menu.Item key={d.id}>
-                        <Link to={`/documents/${d.id}`}>{d.filename}</Link>
-                    </Menu.Item>
-                ) : null}
-            </SubMenu>
-        </Menu>
-    </Sider>
+    return <div>
+        <CreateFolderModal visible={createFolderOpen} onClose={() => setCreateFolderOpen(false)}/>
+        <Sider width={200} className="site-layout-background">
+            <Menu
+                mode="inline"
+                defaultOpenKeys={['sub1']}
+
+                style={{height: '100%', borderRight: 0}}
+            >
+                <Menu.Item key="upload" icon={<FileAddOutlined/>}>
+                    <Link to="/">Upload</Link>
+                </Menu.Item>
+                <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>Create
+                    Folder</Menu.Item>
+                <SubMenu key="sub1" icon={<ThunderboltOutlined/>} title="Recent">
+                    {recentDocuments ? recentDocuments.results.map(d =>
+                        <Menu.Item key={d.id}>
+                            <Link to={`/documents/${d.id}`}>{d.filename}</Link>
+                        </Menu.Item>
+                    ) : null}
+                </SubMenu>
+                {folders ? folders.results.map(f =>
+                    <SubMenu key={f.id} title={f.name}></SubMenu>
+                ): null}
+            </Menu>
+        </Sider>
+    </div>
 }
 
 export default Sidebar;
