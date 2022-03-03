@@ -1,6 +1,6 @@
 import {Button, Input, Modal} from "antd";
 import {useForm} from "react-hook-form";
-import {Api} from "../utils/Api";
+import {Api} from "../../utils/Api";
 
 interface Props {
     visible: boolean;
@@ -12,7 +12,9 @@ export function CreateFolderModal({visible, onClose}: Props) {
     const {register, handleSubmit} = useForm();
 
     const onSubmit = (data: any) => {
-        api.createFolder(data.folderName)
+        api.createFolder(data.folderName).then(() => {
+           onClose();
+        });
     };
 
     return <Modal

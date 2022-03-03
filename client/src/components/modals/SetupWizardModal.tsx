@@ -1,6 +1,6 @@
 import {Modal, Button, Select, Input} from "antd";
 import {useForm, Controller} from "react-hook-form";
-import {Api} from "../utils/Api";
+import {Api} from "../../utils/Api";
 
 interface Props {
     visible: boolean;

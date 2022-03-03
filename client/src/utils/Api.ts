@@ -36,7 +36,16 @@ export class Api {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({name: folderName, documents: []}),
+        });
+    }
 
+    addDocumentToFolder(documentId: number, folderId: number) {
+        return fetch(`http://0.0.0.0:8000/api/folders/${folderId}/document`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: documentId}),
         });
     }
 

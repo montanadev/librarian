@@ -6,7 +6,7 @@ import {Link} from "react-router-dom";
 import {Api} from "../utils/Api";
 import {DocumentModel} from "../models/Document";
 import {ResourceModel} from "../models/Resource";
-import {CreateFolderModal} from "./CreateFolderModal";
+import {CreateFolderModal} from "./modals/CreateFolderModal";
 import {FolderModel} from "../models/Folder";
 
 const {SubMenu} = Menu;
@@ -56,8 +56,14 @@ function Sidebar() {
                     ) : null}
                 </SubMenu>
                 {folders ? folders.results.map(f =>
-                    <SubMenu key={f.id} title={f.name}></SubMenu>
-                ): null}
+                    <SubMenu key={f.id} title={f.name}>
+                        {f.documents ? f.documents.map(d => {
+                            return <Menu.Item key={d.id}>
+                                <Link to={`/documents/${d.id}`}>{d.filename}</Link>
+                            </Menu.Item>
+                        }) : []}
+                    </SubMenu>
+                ) : null}
             </Menu>
         </Sider>
     </div>

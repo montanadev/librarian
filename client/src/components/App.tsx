@@ -1,11 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {cloneElement, useEffect, useState} from 'react';
 import './App.css';
 
 import {Breadcrumb, Button, Input, Layout, Menu} from 'antd';
 import Sidebar from "./Sidebar";
-import {RootState} from "../stores";
-import {useSelector} from 'react-redux';
-import {SetupWizardModal} from "./SetupWizardModal";
+import {SetupWizardModal} from "./modals/SetupWizardModal";
 import {SearchOutlined} from '@ant-design/icons';
 import {useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
@@ -19,6 +17,7 @@ interface AppProps {
 function App(props: AppProps) {
     const [wizardOpen, setWizardOpen] = useState(false)
     const [search, setSearch] = useState<string>();
+    const [breadcrumbs, setBreadcrumbs] = useState<Array<string>>([]);
     const history = useHistory();
 
     const onSearch = () => {
@@ -29,15 +28,6 @@ function App(props: AppProps) {
 
         history.push(`/search?q=${encodeURIComponent(search)}`)
     }
-
-    const {breadcrumbs} = useSelector((state: RootState) => {
-        if (!state) {
-            return {}
-        }
-        return {
-            breadcrumbs: state.breadcrumbs,
-        };
-    });
 
     useEffect(() => {
         //const {isLoading, error, data} = useQuery('config', () =>
