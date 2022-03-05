@@ -61,7 +61,7 @@ function App(props: AppProps) {
             </Header>
             <Layout>
                 <Sidebar/>
-                <Layout style={{padding: '0 24px 24px'}}>
+                <Layout>
                     <Breadcrumb style={{margin: '16px 0'}}>
                         {breadcrumbs ? breadcrumbs.map((b, idx) =>
                             <Breadcrumb.Item key={idx}>{b}</Breadcrumb.Item>

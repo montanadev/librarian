@@ -1,6 +1,6 @@
 import './Sidebar.css';
 import {Layout, Menu} from "antd";
-import {FileAddOutlined, ThunderboltOutlined, FolderAddOutlined} from "@ant-design/icons";
+import {FileAddOutlined, ThunderboltOutlined, FolderAddOutlined, RadiusUprightOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {Api} from "../utils/Api";
@@ -48,18 +48,18 @@ function Sidebar() {
                 </Menu.Item>
                 <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>Create
                     Folder</Menu.Item>
-                <SubMenu key="sub1" icon={<ThunderboltOutlined/>} title="Recent">
-                    {recentDocuments ? recentDocuments.results.map(d =>
-                        <Menu.Item key={d.id}>
-                            <Link to={`/documents/${d.id}`}>{d.filename}</Link>
-                        </Menu.Item>
-                    ) : null}
-                </SubMenu>
+                {/*<SubMenu key="recent" icon={<ThunderboltOutlined/>} title="Recent">*/}
+                {/*    {recentDocuments ? recentDocuments.results.map(d =>*/}
+                {/*        <Menu.Item key={d.id}>*/}
+                {/*            <Link to={`/documents/${d.id}`}>{d.filename}</Link>*/}
+                {/*        </Menu.Item>*/}
+                {/*    ) : null}*/}
+                {/*</SubMenu>*/}
                 {folders ? folders.results.map(f =>
-                    <SubMenu key={f.id} title={f.name}>
+                    <SubMenu key={f.id} title={f.name} icon={f.name === 'Unsorted' ? <RadiusUprightOutlined/> : null}>
                         {f.documents ? f.documents.map(d => {
                             return <Menu.Item key={d.id}>
-                                <Link to={`/documents/${d.id}`}>{d.filename}</Link>
+                                <Link to={`/folders/${f.id}/documents/${d.id}`}>{d.filename}</Link>
                             </Menu.Item>
                         }) : []}
                     </SubMenu>

@@ -4,6 +4,13 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def CreateDefaultFolder(apps, schema_editor):
+    Folder = apps.get_model("api", "Folder")
+
+    # make default folder if not exists
+    Folder.objects.update_or_create(name='Unsorted')
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -42,6 +49,8 @@ class Migration(migrations.Migration):
                 ('documents', models.ManyToManyField(related_name='folders', to='api.Document')),
             ],
         ),
+        migrations.RunPython(CreateDefaultFolder),
+
         migrations.CreateModel(
             name='DocumentPageImage',
             fields=[

@@ -1,6 +1,7 @@
 import logging
 import tempfile
 
+from django.apps import apps
 from django.conf import settings
 from django.db import models
 
@@ -39,7 +40,14 @@ class Document(models.Model):
 
     @classmethod
     def create_from_filename(cls, filename, hash):
-        return cls.objects.create(filename=filename, hash=hash, status=DocumentStatus.created)
+        doc = cls.objects.create(filename=filename, hash=hash, status=DocumentStatus.created)
+
+        # add new doc to the default folder
+        Folder = apps.get_model('api', 'Folder')
+        folder = Folder.get_default()
+        folder.documents.add(doc)
+
+        return doc
 
     def persist_to_filestore(self, content):
         # store file uploaded by user to tempfile until persistence to blob store is

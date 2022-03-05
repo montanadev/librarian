@@ -9,7 +9,7 @@ import {AddToFolderModal} from "./modals/AddToFolderModal";
 import {Api} from "../utils/Api";
 
 
-const Viewer = () => {
+function Viewer() {
     let {documentId} = useParams<any>();
     const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
     const api = new Api();
@@ -26,14 +26,22 @@ const Viewer = () => {
     const {width} = useContainerDimensions(containerRef)
 
     return <div>
-        <AddToFolderModal visible={openAddToFolderModal} onClose={() => setOpenAddToFolderModal(false)} onAddToFolder={(folderId: number) => {
-            api.addDocumentToFolder(documentId, folderId).then(() => setOpenAddToFolderModal(false));
-        }} />
+        <AddToFolderModal visible={openAddToFolderModal} onClose={() => setOpenAddToFolderModal(false)}
+                          onAddToFolder={(folderId: number) => {
+                              api.addDocumentToFolder(documentId, folderId).then(() => setOpenAddToFolderModal(false));
+                          }}/>
 
         <div>
             <Button onClick={() => setOpenAddToFolderModal(true)}>Add to folder</Button>
-            <Divider type="vertical" />
-            <Button>Remove from folder</Button>
+            <Divider type="vertical"/>
+            <Button disabled>Remove from folder</Button>
+
+            <div style={{float: 'right'}}>
+                <Button>Prev</Button>
+                <Divider type="vertical"/>
+                <Button>Next</Button>
+            </div>
+
         </div>
         <div ref={containerRef}>
             <Document file={`http://0.0.0.0:8000/api/documents/${documentId}/data`}
@@ -45,7 +53,7 @@ const Viewer = () => {
                 ))}
             </Document>
         </div>
-    </div>;
+    </div>
 }
 
 export default Viewer;

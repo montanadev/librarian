@@ -32,7 +32,7 @@ ReactDOM.render(
                 <QueryClientProvider client={queryClient}>
                     <App>
                         <Switch>
-                            <Route path="/documents/:documentId">
+                            <Route path="/folders/:folderId/documents/:documentId">
                                 <Viewer/>
                             </Route>
                             <Route path="/search">
