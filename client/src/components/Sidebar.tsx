@@ -7,7 +7,7 @@ import {Api} from "../utils/Api";
 import {CreateFolderModal} from "./modals/CreateFolderModal";
 import {FolderModel} from "../models/Folder";
 import {ResourceModel} from "../models/Resource";
-import { useQuery } from 'react-query';
+import {useQuery} from 'react-query';
 
 const {SubMenu} = Menu;
 const {Sider} = Layout;
@@ -22,25 +22,15 @@ function Sidebar() {
     return <div>
         <CreateFolderModal visible={createFolderOpen} onClose={() => setCreateFolderOpen(false)}/>
         <Sider width={200} className="site-layout-background">
-            <Menu
-                mode="inline"
-                defaultOpenKeys={['sub1']}
-
-                style={{height: '100%', borderRight: 0}}
-            >
+            <Menu mode="inline"
+                  defaultOpenKeys={['sub1']}
+                  style={{height: '100%', borderRight: 0}}>
                 <Menu.Item key="upload" icon={<FileAddOutlined/>}>
                     <Link to="/">Upload</Link>
                 </Menu.Item>
                 <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>
                     Create Folder
                 </Menu.Item>
-                {/*<SubMenu key="recent" icon={<ThunderboltOutlined/>} title="Recent">*/}
-                {/*    {recentDocuments ? recentDocuments.results.map(d =>*/}
-                {/*        <Menu.Item key={d.id}>*/}
-                {/*            <Link to={`/documents/${d.id}`}>{d.filename}</Link>*/}
-                {/*        </Menu.Item>*/}
-                {/*    ) : null}*/}
-                {/*</SubMenu>*/}
                 {data ? data.results.map((f: FolderModel) =>
                     <SubMenu key={f.id} title={f.name} icon={f.name === 'Unsorted' ? <RadiusUprightOutlined/> : null}>
                         {f.documents ? f.documents.map(d => {

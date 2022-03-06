@@ -21,6 +21,7 @@ function Job(props: JobProps) {
     }, job.status === 'ANNOTATED' ? null : 1000)
 
     if (job.status === 'ANNOTATED') {
+        // job finished, reload folders to pick up newly uploaded document
         queryClient.invalidateQueries("folders");
     }
 

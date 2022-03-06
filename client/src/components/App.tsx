@@ -45,11 +45,10 @@ function App(props: AppProps) {
                 <div className="AppLogo">
                     librarian
                 </div>
-                <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-                    <Menu.Item key="1"><Link to={'/'}>Home</Link></Menu.Item>
-                    <Menu.Item onClick={() => setWizardOpen(true)} key="4">Settings</Menu.Item>
-
-                    <div key="5" className="items-center h-16 flex float-right pr-4 w-auto">
+                <Menu theme="dark" mode="horizontal">
+                    <Menu.Item key="home"><Link to={'/'}>Home</Link></Menu.Item>
+                    <Menu.Item onClick={() => setWizardOpen(true)} key="settings">Settings</Menu.Item>
+                    <div className="items-center h-16 flex float-right pr-4 w-auto">
                         <Input onChange={(e) => setSearch(e.target.value)}
                                onPressEnter={onSearch}
                                type="text"

@@ -51,6 +51,8 @@ function Viewer() {
             }
         }
 
+        // find the doc before and after the currently loaded one
+        // and use it to power the prev/next buttons
         if (foundIdx !== -1) {
             if (foundIdx - 1 < 0) {
                 prev = entries[entries.length - 1];
