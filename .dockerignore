@@ -2,5 +2,7 @@ samples/
 local-storage/
 tests/
 node_modules/
+build/
+static/
 
 *.sqlite3
