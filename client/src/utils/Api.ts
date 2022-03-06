@@ -2,6 +2,7 @@ import {JobModel} from "../models/Job";
 import {DocumentModel} from "../models/Document";
 import {ResourceModel} from "../models/Resource";
 import {FolderModel} from "../models/Folder";
+import {useQuery, useQueryClient} from "react-query";
 
 export class Api {
     getDocuments(): Promise<ResourceModel<DocumentModel>> {
@@ -36,6 +37,9 @@ export class Api {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({name: folderName, documents: []}),
+        }).then(() => {
+
+            console.log("Invalidated!");
         });
     }
 
@@ -49,7 +53,8 @@ export class Api {
         });
     }
 
-    getFolders(): Promise<ResourceModel<FolderModel>> {
+    getFolders() {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         return fetch('http://0.0.0.0:8000/api/folders/').then(d => d.json());
     }
 }

@@ -26,7 +26,6 @@ const store = configureStore({
 const queryClient = new QueryClient()
 
 ReactDOM.render(
-    <React.StrictMode>
         <Provider store={store}>
             <HashRouter>
                 <QueryClientProvider client={queryClient}>
@@ -45,7 +44,6 @@ ReactDOM.render(
                     </App>
                 </QueryClientProvider>
             </HashRouter>
-        </Provider>
-    </React.StrictMode>,
+        </Provider>,
     document.getElementById('root')
 );

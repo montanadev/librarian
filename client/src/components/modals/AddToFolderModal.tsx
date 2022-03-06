@@ -3,6 +3,7 @@ import {Api} from "../../utils/Api";
 import {ResourceModel} from "../../models/Resource";
 import {FolderModel} from "../../models/Folder";
 import {useEffect, useState} from "react";
+import { useQuery } from "react-query";
 
 interface Props {
     visible: boolean;
@@ -12,18 +13,12 @@ interface Props {
 
 export function AddToFolderModal({visible, onClose, onAddToFolder}: Props) {
     const [folderId, setFolderId] = useState<any>()
-    const [folders, setFolders] = useState<ResourceModel<FolderModel>>();
 
-    useEffect(() => {
-        (async () => {
-            const api = new Api()
-            const folders = await api.getFolders()
-            setFolders(folders);
-        })()
-    }, [])
+    const api = new Api();
+    const {isLoading, error, data, isFetching} = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
 
 
-    const options = folders ? folders.results.map((f: FolderModel) => {
+    const options = data ? data.results.map((f: FolderModel) => {
         return {value: f.id, "label": f.name}
     }): []
     const filter = (inputValue: string, path: any) => {
@@ -45,7 +40,7 @@ export function AddToFolderModal({visible, onClose, onAddToFolder}: Props) {
     >
         <form>
             <h3>Folder name {folderId}</h3>
-            <Cascader options={options} showSearch={{filter}} onChange={(value, selectedOptions) => setFolderId(value)}/>
+            <Cascader options={options} showSearch={{filter}} onChange={(value:any, selectedOptions:any) => setFolderId(value)}/>
         </form>
     </Modal>
 }

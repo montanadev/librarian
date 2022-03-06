@@ -1,5 +1,6 @@
 import {Button, Input, Modal} from "antd";
 import {useForm} from "react-hook-form";
+import {useQueryClient} from "react-query";
 import {Api} from "../../utils/Api";
 
 interface Props {
@@ -9,11 +10,13 @@ interface Props {
 
 export function CreateFolderModal({visible, onClose}: Props) {
     const api = new Api();
+    const queryClient = useQueryClient()
     const {register, handleSubmit} = useForm();
 
     const onSubmit = (data: any) => {
         api.createFolder(data.folderName).then(() => {
-           onClose();
+            queryClient.invalidateQueries("folders");
+            onClose();
         });
     };
 

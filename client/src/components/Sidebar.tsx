@@ -1,38 +1,23 @@
 import './Sidebar.css';
 import {Layout, Menu} from "antd";
-import {FileAddOutlined, ThunderboltOutlined, FolderAddOutlined, RadiusUprightOutlined} from "@ant-design/icons";
-import React, {useEffect, useState} from "react";
+import {FileAddOutlined, FolderAddOutlined, RadiusUprightOutlined} from "@ant-design/icons";
+import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import {Api} from "../utils/Api";
-import {DocumentModel} from "../models/Document";
-import {ResourceModel} from "../models/Resource";
 import {CreateFolderModal} from "./modals/CreateFolderModal";
 import {FolderModel} from "../models/Folder";
+import {ResourceModel} from "../models/Resource";
+import { useQuery } from 'react-query';
 
 const {SubMenu} = Menu;
 const {Sider} = Layout;
 
 
 function Sidebar() {
-    const [recentDocuments, setRecentDocuments] = useState<ResourceModel<DocumentModel>>();
-    const [folders, setFolders] = useState<ResourceModel<FolderModel>>();
     const [createFolderOpen, setCreateFolderOpen] = useState(false);
 
-    useEffect(() => {
-        (async () => {
-            const api = new Api()
-            const docs = await api.getDocuments()
-            setRecentDocuments(docs);
-        })()
-    }, []);
-
-    useEffect(() => {
-        (async () => {
-            const api = new Api()
-            const folders = await api.getFolders()
-            setFolders(folders);
-        })()
-    }, [createFolderOpen])
+    const api = new Api();
+    const {isLoading, error, data, isFetching} = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
 
     return <div>
         <CreateFolderModal visible={createFolderOpen} onClose={() => setCreateFolderOpen(false)}/>
@@ -46,8 +31,9 @@ function Sidebar() {
                 <Menu.Item key="upload" icon={<FileAddOutlined/>}>
                     <Link to="/">Upload</Link>
                 </Menu.Item>
-                <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>Create
-                    Folder</Menu.Item>
+                <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>
+                    Create Folder
+                </Menu.Item>
                 {/*<SubMenu key="recent" icon={<ThunderboltOutlined/>} title="Recent">*/}
                 {/*    {recentDocuments ? recentDocuments.results.map(d =>*/}
                 {/*        <Menu.Item key={d.id}>*/}
@@ -55,7 +41,7 @@ function Sidebar() {
                 {/*        </Menu.Item>*/}
                 {/*    ) : null}*/}
                 {/*</SubMenu>*/}
-                {folders ? folders.results.map(f =>
+                {data ? data.results.map((f: FolderModel) =>
                     <SubMenu key={f.id} title={f.name} icon={f.name === 'Unsorted' ? <RadiusUprightOutlined/> : null}>
                         {f.documents ? f.documents.map(d => {
                             return <Menu.Item key={d.id}>

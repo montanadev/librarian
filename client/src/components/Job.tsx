@@ -5,6 +5,7 @@ import {useInterval} from "../utils/setInterval";
 import Progress from "./Progress";
 import {Link} from "react-router-dom";
 import {Api} from "../utils/Api";
+import { useQueryClient } from 'react-query';
 
 export interface JobProps {
     job: any
@@ -12,11 +13,16 @@ export interface JobProps {
 
 function Job(props: JobProps) {
     const api = new Api();
+    const queryClient = useQueryClient()
     const [job, setJob] = useState(props.job)
 
     useInterval(() => {
         api.refreshJob(props.job.id).then(job => setJob(job));
     }, job.status === 'ANNOTATED' ? null : 1000)
+
+    if (job.status === 'ANNOTATED') {
+        queryClient.invalidateQueries("folders");
+    }
 
     let progress = () => {
         switch (job.status) {
