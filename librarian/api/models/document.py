@@ -7,6 +7,7 @@ from django.db import models
 
 from librarian.api.models import DocumentJob, DocumentJobJobs
 from librarian.api.models import DocumentStatus
+from librarian.api.models.folder import Folder
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class Document(models.Model):
     hash = models.TextField(null=True)
     temp_path = models.TextField(null=True)
     filestore_path = models.TextField(null=True)
+    folder = models.ForeignKey(Folder, null=True, related_name='documents', on_delete=models.SET_NULL)
 
     status = models.TextField(choices=DocumentStatus.choices(), default=DocumentStatus.created.value)
 
@@ -40,14 +42,11 @@ class Document(models.Model):
 
     @classmethod
     def create_from_filename(cls, filename, hash):
-        doc = cls.objects.create(filename=filename, hash=hash, status=DocumentStatus.created)
-
         # add new doc to the default folder
         Folder = apps.get_model('api', 'Folder')
-        folder = Folder.get_default()
-        folder.documents.add(doc)
 
-        return doc
+        return cls.objects.create(filename=filename, hash=hash, status=DocumentStatus.created,
+                                  folder=Folder.get_default())
 
     def persist_to_filestore(self, content):
         # store file uploaded by user to tempfile until persistence to blob store is

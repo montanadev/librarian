@@ -29,7 +29,7 @@ class FolderAddDocumentView(UpdateAPIView):
 
         # TODO - check if document already in folder?
         document = get_object_or_404(Document, id=serializer.validated_data['id'])
-        document.folders.add(folder)
+        document.folder = folder
         document.save()
 
         # return full folder representation
@@ -37,12 +37,12 @@ class FolderAddDocumentView(UpdateAPIView):
         return Response(FolderSerializer(folder).data)
 
 
+# TODO - might be better renamed if only exposing a destroy method
 class FolderDocumentDetailView(DestroyAPIView):
     queryset = Folder.objects.all()
 
     def destroy(self, request, *args, **kwargs):
-        folder = self.get_object()
         document = get_object_or_404(Document, id=kwargs['doc_id'])
-        document.folders.remove(folder)
+        document.folder = Folder.get_default()
         document.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

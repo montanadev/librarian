@@ -21,7 +21,7 @@ urlpatterns = [
     # document endpoints
     path("api/documents/", document_views.DocumentListView.as_view()),
     path("api/documents/<str:filename>", document_views.document_create, name='document-create'),
-    path("api/documents/<int:id>/details", document_views.DocumentView.as_view()),
+    path("api/documents/<int:id>/details", document_views.DocumentView.as_view(), name='document-detail'),
     path("api/documents/<int:id>/data", document_views.DocumentDataView.as_view()),
 
     # folder endpoints

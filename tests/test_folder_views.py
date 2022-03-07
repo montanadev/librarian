@@ -56,3 +56,16 @@ class TestFolderViews(TestCase):
         url = reverse('folder-document-detail', args=(folder.json()['id'], self.test_doc.json()['id']))
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_rename_folder(self):
+        url = reverse('folder-create')
+        data = {'name': 'new-folder', 'documents': [self.test_doc.json()]}
+        folder = self.client.post(url, data, format="json")
+        self.assertEqual(folder.status_code, status.HTTP_201_CREATED)
+
+        url = reverse('folder-detail', args=(folder.json()['id'],))
+        body = folder.json()
+        body['name'] = 'renamed'
+        response = self.client.put(url, body, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['name'], 'renamed')

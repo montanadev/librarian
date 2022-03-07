@@ -40,10 +40,22 @@ class FolderSerializer(serializers.ModelSerializer):
         for doc in docs:
             doc_obj = Document.objects.get(id=doc['id'])
             # TODO - not very efficient, is there a way to do in bulk? set?
-            doc_obj.folders.add(folder)
+            doc_obj.folder = folder
             doc_obj.save()
 
         return folder
+
+    def update(self, instance, validated_data):
+        docs = validated_data.pop('documents', [])
+
+        for doc in docs:
+            doc_obj = Document.objects.get(id=doc['id'])
+            # TODO - not very efficient, is there a way to do in bulk? set?
+            doc_obj.folder = instance
+            doc_obj.save()
+
+        instance.__dict__.update(validated_data)
+        return instance
 
 
 class FolderAddDocumentViewSerializer(serializers.Serializer):

@@ -105,7 +105,7 @@ function Viewer() {
 
         </div>
         <div ref={containerRef}>
-            <Document file={`http://0.0.0.0:8000/api/documents/${documentId}/data`}
+            <Document file={`/api/documents/${documentId}/data`}
                       loading={<Spin size="large"/>}
                       onLoadSuccess={onDocumentLoadSuccess}>
                 {Array.from(new Array(numPages), (el, index) => (
