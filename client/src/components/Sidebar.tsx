@@ -1,51 +1,75 @@
 import './Sidebar.css';
-import {Layout, Menu} from "antd";
-import {FileAddOutlined, ThunderboltOutlined} from "@ant-design/icons";
-import React, {useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../stores";
-import {refreshLibrary} from "../actions/Library";
+import {Layout, Menu, Typography} from "antd";
+import {
+    FileAddOutlined,
+    FolderAddOutlined,
+    RadiusUprightOutlined,
+    CheckOutlined,
+    HighlightOutlined
+} from "@ant-design/icons";
+import React, {useState} from "react";
 import {Link} from "react-router-dom";
+import {Api} from "../utils/Api";
+import {CreateFolderModal} from "./modals/CreateFolderModal";
+import {FolderModel} from "../models/Folder";
+import {ResourceModel} from "../models/Resource";
+import {useQuery, useQueryClient} from 'react-query';
 
+const {Paragraph} = Typography;
 const {SubMenu} = Menu;
 const {Sider} = Layout;
 
 
 function Sidebar() {
-    const dispatch = useDispatch();
+    const [createFolderOpen, setCreateFolderOpen] = useState(false);
+    const queryClient = useQueryClient();
 
-    const {library} = useSelector((state: RootState) => {
-        if (!state) {
-            return {}
+    const api = new Api();
+    const {isLoading, error, data, isFetching} = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
+
+    const makeEditable = (folder: FolderModel) => {
+        if (folder.name === 'Unsorted') {
+            return folder.name;
         }
-        return {
-            library: state.library,
-        };
-    });
+        return <Paragraph
+            editable={{
+                icon: <HighlightOutlined/>,
+                tooltip: 'Click to rename',
+                onChange: (newFolderName) => {
+                    api.renameFolder(folder.id, newFolderName).then(() => {
+                        queryClient.invalidateQueries('folders');
+                    })
+                },
+                enterIcon: <CheckOutlined/>,
+            }}>{folder.name}</Paragraph>
+    }
 
-    useEffect(() => {
-        dispatch(refreshLibrary)
-    }, [])
+    return <div>
+        <CreateFolderModal visible={createFolderOpen} onClose={() => setCreateFolderOpen(false)}/>
+        <Sider width={200} className="site-layout-background">
+            <Menu mode="inline"
+                  defaultOpenKeys={['sub1']}
+                  style={{height: '100%', borderRight: 0}}>
+                <Menu.Item key="upload" icon={<FileAddOutlined/>}>
+                    <Link to="/">Upload</Link>
+                </Menu.Item>
 
-    return <Sider width={200} className="site-layout-background">
-        <Menu
-            mode="inline"
-            defaultOpenKeys={['sub1']}
-
-            style={{height: '100%', borderRight: 0}}
-        >
-            <Menu.Item key="link" icon={<FileAddOutlined/>}>
-                <Link to="/">Upload</Link>
-            </Menu.Item>
-            <SubMenu key="sub1" icon={<ThunderboltOutlined/>} title="Recent">
-                {library ? library.documents.map(d =>
-                    <Menu.Item key={d.id}>
-                        <Link to={`/documents/${d.id}`}>{d.filename}</Link>
-                    </Menu.Item>
+                {data ? data.results.map((f: FolderModel) =>
+                    <SubMenu key={f.id} title={makeEditable(f)} icon={f.name === 'Unsorted' ? <RadiusUprightOutlined/> : null}>
+                        {f.documents ? f.documents.map(d => {
+                            return <Menu.Item key={d.id}>
+                                <Link to={`/folders/${f.id}/documents/${d.id}`}>{d.filename}</Link>
+                            </Menu.Item>
+                        }) : []}
+                    </SubMenu>
                 ) : null}
-            </SubMenu>
-        </Menu>
-    </Sider>
+
+                <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>
+                    Add Folder
+                </Menu.Item>
+            </Menu>
+        </Sider>
+    </div>
 }
 
 export default Sidebar;

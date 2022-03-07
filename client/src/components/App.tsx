@@ -1,11 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {cloneElement, useEffect, useState} from 'react';
 import './App.css';
 
 import {Breadcrumb, Button, Input, Layout, Menu} from 'antd';
 import Sidebar from "./Sidebar";
-import {RootState} from "../stores";
-import {useSelector} from 'react-redux';
-import {SetupWizard} from "./SetupWizard";
+import {SetupWizardModal} from "./modals/SetupWizardModal";
 import {SearchOutlined} from '@ant-design/icons';
 import {useHistory} from 'react-router';
 import {Link} from 'react-router-dom';
@@ -19,6 +17,7 @@ interface AppProps {
 function App(props: AppProps) {
     const [wizardOpen, setWizardOpen] = useState(false)
     const [search, setSearch] = useState<string>();
+    const [breadcrumbs, setBreadcrumbs] = useState<Array<string>>([]);
     const history = useHistory();
 
     const onSearch = () => {
@@ -29,15 +28,6 @@ function App(props: AppProps) {
 
         history.push(`/search?q=${encodeURIComponent(search)}`)
     }
-
-    const {breadcrumbs} = useSelector((state: RootState) => {
-        if (!state) {
-            return {}
-        }
-        return {
-            breadcrumbs: state.breadcrumbs,
-        };
-    });
 
     useEffect(() => {
         //const {isLoading, error, data} = useQuery('config', () =>
@@ -50,16 +40,15 @@ function App(props: AppProps) {
 
     return (
         <Layout>
-            <SetupWizard visible={wizardOpen} onClose={() => setWizardOpen(false)}/>
+            <SetupWizardModal visible={wizardOpen} onClose={() => setWizardOpen(false)}/>
             <Header className="header AppHeader">
                 <div className="AppLogo">
                     librarian
                 </div>
-                <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-                    <Menu.Item key="1"><Link to={'/'}>Home</Link></Menu.Item>
-                    <Menu.Item onClick={() => setWizardOpen(true)} key="4">Settings</Menu.Item>
-
-                    <div key="5" className="items-center h-16 flex float-right pr-4 w-auto">
+                <Menu theme="dark" mode="horizontal">
+                    <Menu.Item key="home"><Link to={'/'}>Home</Link></Menu.Item>
+                    <Menu.Item onClick={() => setWizardOpen(true)} key="settings">Settings</Menu.Item>
+                    <div className="items-center h-16 flex float-right pr-4 w-auto">
                         <Input onChange={(e) => setSearch(e.target.value)}
                                onPressEnter={onSearch}
                                type="text"
@@ -71,7 +60,7 @@ function App(props: AppProps) {
             </Header>
             <Layout>
                 <Sidebar/>
-                <Layout style={{padding: '0 24px 24px'}}>
+                <Layout>
                     <Breadcrumb style={{margin: '16px 0'}}>
                         {breadcrumbs ? breadcrumbs.map((b, idx) =>
                             <Breadcrumb.Item key={idx}>{b}</Breadcrumb.Item>

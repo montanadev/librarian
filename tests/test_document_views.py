@@ -9,6 +9,19 @@ class TestDocumentViews(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+    def test_rename_document(self):
+        url = reverse('document-create', args=('testfile',))
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = reverse('document-detail', args=(response.json()['id'],))
+        body = response.json()
+        body['filename'] = 'renamed'
+
+        response = self.client.put(url, body, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['filename'], 'renamed')
+
     def test_create_document(self):
         url = reverse('document-create', args=('testfile',))
         response = self.client.post(url)
@@ -27,10 +40,12 @@ class TestDocumentViews(TestCase):
 
     def test_search_document_pages(self):
         doc_a = Document.objects.create(filename='a')
-        doc_a_page_1 = DocumentPageImage.objects.create(document=doc_a, page_number=1, text='my egg is dirty, please may i have a new one')
+        doc_a_page_1 = DocumentPageImage.objects.create(document=doc_a, page_number=1,
+                                                        text='my egg is dirty, please may i have a new one')
 
         doc_b = Document.objects.create(filename='b')
-        doc_b_page_1 = DocumentPageImage.objects.create(document=doc_b, page_number=1, text='this omelette is eggcellent')
+        doc_b_page_1 = DocumentPageImage.objects.create(document=doc_b, page_number=1,
+                                                        text='this omelette is eggcellent')
 
         url = reverse('document-text-search', query_params={'q': 'egg'})
         response = self.client.get(url)
@@ -65,8 +80,8 @@ class TestDocumentViews(TestCase):
         tax_documents = Document.objects.filter(filename__contains="tax")
         self.assertEqual(len(tax_documents), 2)
 
-        annotated_tax_documents = Document.objects\
-            .filter(filename__contains="tax")\
+        annotated_tax_documents = Document.objects \
+            .filter(filename__contains="tax") \
             .filter(status=DocumentStatus.annotated.value)
         self.assertEqual(len(annotated_tax_documents), 1)
         self.assertEqual(annotated_tax_documents[0].filename, "tax 2020")
@@ -92,22 +107,22 @@ class TestDocumentViews(TestCase):
         response = client.get(url_with_query_parameters)
         self.assertEqual(response.status_code, 200)
 
-        #number of documents containing the search term
+        # number of documents containing the search term
         match_query = Document.objects.filter(filename__contains="taxes")
         self.assertEqual(len(match_query), 2)
 
-        #number of documents being searched
+        # number of documents being searched
         all_docs = Document.objects.all()
         self.assertEqual(len(all_docs), 5)
 
-        #match specific file names
+        # match specific file names
         specific_doc_2020 = Document.objects.filter(filename="taxes 2020")
         self.assertEqual(len(specific_doc_2020), 1)
 
         specific_doc_2021 = Document.objects.filter(filename="taxes 2021")
         self.assertEqual(len(specific_doc_2021), 1)
 
-        #document list contains dog vaccine record
+        # document list contains dog vaccine record
         vaccine_doc = Document.objects.filter(filename__contains="dog vaccine record")
         self.assertEqual(len(vaccine_doc), 1)
 

@@ -1,34 +1,23 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import './Uploader.css';
-import {useParams} from "react-router-dom";
-import {Spin} from "antd";
+import {useHistory, useParams} from "react-router-dom";
+import {Button, Divider, Spin} from "antd";
 
 import {Document, Page} from 'react-pdf';
 import {useContainerDimensions} from "../utils/useContainerDimenstions";
-import {SET_BREADCRUMB} from "../stores";
-import {useDispatch} from "react-redux";
-import {DocumentModel} from "../models/Document";
-//import {VariableSizeList} from 'react-window';
+import {AddToFolderModal} from "./modals/AddToFolderModal";
+import {Api} from "../utils/Api";
+import {ResourceModel} from "../models/Resource";
+import {FolderModel} from "../models/Folder";
+import {useQuery, useQueryClient} from "react-query";
 
 
-const Viewer = () => {
-    const dispatch = useDispatch();
-    let {documentId} = useParams<any>();
-
-
-    useEffect(() => {
-        dispatch({
-            type: SET_BREADCRUMB,
-            payload: ["Docs"]
-        })
-
-        fetch(`http://0.0.0.0:8000/api/documents/${documentId}/details`).then(d => d.json()).then((document: DocumentModel) => {
-            dispatch({
-                type: SET_BREADCRUMB,
-                payload: ["Docs", document.filename]
-            })
-        });
-    }, [])
+function Viewer() {
+    let {documentId, folderId} = useParams<any>();
+    const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
+    const queryClient = useQueryClient()
+    const api = new Api();
+    const history = useHistory();
 
     const [numPages, setNumPages] = useState(null);
     const [pdf, setPdf] = useState(null);
@@ -38,19 +27,98 @@ const Viewer = () => {
         setPdf(pdf);
     }
 
-    const containerRef = useRef<any>()
-    const { width } = useContainerDimensions(containerRef)
+    const {
+        isLoading,
+        error,
+        data,
+        isFetching
+    } = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
 
-    return <div ref={containerRef}>
-        <Document file={`http://0.0.0.0:8000/api/documents/${documentId}/data`}
-                  loading={<Spin size="large"/>}
-                  onLoadSuccess={onDocumentLoadSuccess}>
+    let next: Array<number> = [];
+    let prev: Array<number> = [];
+
+    if (data && !isLoading) {
+        let entries = [];
+        let foundIdx = -1;
+
+        // flatten the folder / doc hierarchy into list
+        for (let folder of data.results) {
+            for (let document of folder.documents) {
+                entries.push([folder.id, document.id]);
+                if (document.id === parseInt(documentId) && folder.id === parseInt(folderId)) {
+                    foundIdx = entries.length - 1;
+                }
+            }
+        }
+
+        // find the doc before and after the currently loaded one
+        // and use it to power the prev/next buttons
+        if (foundIdx !== -1) {
+            if (foundIdx - 1 < 0) {
+                prev = entries[entries.length - 1];
+            } else {
+                prev = entries[foundIdx - 1];
+            }
+
+            if (foundIdx + 1 === entries.length) {
+                next = entries[0]
+            } else {
+                next = entries[foundIdx + 1];
+            }
+        }
+    }
+
+    const containerRef = useRef<any>()
+    const {width} = useContainerDimensions(containerRef)
+
+    console.log(`Rendering pdf from http://0.0.0.0:8000/api/documents/${documentId}/data`)
+    return <div>
+        <AddToFolderModal visible={openAddToFolderModal}
+                          onClose={() => setOpenAddToFolderModal(false)}
+                          onAddToFolder={(folderId: number) => {
+                              api.addDocumentToFolder(documentId, folderId).then(() => {
+                                  setOpenAddToFolderModal(false);
+                                  queryClient.invalidateQueries("folders");
+                              });
+                          }}/>
+
+        <div>
+            <Button onClick={() => setOpenAddToFolderModal(true)}>Add to folder</Button>
+            <Divider type="vertical"/>
+            <Button disabled>Remove from folder</Button>
+
+            <div style={{float: 'right'}}>
+                <Button onClick={() => {
+                    if (!prev) {
+                        return
+                    }
+                    history.push(`/folders/${prev[0]}/documents/${prev[1]}`);
+                }}>Prev</Button>
+                <Divider type="vertical"/>
+                <Button onClick={() => {
+                    if (!next) {
+                        return
+                    }
+                    history.push(`/folders/${next[0]}/documents/${next[1]}`);
+                }}>Next</Button>
+
+            </div>
+
+        </div>
+        <div ref={containerRef}>
+            <Document file={`/api/documents/${documentId}/data`}
+                      loading={<Spin size="large"/>}
+                      onLoadSuccess={onDocumentLoadSuccess}
+                      onLoadError={(error) => alert('Error while loading document! ' + error.message)}
+                      onSourceError={(error) => alert('Error while retrieving document source! ' + error.message)}
+            >
                 {Array.from(new Array(numPages), (el, index) => (
                     <Page width={width} key={`page_${index + 1}`}
                           pageNumber={index + 1}/>
                 ))}
-        </Document>
-    </div>;
+            </Document>
+        </div>
+    </div>
 }
 
 export default Viewer;

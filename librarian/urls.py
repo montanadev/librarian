@@ -21,11 +21,15 @@ urlpatterns = [
     # document endpoints
     path("api/documents/", document_views.DocumentListView.as_view()),
     path("api/documents/<str:filename>", document_views.document_create, name='document-create'),
-    path("api/documents/<int:id>/details", document_views.DocumentView.as_view()),
+    path("api/documents/<int:id>/details", document_views.DocumentView.as_view(), name='document-detail'),
     path("api/documents/<int:id>/data", document_views.DocumentDataView.as_view()),
 
     # folder endpoints
     path("api/folders/", folder_views.FolderListView.as_view(), name='folder-create'),
+    path("api/folders/<int:pk>", folder_views.FolderDetailView.as_view(), name='folder-detail'),
+    path("api/folders/<int:pk>/document", folder_views.FolderAddDocumentView.as_view(), name='folder-add-document'),
+    path("api/folders/<int:pk>/document/<int:doc_id>", folder_views.FolderDocumentDetailView.as_view(),
+         name='folder-document-detail'),
 
     # static file endpoints
     path("<path:resource>", index),

@@ -26,13 +26,12 @@ const store = configureStore({
 const queryClient = new QueryClient()
 
 ReactDOM.render(
-    <React.StrictMode>
         <Provider store={store}>
             <HashRouter>
                 <QueryClientProvider client={queryClient}>
                     <App>
                         <Switch>
-                            <Route path="/documents/:documentId">
+                            <Route path="/folders/:folderId/documents/:documentId">
                                 <Viewer/>
                             </Route>
                             <Route path="/search">
@@ -45,7 +44,6 @@ ReactDOM.render(
                     </App>
                 </QueryClientProvider>
             </HashRouter>
-        </Provider>
-    </React.StrictMode>,
+        </Provider>,
     document.getElementById('root')
 );

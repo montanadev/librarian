@@ -14,7 +14,8 @@ export function useContainerDimensions(myRef: React.RefObject<any>) {
         };
 
         if (myRef.current) {
-            setDimensions(getDimensions());
+            // TODO - there's something wonky going on with initial render sizing
+            setTimeout(() => setDimensions(getDimensions()), 100);
         }
 
         window.addEventListener('resize', handleResize);

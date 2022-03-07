@@ -1,25 +1,32 @@
 import './Sidebar.css';
 import './Job.css';
-import React from "react";
+import React, {useState} from "react";
 import {useInterval} from "../utils/setInterval";
-import {useDispatch} from "react-redux";
-import {refreshJob} from "../actions/Library";
 import Progress from "./Progress";
 import {Link} from "react-router-dom";
+import {Api} from "../utils/Api";
+import { useQueryClient } from 'react-query';
 
 export interface JobProps {
     job: any
 }
 
 function Job(props: JobProps) {
-    const dispatch = useDispatch();
+    const api = new Api();
+    const queryClient = useQueryClient()
+    const [job, setJob] = useState(props.job)
 
     useInterval(() => {
-        dispatch(refreshJob(props.job.id))
-    }, props.job.status === 'ANNOTATED' ? null : 1000)
+        api.refreshJob(props.job.id).then(job => setJob(job));
+    }, job.status === 'ANNOTATED' ? null : 1000)
+
+    if (job.status === 'ANNOTATED') {
+        // job finished, reload folders to pick up newly uploaded document
+        queryClient.invalidateQueries("folders");
+    }
 
     let progress = () => {
-        switch (props.job.status) {
+        switch (job.status) {
             case "CREATED":
                 return <Progress percent={10} done={false} success={false}/>
             case "PERSISTING":
@@ -41,8 +48,8 @@ function Job(props: JobProps) {
 
     return <div className="Job">
         <div className="JobFilename">
-            {props.job.status === "ANNOTATED" ?
-                <Link to={`/documents/${props.job.id}`}>{props.job.filename}</Link> : props.job.filename}
+            {job.status === "ANNOTATED" ?
+                <Link to={`/documents/${job.id}`}>{job.filename}</Link> : job.filename}
         </div>
         <div className="JobProgress">
             {progress()}

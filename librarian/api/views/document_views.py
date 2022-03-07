@@ -3,7 +3,7 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404
+from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404, RetrieveUpdateAPIView
 
 from librarian.api.models import Document, DocumentPageImage
 from librarian.api.serializers import DocumentSerializer, DocumentPageImageSerializer
@@ -17,7 +17,7 @@ class DocumentListView(ListAPIView):
     serializer_class = DocumentSerializer
 
 
-class DocumentView(RetrieveAPIView):
+class DocumentView(RetrieveUpdateAPIView):
     serializer_class = DocumentSerializer
 
     def get_object(self):
