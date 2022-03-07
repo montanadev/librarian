@@ -35,7 +35,7 @@ export function CreateFolderModal({visible, onClose}: Props) {
     >
         <form>
             <h3>Folder name</h3>
-            <Input className="w-full" type="text" {...register("folderName")} />
+            <input className="w-full" type="text" {...register("folderName")} />
         </form>
     </Modal>
 }

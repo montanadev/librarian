@@ -55,6 +55,8 @@ class FolderSerializer(serializers.ModelSerializer):
             doc_obj.save()
 
         instance.__dict__.update(validated_data)
+        instance.save()
+
         return instance
 
 

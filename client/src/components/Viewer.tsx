@@ -71,6 +71,7 @@ function Viewer() {
     const containerRef = useRef<any>()
     const {width} = useContainerDimensions(containerRef)
 
+    console.log(`Rendering pdf from http://0.0.0.0:8000/api/documents/${documentId}/data`)
     return <div>
         <AddToFolderModal visible={openAddToFolderModal}
                           onClose={() => setOpenAddToFolderModal(false)}
@@ -107,7 +108,10 @@ function Viewer() {
         <div ref={containerRef}>
             <Document file={`/api/documents/${documentId}/data`}
                       loading={<Spin size="large"/>}
-                      onLoadSuccess={onDocumentLoadSuccess}>
+                      onLoadSuccess={onDocumentLoadSuccess}
+                      onLoadError={(error) => alert('Error while loading document! ' + error.message)}
+                      onSourceError={(error) => alert('Error while retrieving document source! ' + error.message)}
+            >
                 {Array.from(new Array(numPages), (el, index) => (
                     <Page width={width} key={`page_${index + 1}`}
                           pageNumber={index + 1}/>

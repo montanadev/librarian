@@ -64,8 +64,7 @@ class TestFolderViews(TestCase):
         self.assertEqual(folder.status_code, status.HTTP_201_CREATED)
 
         url = reverse('folder-detail', args=(folder.json()['id'],))
-        body = folder.json()
-        body['name'] = 'renamed'
+        body = {'name': 'renamed', 'documents': []}
         response = self.client.put(url, body, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['name'], 'renamed')

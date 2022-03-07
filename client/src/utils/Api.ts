@@ -57,4 +57,14 @@ export class Api {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         return fetch('http://0.0.0.0:8000/api/folders/').then(d => d.json());
     }
+
+    renameFolder(folderId: number, newFolderName: string) {
+        return fetch(`http://0.0.0.0:8000/api/folders/${folderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: folderId, name: newFolderName, documents: []}),
+        });
+    }
 }
