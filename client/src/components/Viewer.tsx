@@ -1,8 +1,8 @@
 import React, {useRef, useState} from "react";
 import './Uploader.css';
 import {useHistory, useParams} from "react-router-dom";
-import {Button, Divider, Spin} from "antd";
-
+import {Button, Divider, Spin, Typography} from "antd";
+import {CheckOutlined, HighlightOutlined, EditOutlined} from "@ant-design/icons";
 import {Document, Page} from 'react-pdf';
 import {useContainerDimensions} from "../utils/useContainerDimenstions";
 import {AddToFolderModal} from "./modals/AddToFolderModal";
@@ -10,7 +10,9 @@ import {Api} from "../utils/Api";
 import {ResourceModel} from "../models/Resource";
 import {FolderModel} from "../models/Folder";
 import {useQuery, useQueryClient} from "react-query";
+import {DocumentModel} from "../models/Document";
 
+const {Paragraph} = Typography;
 
 function Viewer() {
     let {documentId, folderId} = useParams<any>();
@@ -27,26 +29,25 @@ function Viewer() {
         setPdf(pdf);
     }
 
-    const {
-        isLoading,
-        error,
-        data,
-        isFetching
-    } = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
+    const folders = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
 
     let next: Array<number> = [];
     let prev: Array<number> = [];
+    let folder: any = null;
+    let document: any = null;
 
-    if (data && !isLoading) {
+    if (folders.data && !folders.isLoading) {
         let entries = [];
         let foundIdx = -1;
 
         // flatten the folder / doc hierarchy into list
-        for (let folder of data.results) {
-            for (let document of folder.documents) {
-                entries.push([folder.id, document.id]);
-                if (document.id === parseInt(documentId) && folder.id === parseInt(folderId)) {
+        for (let seekFolder of folders.data.results) {
+            for (let seekDocument of seekFolder.documents) {
+                entries.push([seekFolder.id, seekDocument.id]);
+                if (seekDocument.id === parseInt(documentId) && seekFolder.id === parseInt(folderId)) {
                     foundIdx = entries.length - 1;
+                    document = seekDocument;
+                    folder = seekFolder;
                 }
             }
         }
@@ -83,6 +84,18 @@ function Viewer() {
                           }}/>
 
         <div>
+                {document ? <Typography.Title
+                    style={{ margin: 0 }}
+                    level={1}
+                    editable={{
+                        icon: <EditOutlined style={{fontSize: 22}}/>,
+                        onChange: (newDocumentName: string) => {
+                            api.renameDocument(document.id, newDocumentName).then(() => {
+                                queryClient.invalidateQueries('folders');
+                            })
+                        },
+                        enterIcon: <CheckOutlined/>,
+                    }}>{document.filename}</Typography.Title> : null }
             <Button onClick={() => setOpenAddToFolderModal(true)}>Add to folder</Button>
             <Divider type="vertical"/>
             <Button disabled>Remove from folder</Button>

@@ -1,4 +1,4 @@
-import React, {cloneElement, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 
 import {Breadcrumb, Button, Input, Layout, Menu} from 'antd';
@@ -6,15 +6,15 @@ import Sidebar from "./Sidebar";
 import {SetupWizardModal} from "./modals/SetupWizardModal";
 import {SearchOutlined} from '@ant-design/icons';
 import {useHistory} from 'react-router';
-import {Link} from 'react-router-dom';
+import {Link, Route, Switch} from 'react-router-dom';
+import Viewer from "./Viewer";
+import Search from "./Search";
+import Uploader from "./Uploader";
 
 const {Header, Content} = Layout;
 
-interface AppProps {
-    children: any
-}
 
-function App(props: AppProps) {
+function App() {
     const [wizardOpen, setWizardOpen] = useState(false)
     const [search, setSearch] = useState<string>();
     const [breadcrumbs, setBreadcrumbs] = useState<Array<string>>([]);
@@ -29,14 +29,21 @@ function App(props: AppProps) {
         history.push(`/search?q=${encodeURIComponent(search)}`)
     }
 
-    useEffect(() => {
-        //const {isLoading, error, data} = useQuery('config', () =>
-        //        fetch('http://0.0.0.0:8000/api/config/').then(res => res.json()), {retry: false});
-
-        //if (error) {
-        //    console.log(error);
-        //}
-    }, [])
+    // withSidebar embeds the sidebar into the rendered component.
+    // needed to inform the sidebar what is currently selected
+    const withSidebar = (children: any) => {
+        return <Layout>
+            <Sidebar/>
+            <Breadcrumb style={{margin: '16px 0'}}>
+                {breadcrumbs ? breadcrumbs.map((b, idx) =>
+                    <Breadcrumb.Item key={idx}>{b}</Breadcrumb.Item>
+                ) : null}
+            </Breadcrumb>
+            <Content className="AppContent">
+                {children}
+            </Content>
+        </Layout>
+    }
 
     return (
         <Layout>
@@ -56,20 +63,19 @@ function App(props: AppProps) {
                         <Button onClick={onSearch} className="items-center"><SearchOutlined/></Button>
                     </div>
                 </Menu>
-
             </Header>
             <Layout>
-                <Sidebar/>
-                <Layout>
-                    <Breadcrumb style={{margin: '16px 0'}}>
-                        {breadcrumbs ? breadcrumbs.map((b, idx) =>
-                            <Breadcrumb.Item key={idx}>{b}</Breadcrumb.Item>
-                        ) : null}
-                    </Breadcrumb>
-                    <Content className="AppContent">
-                        {props.children}
-                    </Content>
-                </Layout>
+                <Switch>
+                    <Route path="/folders/:folderId/documents/:documentId">
+                        {withSidebar(<Viewer/>)}
+                    </Route>
+                    <Route path="/search">
+                        {withSidebar(<Search/>)}
+                    </Route>
+                    <Route path="/">
+                        {withSidebar(<Uploader/>)}
+                    </Route>
+                </Switch>
             </Layout>
         </Layout>
     );

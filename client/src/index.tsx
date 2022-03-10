@@ -26,24 +26,12 @@ const store = configureStore({
 const queryClient = new QueryClient()
 
 ReactDOM.render(
-        <Provider store={store}>
-            <HashRouter>
-                <QueryClientProvider client={queryClient}>
-                    <App>
-                        <Switch>
-                            <Route path="/folders/:folderId/documents/:documentId">
-                                <Viewer/>
-                            </Route>
-                            <Route path="/search">
-                                <Search/>
-                            </Route>
-                            <Route path="/">
-                                <Uploader/>
-                            </Route>
-                        </Switch>
-                    </App>
-                </QueryClientProvider>
-            </HashRouter>
-        </Provider>,
+    <Provider store={store}>
+        <HashRouter>
+            <QueryClientProvider client={queryClient}>
+                <App/>
+            </QueryClientProvider>
+        </HashRouter>
+    </Provider>,
     document.getElementById('root')
 );

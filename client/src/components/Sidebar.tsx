@@ -1,14 +1,8 @@
 import './Sidebar.css';
 import {Layout, Menu, Typography} from "antd";
-import {
-    FileAddOutlined,
-    FolderAddOutlined,
-    RadiusUprightOutlined,
-    CheckOutlined,
-    HighlightOutlined
-} from "@ant-design/icons";
+import {FileAddOutlined, FolderAddOutlined, RadiusUprightOutlined} from "@ant-design/icons";
 import React, {useState} from "react";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {Api} from "../utils/Api";
 import {CreateFolderModal} from "./modals/CreateFolderModal";
 import {FolderModel} from "../models/Folder";
@@ -22,51 +16,40 @@ const {Sider} = Layout;
 
 function Sidebar() {
     const [createFolderOpen, setCreateFolderOpen] = useState(false);
-    const queryClient = useQueryClient();
+    let {documentId, folderId} = useParams<any>();
 
     const api = new Api();
-    const {isLoading, error, data, isFetching} = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
+    const folders = useQuery<ResourceModel<FolderModel>>("folders", api.getFolders);
 
-    const makeEditable = (folder: FolderModel) => {
-        if (folder.name === 'Unsorted') {
-            return folder.name;
-        }
-        return <Paragraph
-            editable={{
-                icon: <HighlightOutlined/>,
-                tooltip: 'Click to rename',
-                onChange: (newFolderName) => {
-                    api.renameFolder(folder.id, newFolderName).then(() => {
-                        queryClient.invalidateQueries('folders');
-                    })
-                },
-                enterIcon: <CheckOutlined/>,
-            }}>{folder.name}</Paragraph>
-    }
+    const openDocuments = [`document-${documentId}`];
+    const openFolders = [`folder-${folderId}`];
 
-    return <div>
+    return <div key={`sidebar-${documentId}-${folderId}`}>
         <CreateFolderModal visible={createFolderOpen} onClose={() => setCreateFolderOpen(false)}/>
         <Sider width={200} className="site-layout-background">
             <Menu mode="inline"
-                  defaultOpenKeys={['sub1']}
+                  defaultSelectedKeys={openDocuments}
+                  defaultOpenKeys={openFolders}
                   style={{height: '100%', borderRight: 0}}>
                 <Menu.Item key="upload" icon={<FileAddOutlined/>}>
                     <Link to="/">Upload</Link>
                 </Menu.Item>
+                <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>
+                    Add Folder
+                </Menu.Item>
 
-                {data ? data.results.map((f: FolderModel) =>
-                    <SubMenu key={f.id} title={makeEditable(f)} icon={f.name === 'Unsorted' ? <RadiusUprightOutlined/> : null}>
+                <Menu.Divider />
+
+                {folders.data ? folders.data.results.map((f: FolderModel) =>
+                    <SubMenu key={`folder-${f.id}`} title={f.name}
+                             icon={f.name === 'Unsorted' ? <RadiusUprightOutlined/> : null}>
                         {f.documents ? f.documents.map(d => {
-                            return <Menu.Item key={d.id}>
+                            return <Menu.Item key={`document-${d.id}`}>
                                 <Link to={`/folders/${f.id}/documents/${d.id}`}>{d.filename}</Link>
                             </Menu.Item>
                         }) : []}
                     </SubMenu>
                 ) : null}
-
-                <Menu.Item key="create-folder" onClick={() => setCreateFolderOpen(true)} icon={<FolderAddOutlined/>}>
-                    Add Folder
-                </Menu.Item>
             </Menu>
         </Sider>
     </div>

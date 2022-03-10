@@ -15,8 +15,7 @@ class TestDocumentViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
         url = reverse('document-detail', args=(response.json()['id'],))
-        body = response.json()
-        body['filename'] = 'renamed'
+        body = {'filename': 'renamed', 'id': response.json()['id']}
 
         response = self.client.put(url, body, format="json")
         self.assertEqual(response.status_code, 200)

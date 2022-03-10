@@ -1,8 +1,6 @@
 import {JobModel} from "../models/Job";
 import {DocumentModel} from "../models/Document";
 import {ResourceModel} from "../models/Resource";
-import {FolderModel} from "../models/Folder";
-import {useQuery, useQueryClient} from "react-query";
 
 export class Api {
     getDocuments(): Promise<ResourceModel<DocumentModel>> {
@@ -10,18 +8,18 @@ export class Api {
     }
 
     refreshJob(jobId: number): Promise<JobModel> {
-        return fetch(`http://0.0.0.0:8000/api/documents/${jobId}/details`).then(d => d.json());
+        return fetch(`/api/documents/${jobId}/details`).then(d => d.json());
     }
 
     createDocument(acceptedFiles: any) {
-        return acceptedFiles.map((file: any) => fetch(`http://0.0.0.0:8000/api/documents/${file.name}`, {
+        return acceptedFiles.map((file: any) => fetch(`/api/documents/${file.name}`, {
             method: 'POST',
             body: file,
         }).then(d => d.json()));
     }
 
     saveConfig(data: any) {
-        return fetch('http://0.0.0.0:8000/api/config/', {
+        return fetch('/api/config/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -31,7 +29,7 @@ export class Api {
     }
 
     createFolder(folderName: string) {
-        return fetch('http://0.0.0.0:8000/api/folders/', {
+        return fetch('/api/folders/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -44,7 +42,7 @@ export class Api {
     }
 
     addDocumentToFolder(documentId: number, folderId: number) {
-        return fetch(`http://0.0.0.0:8000/api/folders/${folderId}/document`, {
+        return fetch(`/api/folders/${folderId}/document`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -54,17 +52,26 @@ export class Api {
     }
 
     getFolders() {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return fetch('http://0.0.0.0:8000/api/folders/').then(d => d.json());
+        return fetch('/api/folders/').then(d => d.json());
     }
 
     renameFolder(folderId: number, newFolderName: string) {
-        return fetch(`http://0.0.0.0:8000/api/folders/${folderId}`, {
+        return fetch(`/api/folders/${folderId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({id: folderId, name: newFolderName, documents: []}),
+        });
+    }
+
+    renameDocument(documentId: number, newDocumentName: string) {
+        return fetch(`/api/documents/${documentId}/details`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: documentId, filename: newDocumentName}),
         });
     }
 }
