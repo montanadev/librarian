@@ -43,7 +43,7 @@ class DocumentTextSearchView(RetrieveAPIView):
 @api_view(["POST"])
 def document_create(request, filename):
     doc_hash = md5_for_bytes(request.body)
-    if Document.objects.filter(hash=doc_hash).exists() and False:
+    if Document.objects.filter(hash=doc_hash).exists():
         logger.warning("Document hash already uploaded, skipping")
         return JsonResponse({"reason": "Document already uploaded"}, status=status.HTTP_400_BAD_REQUEST)
 
