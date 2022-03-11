@@ -1,7 +1,7 @@
-import {DocumentModel} from "./Document";
+import { DocumentModel } from "./Document";
 
 export interface FolderModel {
-    id: number
-    name: string
-    documents: Array<DocumentModel>
+  id: number;
+  name: string;
+  documents: Array<DocumentModel>;
 }
