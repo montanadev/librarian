@@ -40,7 +40,6 @@ function Viewer() {
 
   let next: Array<number> = [];
   let prev: Array<number> = [];
-  let folder: any = null;
   let document: any = null;
 
   if (folders.data && !folders.isLoading) {
@@ -57,7 +56,6 @@ function Viewer() {
         ) {
           foundIdx = entries.length - 1;
           document = seekDocument;
-          folder = seekFolder;
         }
       }
     }
