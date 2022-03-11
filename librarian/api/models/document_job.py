@@ -45,9 +45,12 @@ class DocumentJob(models.Model):
 
         if self.job == DocumentJobJobs.persist:
             try:
+                logger.debug(f"Persistence mode {settings.STORAGE_MODE}")
                 if settings.STORAGE_MODE == "local":
+                    dest = settings.LOCAL_STORAGE_PATH + "/" + dc.filename
+                    logger.debug(f"Persisting to {dest}")
                     # TODO - no need to open / write, just move from temp to filestore path
-                    with open(settings.LOCAL_STORAGE_PATH + "/" + dc.filename, mode="wb") as local_f, \
+                    with open(dest, mode="wb") as local_f, \
                             open(dc.temp_path, "rb") as tmp_f:
                         local_f.write(bytearray(tmp_f.read()))
                 elif settings.STORAGE_MODE == "nfs":
@@ -92,11 +95,14 @@ class DocumentJob(models.Model):
             try:
                 b = dc.get_bytes_from_filestore()
 
-                d = tempfile.mkdtemp()
-                with tempfile.NamedTemporaryFile() as f:
+                # temp dir to hold imagemagick output images
+                image_dir = tempfile.mkdtemp()
+                # temp file to write file to disk for imagemagick
+                fd, input_file = tempfile.mkstemp()
+                with open(fd, "w+b") as f:
                     f.write(b)
 
-                cmd = f"convert -density 150 {f.name} -quality 90 {d}/output.png"
+                cmd = f"convert -density 150 {input_file} -quality 90 {image_dir}/output.png"
 
                 start_time = datetime.now()
                 logger.debug(f"Starting conversion...: \n{cmd}")
@@ -110,7 +116,7 @@ class DocumentJob(models.Model):
 
                 seen = 0
                 # list images from pdf split
-                for filename in os.listdir(d):
+                for filename in os.listdir(image_dir):
                     seen += 1
                     page_number = 0
 
@@ -120,17 +126,19 @@ class DocumentJob(models.Model):
                         # split "5.png" to 5
                         page_number, _ = filename_parts.split(".")
 
-                    DocumentPageImage.objects.create(document=dc, temp_path=f"{d}/{filename}",
+                    DocumentPageImage.objects.create(document=dc, temp_path=f"{image_dir}/{filename}",
                                                      page_number=int(page_number))
 
                 if not seen:
                     logger.warning(f"No images detected from imagemagick convert command: '{cmd}'")
                 logger.debug(f"Stored {seen} pages from imagemagick convert command")
 
+                # cleanup temp file,  but dont cleanup images: still needed for annotation
+                os.remove(input_file)
+
                 dc.status = self.desired_status
                 dc.save()
                 dc.annotate()
-
             except Exception as e:
                 successful = False
                 failed_reason = str(e)
@@ -142,7 +150,6 @@ class DocumentJob(models.Model):
                     successful=successful,
                     failed_reason=failed_reason,
                 )
-
                 self.save()
 
         if self.job == DocumentJobJobs.annotate:

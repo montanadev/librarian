@@ -1,13 +1,12 @@
-
 .Uploader {
-    height: 200px;
-    border: 2px dashed #001529;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+  height: 200px;
+  border: 2px dashed #001529;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .UploaderText {
-    font-style: italic;
+  font-style: italic;
 }

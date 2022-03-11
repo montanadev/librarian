@@ -56,6 +56,7 @@ class Document(models.Model):
             f.write(content)
 
         self.temp_path = path
+        logger.debug(f"Temp persist: {path}")
         self.save()
 
         DocumentJob.objects.create(

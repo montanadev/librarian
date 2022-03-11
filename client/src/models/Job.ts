@@ -1,3 +1,3 @@
 export interface JobModel {
-    id: any
+  id: any;
 }

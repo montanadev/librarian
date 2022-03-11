@@ -1,70 +1,54 @@
-import {JobModel} from "../models/Job";
-import {DocumentModel} from "../models/Document";
-import {ResourceModel} from "../models/Resource";
-import {FolderModel} from "../models/Folder";
-import {useQuery, useQueryClient} from "react-query";
+import { JobModel } from "../models/Job";
+import { DocumentModel } from "../models/Document";
+import { ResourceModel } from "../models/Resource";
+import axios from "axios";
 
 export class Api {
-    getDocuments(): Promise<ResourceModel<DocumentModel>> {
-        return fetch("http://localhost:8000/api/documents/").then(d => d.json());
-    }
+  getDocuments(): Promise<ResourceModel<DocumentModel>> {
+    return axios.get("/api/documents/").then((d) => d.data);
+  }
 
-    refreshJob(jobId: number): Promise<JobModel> {
-        return fetch(`http://0.0.0.0:8000/api/documents/${jobId}/details`).then(d => d.json());
-    }
+  refreshJob(jobId: number): Promise<JobModel> {
+    return axios.get(`/api/documents/${jobId}/details`).then((d) => d.data);
+  }
 
-    createDocument(acceptedFiles: any) {
-        return acceptedFiles.map((file: any) => fetch(`http://0.0.0.0:8000/api/documents/${file.name}`, {
-            method: 'POST',
-            body: file,
-        }).then(d => d.json()));
-    }
+  uploadDocuments(file: any) {
+    return axios
+      .post(`/api/documents/${file.name}`, file)
+      .then((d) => d.data)
+      .catch((error: any) => {
+        return Promise.reject(error.response.data.reason);
+      });
+  }
 
-    saveConfig(data: any) {
-        return fetch('http://0.0.0.0:8000/api/config/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data),
-        }).then(res => res.json());
-    }
+  saveConfig(data: any) {
+    return axios.post("/api/config/", data).then((d) => d.data);
+  }
 
-    createFolder(folderName: string) {
-        return fetch('http://0.0.0.0:8000/api/folders/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({name: folderName, documents: []}),
-        }).then(() => {
+  createFolder(folderName: string) {
+    return axios.post("/api/folders/", { name: folderName, documents: [] });
+  }
 
-            console.log("Invalidated!");
-        });
-    }
+  addDocumentToFolder(documentId: number, folderId: number) {
+    return axios.put(`/api/folders/${folderId}/document`, { id: documentId });
+  }
 
-    addDocumentToFolder(documentId: number, folderId: number) {
-        return fetch(`http://0.0.0.0:8000/api/folders/${folderId}/document`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({id: documentId}),
-        });
-    }
+  getFolders() {
+    return axios.get("/api/folders/").then((d) => d.data);
+  }
 
-    getFolders() {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return fetch('http://0.0.0.0:8000/api/folders/').then(d => d.json());
-    }
+  renameFolder(folderId: number, newFolderName: string) {
+    return axios.put(`/api/folders/${folderId}`, {
+      id: folderId,
+      name: newFolderName,
+      documents: [],
+    });
+  }
 
-    renameFolder(folderId: number, newFolderName: string) {
-        return fetch(`http://0.0.0.0:8000/api/folders/${folderId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({id: folderId, name: newFolderName, documents: []}),
-        });
-    }
+  renameDocument(documentId: number, newDocumentName: string) {
+    return axios.put(`/api/documents/${documentId}/details`, {
+      id: documentId,
+      filename: newDocumentName,
+    });
+  }
 }

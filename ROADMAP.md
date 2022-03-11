@@ -7,19 +7,21 @@
   - [x] filenames
   - [x] text
   - [ ] seek to highlighted text in page
-- [ ] docker builds
+- [x] docker builds
 - [ ] image support (png, jpg)
 - [ ] wizard for first-time setup
   - [x] backend config storage
   - [ ] frontend sending to storage
 - [x] support local file storage (disable nfs)
-- [ ] single REST call to check status of multiple uploads 
+- [ ] basic cypress tests
 
 ## Beta
 
-* <500 page pdfs are viewable
+- [ ] <500 page pdfs are viewable
+- [ ] single REST call to check status of multiple uploads
 
-## 1.0
+## Nice to haves
 
-* pluggable workers (single thread, distributed)
-* document jobs page
+- [ ] toggle allow duplicate uploads / md5 hashes
+- [ ] delete document
+- [ ] combine multiple documents into single document
