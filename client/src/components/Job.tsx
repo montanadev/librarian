@@ -49,7 +49,7 @@ function Job(props: JobProps) {
     return <div className="Job">
         <div className="JobFilename">
             {job.status === "ANNOTATED" ?
-                <Link to={`/documents/${job.id}`}>{job.filename}</Link> : job.filename}
+                <Link to={`/folders/${job.folder}/documents/${job.id}`}>{job.filename} (click to view)</Link> : job.filename}
         </div>
         <div className="JobProgress">
             {progress()}

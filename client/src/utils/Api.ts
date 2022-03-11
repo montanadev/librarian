@@ -1,6 +1,7 @@
 import {JobModel} from "../models/Job";
 import {DocumentModel} from "../models/Document";
 import {ResourceModel} from "../models/Resource";
+import axios from "axios";
 
 export class Api {
     getDocuments(): Promise<ResourceModel<DocumentModel>> {
@@ -11,11 +12,12 @@ export class Api {
         return fetch(`/api/documents/${jobId}/details`).then(d => d.json());
     }
 
-    createDocument(acceptedFiles: any) {
-        return acceptedFiles.map((file: any) => fetch(`/api/documents/${file.name}`, {
-            method: 'POST',
+    uploadDocuments(file: any) {
+        return axios.post(`/api/documents/${file.name}`, {
             body: file,
-        }).then(d => d.json()));
+        }).then(d => d.data).catch((error: any) => {
+            return Promise.reject(error.response.data.reason)
+        });
     }
 
     saveConfig(data: any) {

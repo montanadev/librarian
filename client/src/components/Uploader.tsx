@@ -12,7 +12,11 @@ const Uploader = () => {
     const api = new Api();
 
     const onDropInternal = useCallback(acceptedFiles => {
-        Promise.all(api.createDocument(acceptedFiles)).then(docs => setJobs(prevJobs => prevJobs.concat(docs as any)));
+        for (let file of acceptedFiles) {
+            api.uploadDocuments(file).then((doc: any) => setJobs(prevJobs => prevJobs.concat(doc as any))).catch((error: any) => {
+                alert(error)
+            });
+        }
     }, []);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop: onDropInternal} as any)

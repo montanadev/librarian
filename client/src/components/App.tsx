@@ -55,13 +55,15 @@ function App() {
                 <Menu theme="dark" mode="horizontal">
                     <Menu.Item key="home"><Link to={'/'}>Home</Link></Menu.Item>
                     <Menu.Item onClick={() => setWizardOpen(true)} key="settings">Settings</Menu.Item>
-                    <div className="items-center h-16 flex float-right pr-4 w-auto">
-                        <Input onChange={(e) => setSearch(e.target.value)}
-                               onPressEnter={onSearch}
-                               type="text"
-                               placeholder="Search"/>
-                        <Button onClick={onSearch} className="items-center"><SearchOutlined/></Button>
-                    </div>
+                    <li style={{order: 2, width: '100%'}}>
+                        <div className="items-center h-16 flex float-right pr-4 w-auto">
+                            <Input onChange={(e) => setSearch(e.target.value)}
+                                   onPressEnter={onSearch}
+                                   type="text"
+                                   placeholder="Search"/>
+                            <Button onClick={onSearch} className="items-center"><SearchOutlined/></Button>
+                        </div>
+                    </li>
                 </Menu>
             </Header>
             <Layout>
