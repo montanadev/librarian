@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { DocumentModel } from "../models/Document";
 import { Link } from "react-router-dom";
 import { DocumentTextModel } from "../models/DocumentText";
+import { Api } from "../utils/Api";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -14,20 +14,11 @@ function Search() {
   const [documentTextSearch, setDocumentTextSearch] = useState([]);
   const query = useQuery();
   const q = query.get("q");
-  console.log(q);
+  const api = new Api();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/documents/search", {
-        params: { q },
-      })
-      .then((d) => setDocumentSearch(d.data));
-
-    axios
-      .get("http://localhost:8000/api/documents/text/search", {
-        params: { q },
-      })
-      .then((d) => setDocumentTextSearch(d.data));
+    api.searchDocumentTitles(q).then((d) => setDocumentSearch(d.data));
+    api.searchDocumentText(q).then((d) => setDocumentTextSearch(d.data));
   }, [q]);
 
   const formatDocumentLinks = (links: Array<DocumentModel>) => {

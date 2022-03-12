@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import { ToastContainer } from "react-toastify";
 
 import { Breadcrumb, Button, Input, Layout, Menu } from "antd";
 import Sidebar from "./Sidebar";
@@ -7,7 +8,7 @@ import { SetupWizardModal } from "./modals/SetupWizardModal";
 import { SearchOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
-import Viewer from "./Viewer";
+import Viewer from "./viewer/Viewer";
 import Search from "./Search";
 import Uploader from "./Uploader";
 
@@ -48,6 +49,8 @@ function App() {
 
   return (
     <Layout>
+      <ToastContainer />
+
       <SetupWizardModal
         visible={wizardOpen}
         onClose={() => setWizardOpen(false)}
@@ -78,10 +81,13 @@ function App() {
       </Header>
       <Layout>
         <Switch>
-          <Route path="/folders/:folderId/documents/:documentId">
+          <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
             {withSidebar(<Viewer />)}
           </Route>
           <Route path="/search">{withSidebar(<Search />)}</Route>
+          <Route path="/folders/:folderId/documents/:documentId">
+            {withSidebar(<Viewer />)}
+          </Route>
           <Route path="/">{withSidebar(<Uploader />)}</Route>
         </Switch>
       </Layout>
