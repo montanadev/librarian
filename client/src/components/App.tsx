@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 
@@ -8,9 +8,9 @@ import { SetupWizardModal } from "./modals/SetupWizardModal";
 import { SearchOutlined } from "@ant-design/icons";
 import { useHistory } from "react-router";
 import { Link, Route, Switch } from "react-router-dom";
-import Viewer from "./viewer/Viewer";
 import Search from "./Search";
 import Uploader from "./Uploader";
+import Viewer from "./viewer/Viewer";
 
 const { Header, Content } = Layout;
 
@@ -55,6 +55,7 @@ function App() {
         visible={wizardOpen}
         onClose={() => setWizardOpen(false)}
       />
+
       <Header className="header AppHeader">
         <div className="AppLogo">librarian</div>
         <Menu theme="dark" mode="horizontal">

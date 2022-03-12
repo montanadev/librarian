@@ -31,13 +31,14 @@ function Viewer() {
     return <div />;
   }
 
-  const onDocumentRename = () => (newDocumentName: string) => {
+  const onDocumentRename = (newDocumentName: string) => {
     api.renameDocument(document.data.id, newDocumentName).then(() => {
       queryClient.invalidateQueries("folders");
+      queryClient.invalidateQueries("document");
     });
   };
 
-  const onAddDocumentToFolder = () => (folderId: number) => {
+  const onAddDocumentToFolder = (folderId: number) => {
     api.addDocumentToFolder(documentId, folderId).then(() => {
       setOpenAddToFolderModal(false);
       queryClient.invalidateQueries("folders");
