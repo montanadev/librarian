@@ -35,6 +35,7 @@ function Document({ pageNumber, documentId }: Props) {
         {Array.from(new Array(numPages), (el, index) => (
           <>
             <ReactPDFPage
+              renderAnnotationLayer={false}
               onRenderSuccess={() => {
                 if (pageNumber && parseInt(pageNumber) === index + 1) {
                   const pageEl = document.querySelector(
