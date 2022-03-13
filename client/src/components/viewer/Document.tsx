@@ -23,6 +23,13 @@ function Document({ pageNumber, documentId }: Props) {
   const ref = useRef<any>();
   const { width } = useContainerDimensions(ref);
 
+  const tryJump = () => {
+    const pageEl = document.querySelector(`[data-page-number="${pageNumber}"`);
+    if (pageEl) {
+      pageEl.scrollIntoView();
+    }
+  };
+
   return (
     <div ref={ref}>
       <ReactPDFDocument
@@ -38,12 +45,7 @@ function Document({ pageNumber, documentId }: Props) {
               renderAnnotationLayer={false}
               onRenderSuccess={() => {
                 if (pageNumber && parseInt(pageNumber) === index + 1) {
-                  const pageEl = document.querySelector(
-                    `[data-page-number="${pageNumber}"`
-                  );
-                  if (pageEl) {
-                    pageEl.scrollIntoView();
-                  }
+                  tryJump();
                 }
               }}
               width={width}
