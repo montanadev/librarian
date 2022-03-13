@@ -8,7 +8,14 @@ export class Api {
     return axios.get("/api/documents/").then((d) => d.data);
   }
 
+  getDocumentById(documentId: string): Promise<DocumentModel> {
+    return axios
+      .get(`/api/documents/${documentId}/details`)
+      .then((d) => d.data);
+  }
+
   refreshJob(jobId: number): Promise<JobModel> {
+    // TODO - dedupe this with `getDocumentById`
     return axios.get(`/api/documents/${jobId}/details`).then((d) => d.data);
   }
 
@@ -49,6 +56,18 @@ export class Api {
     return axios.put(`/api/documents/${documentId}/details`, {
       id: documentId,
       filename: newDocumentName,
+    });
+  }
+
+  searchDocumentTitles(q: string | null) {
+    return axios.get("/api/documents/search", {
+      params: { q },
+    });
+  }
+
+  searchDocumentText(q: string | null) {
+    return axios.get("/api/documents/text/search", {
+      params: { q },
     });
   }
 }
