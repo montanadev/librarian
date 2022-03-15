@@ -14,3 +14,20 @@ jobs:
           cd client
           npm install
           npm run prettier-check
+
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - run: |
+        sudo apt-get install -y libnfs-dev:
+
+        python -m pip install --upgrade pip
+        python -m pip install poetry
+
+        poetry install -D
+        poetry run fourmat check
