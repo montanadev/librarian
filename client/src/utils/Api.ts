@@ -28,8 +28,12 @@ export class Api {
       });
   }
 
-  saveConfig(data: any) {
-    return axios.post("/api/config/", data).then((d) => d.data);
+  getSettings() {
+    return axios.get("/api/settings").then((d) => d.data);
+  }
+
+  writeSettings(data: any) {
+    return axios.post("/api/settings", data).then((d) => d.data);
   }
 
   createFolder(folderName: string) {
@@ -69,5 +73,9 @@ export class Api {
     return axios.get("/api/documents/text/search", {
       params: { q },
     });
+  }
+
+  deleteDocument(documentId: string) {
+    return axios.delete(`/api/documents/${documentId}/details`);
   }
 }

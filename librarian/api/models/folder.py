@@ -6,4 +6,4 @@ class Folder(models.Model):
 
     @classmethod
     def get_default(cls):
-        return cls.objects.get(name='Unsorted')
+        return cls.objects.get(name="Unsorted")

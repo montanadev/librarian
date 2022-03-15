@@ -1,3 +1,4 @@
+from .settings import *
 from .document_status import *
 from .document_page_image import *
 from .document_job import *

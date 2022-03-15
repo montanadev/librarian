@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from librarian.api.models import Document, DocumentPageImage
-from librarian.api.models.config_models import Setup
 from librarian.api.models.folder import Folder
+from librarian.api.models.settings import Settings
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -11,19 +11,25 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = '__all__'
+        fields = "__all__"
 
 
 class DocumentPageImageSerializer(serializers.ModelSerializer):
+    folder = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_folder(obj):
+        return obj.document.folder.id
+
     class Meta:
         model = DocumentPageImage
-        fields = ('id', 'document', 'text')
+        fields = ("id", "document", "text", "folder", "page_number")
 
 
 class SetupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Setup
-        fields = '__all__'
+        model = Settings
+        fields = "__all__"
 
 
 class FolderSerializer(serializers.ModelSerializer):
@@ -31,14 +37,14 @@ class FolderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folder
-        fields = '__all__'
+        fields = "__all__"
 
     def create(self, validated_data):
-        docs = validated_data.pop('documents')
+        docs = validated_data.pop("documents")
         folder = Folder.objects.create(**validated_data)
 
         for doc in docs:
-            doc_obj = Document.objects.get(id=doc['id'])
+            doc_obj = Document.objects.get(id=doc["id"])
             # TODO - not very efficient, is there a way to do in bulk? set?
             doc_obj.folder = folder
             doc_obj.save()
@@ -46,10 +52,10 @@ class FolderSerializer(serializers.ModelSerializer):
         return folder
 
     def update(self, instance, validated_data):
-        docs = validated_data.pop('documents', [])
+        docs = validated_data.pop("documents", [])
 
         for doc in docs:
-            doc_obj = Document.objects.get(id=doc['id'])
+            doc_obj = Document.objects.get(id=doc["id"])
             # TODO - not very efficient, is there a way to do in bulk? set?
             doc_obj.folder = instance
             doc_obj.save()
@@ -65,4 +71,4 @@ class FolderAddDocumentViewSerializer(serializers.Serializer):
 
     class Meta:
         model = Document
-        fields = ('id',)
+        fields = ("id",)
