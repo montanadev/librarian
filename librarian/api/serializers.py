@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from librarian.api.models import Document, DocumentPageImage
-from librarian.api.models.config_models import Setup
+from librarian.api.models.settings import Settings
 from librarian.api.models.folder import Folder
 
 
@@ -22,7 +22,7 @@ class DocumentPageImageSerializer(serializers.ModelSerializer):
 
 class SetupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Setup
+        model = Settings
         fields = '__all__'
 
 

@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from librarian.api.views import document_views, config_views, folder_views
+from librarian.api.views import document_views, settings_views, folder_views
 from librarian.api.views.static_views import index
 
 urlpatterns = [
@@ -11,8 +11,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # config endpoints
-    path("api/config/", config_views.config_create, name='setup-data'),
-    path("api/config/read", config_views.config_get, name='get-data'),
+    path("api/settings", settings_views.get_or_create_settings_view, name='setup-data'),
 
     # search endpoints
     path("api/documents/search", document_views.document_search, name='document-search'),

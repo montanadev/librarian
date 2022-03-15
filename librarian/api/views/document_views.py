@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404, RetrieveUpdateAPIView
 
-from librarian.api.models import Document, DocumentPageImage
+from librarian.api.models import Document, DocumentPageImage, Settings
 from librarian.api.serializers import DocumentSerializer, DocumentPageImageSerializer
 from librarian.utils.hash import md5_for_bytes
 
@@ -26,8 +26,12 @@ class DocumentView(RetrieveUpdateAPIView):
 
 class DocumentDataView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
+        settings = Settings.objects.first()
+        if not settings:
+            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+
         dc = get_object_or_404(Document.objects, id=self.kwargs['id'])
-        data = dc.get_bytes_from_filestore()
+        data = dc.get_bytes_from_filestore(settings)
 
         return HttpResponse(bytes(data), headers={"Content-Type": "application/pdf"}, status=status.HTTP_200_OK)
 

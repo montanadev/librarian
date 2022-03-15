@@ -2,7 +2,6 @@ import logging
 import tempfile
 
 from django.apps import apps
-from django.conf import settings
 from django.db import models
 
 from librarian.api.models import DocumentJob, DocumentJobJobs
@@ -25,18 +24,18 @@ class Document(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_bytes_from_filestore(self):
-        if settings.STORAGE_MODE == "local":
-            with open(settings.LOCAL_STORAGE_PATH + "/" + self.filestore_path, mode="rb") as f:
+    def get_bytes_from_filestore(self, settings):
+        if settings.storage_mode == "local":
+            with open(settings.storage_path + "/" + self.filestore_path, mode="rb") as f:
                 b = f.read()
-        elif settings.STORAGE_MODE == "nfs":
+        elif settings.storage_mode == "nfs":
             import libnfs
-            nfs = libnfs.NFS(settings.NFS_PATH)
+            nfs = libnfs.NFS(settings.storage_path)
             nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
             b = nfs_f.read()
             nfs_f.close()
         else:
-            raise Exception(f"Storage mode {settings.STORAGE_MODE} not recognized, quitting")
+            raise Exception(f"Storage mode {settings.storage_mode} not recognized, quitting")
 
         return b
 

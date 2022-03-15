@@ -1,6 +1,10 @@
-import { Modal, Button, Select, Input } from "antd";
-import { useForm, Controller } from "react-hook-form";
+import { Button, Input, Modal, Select } from "antd";
+import { Controller, useForm } from "react-hook-form";
 import { Api } from "../../utils/Api";
+import { useQuery, useQueryClient } from "react-query";
+import { SettingsModel, StorageModes } from "../../models/Settings";
+
+const { TextArea } = Input;
 
 interface Props {
   visible: boolean;
@@ -9,7 +13,15 @@ interface Props {
 
 export function SetupWizardModal({ visible, onClose }: Props) {
   const api = new Api();
-  const { register, handleSubmit, control } = useForm();
+
+  const queryClient = useQueryClient();
+
+  const settings = useQuery<SettingsModel>("settings", api.getSettings);
+  const { handleSubmit, control } = useForm();
+
+  if (settings.isLoading || !settings.data) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Modal
@@ -21,23 +33,44 @@ export function SetupWizardModal({ visible, onClose }: Props) {
         <Button
           type="primary"
           htmlType="submit"
-          onClick={handleSubmit(api.saveConfig)}
+          onClick={handleSubmit((data) =>
+            api
+              .writeSettings(data)
+              .then(() => queryClient.invalidateQueries("settings"))
+              .then(() => onClose())
+          )}
         >
           Submit
         </Button>,
       ]}
     >
       <form>
-        <h3>Storage Options</h3>
+        <h3>Storage Mode</h3>
         <Controller
-          name="storageOption"
-          defaultValue="nas"
+          name="storage_mode"
           control={control}
-          render={({ onChange, value }: any) => (
-            <Select onChange={onChange} value={value} className="w-full">
-              <Select.Option value="nas">NAS</Select.Option>
-              <Select.Option value="local">Local (on the server)</Select.Option>
-            </Select>
+          defaultValue={settings.data.storage_mode ?? StorageModes[0]}
+          render={({ field }: any) => (
+            <Select
+              {...field}
+              className="w-full"
+              options={StorageModes.map((m) => {
+                return { value: m, label: m };
+              })}
+            />
+          )}
+        />
+
+        <br />
+        <br />
+
+        <h3>Storage Path</h3>
+        <Controller
+          name={"storage_path"}
+          control={control}
+          defaultValue={settings.data.storage_path ?? "/tmp"}
+          render={({ field }: any) => (
+            <Input {...field} className="w-full" type="text" />
           )}
         />
 
@@ -45,22 +78,11 @@ export function SetupWizardModal({ visible, onClose }: Props) {
         <br />
 
         <h3>Cloud Vision API Key</h3>
-        <Input className="w-full" type="text" {...register("gcvKey")} />
-
-        <br />
-        <br />
-
-        <h3>Django Secret Key</h3>
         <Controller
-          name="djangoSecretKey"
-          defaultValue="create"
+          name={"google_cloud_api_key"}
           control={control}
-          render={({ onChange, value }: any) => (
-            <Select onChange={onChange} value={value} className="w-full">
-              <Select.Option value="create">Create one for me</Select.Option>
-              <Select.Option value="custom">Custom</Select.Option>
-            </Select>
-          )}
+          defaultValue={settings.data.google_cloud_api_key ?? ""}
+          render={({ field }: any) => <TextArea {...field} rows={5} />}
         />
       </form>
     </Modal>
