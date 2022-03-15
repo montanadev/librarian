@@ -6,15 +6,16 @@ from librarian.api.models.settings import Settings
 
 
 class TestConfigViews(TestCase):
-
     def test_config_create(self):
         client = APIClient()
-        test_data = {'google_cloud_api_key': '{}',
-                     'storage_path': '10.0.1.1/volume1/test',
-                     'storage_mode': 'nfs'}
+        test_data = {
+            "google_cloud_api_key": "{}",
+            "storage_path": "10.0.1.1/volume1/test",
+            "storage_mode": "nfs",
+        }
 
         # request is sending data to the model
-        url = reverse('settings')
+        url = reverse("settings")
         url_with_query_parameters = url + "?hello=world"
 
         response = client.post(url_with_query_parameters, test_data, format="json")
@@ -26,13 +27,15 @@ class TestConfigViews(TestCase):
 
         # the data in the model should match what was sent
         settings_data = settings[0]
-        self.assertEqual(settings_data.google_cloud_api_key, test_data['google_cloud_api_key'])
-        self.assertEqual(settings_data.storage_path, test_data['storage_path'])
-        self.assertEqual(settings_data.storage_mode, test_data['storage_mode'])
+        self.assertEqual(
+            settings_data.google_cloud_api_key, test_data["google_cloud_api_key"]
+        )
+        self.assertEqual(settings_data.storage_path, test_data["storage_path"])
+        self.assertEqual(settings_data.storage_mode, test_data["storage_mode"])
 
     def test_config_get(self):
         client = APIClient()
 
-        url = reverse('settings')
+        url = reverse("settings")
         response = client.get(url)
         self.assertEqual(response.status_code, 200)

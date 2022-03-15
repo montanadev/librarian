@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from env_utils import get_env, get_bool
+from env_utils import get_bool, get_env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,7 +18,11 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:8000")
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+)
 
 LOGGING = {
     "version": 1,
@@ -63,9 +67,7 @@ ROOT_URLCONF = "librarian.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            os.path.join(BASE_DIR, 'client')
-        ],
+        "DIRS": [os.path.join(BASE_DIR, "client")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -117,22 +119,24 @@ USE_TZ = True
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5000000000  # 5GB
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'client', 'build', 'static'),
-)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "client", "build", "static"),)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
 }
 
 LOCAL_FRONTEND = get_bool("LOCAL_FRONTEND", False)
 
-GOOGLE_APPLICATION_CREDENTIALS = get_env("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
+GOOGLE_APPLICATION_CREDENTIALS = get_env(
+    "GOOGLE_APPLICATION_CREDENTIALS", "service-account.json"
+)
 NFS_PATH = get_env("NFS_PATH", "nfs://192.168.1.1/volume1/librarian")
-LOCAL_STORAGE_PATH = get_env("LOCAL_STORAGE_PATH", str(BASE_DIR.joinpath(Path('local-storage'))))
+LOCAL_STORAGE_PATH = get_env(
+    "LOCAL_STORAGE_PATH", str(BASE_DIR.joinpath(Path("local-storage")))
+)
 STORAGE_MODE = get_env("STORAGE_MODE", "local")
 
 # make local folder if not exists

@@ -4,8 +4,7 @@ import tempfile
 from django.apps import apps
 from django.db import models
 
-from librarian.api.models import DocumentJob, DocumentJobJobs
-from librarian.api.models import DocumentStatus
+from librarian.api.models import DocumentJob, DocumentJobJobs, DocumentStatus
 from librarian.api.models.folder import Folder
 
 logger = logging.getLogger(__name__)
@@ -17,35 +16,48 @@ class Document(models.Model):
     hash = models.TextField(null=True)
     temp_path = models.TextField(null=True)
     filestore_path = models.TextField(null=True)
-    folder = models.ForeignKey(Folder, null=True, related_name='documents', on_delete=models.SET_NULL)
+    folder = models.ForeignKey(
+        Folder, null=True, related_name="documents", on_delete=models.SET_NULL
+    )
 
-    status = models.TextField(choices=DocumentStatus.choices(), default=DocumentStatus.created.value)
+    status = models.TextField(
+        choices=DocumentStatus.choices(), default=DocumentStatus.created.value
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def get_bytes_from_filestore(self, settings):
         if settings.storage_mode == "local":
-            with open(settings.storage_path + "/" + self.filestore_path, mode="rb") as f:
+            with open(
+                settings.storage_path + "/" + self.filestore_path, mode="rb"
+            ) as f:
                 b = f.read()
         elif settings.storage_mode == "nfs":
             import libnfs
+
             nfs = libnfs.NFS(settings.storage_path)
             nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
             b = nfs_f.read()
             nfs_f.close()
         else:
-            raise Exception(f"Storage mode {settings.storage_mode} not recognized, quitting")
+            raise Exception(
+                f"Storage mode {settings.storage_mode} not recognized, quitting"
+            )
 
         return b
 
     @classmethod
     def create_from_filename(cls, filename, hash):
         # add new doc to the default folder
-        Folder = apps.get_model('api', 'Folder')
+        Folder = apps.get_model("api", "Folder")
 
-        return cls.objects.create(filename=filename, hash=hash, status=DocumentStatus.created,
-                                  folder=Folder.get_default())
+        return cls.objects.create(
+            filename=filename,
+            hash=hash,
+            status=DocumentStatus.created,
+            folder=Folder.get_default(),
+        )
 
     def persist_to_filestore(self, content):
         # store file uploaded by user to tempfile until persistence to blob store is

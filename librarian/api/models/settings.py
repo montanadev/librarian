@@ -10,5 +10,5 @@ class Settings(models.Model):
 
     def read_google_cloud_api_key(self):
         # replaces the html textarea rendered content from the frontend into svalid json
-        content = self.google_cloud_api_key.replace('\n', '')
+        content = self.google_cloud_api_key.replace("\n", "")
         return json.loads(content)

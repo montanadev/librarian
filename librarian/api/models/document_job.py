@@ -7,7 +7,7 @@ from datetime import datetime
 from django.db import models
 
 from librarian import annotate
-from librarian.api.models import DocumentStatus, DocumentPageImage, Settings
+from librarian.api.models import DocumentPageImage, DocumentStatus, Settings
 from librarian.utils.attrs import setattrs
 from librarian.utils.enum import BaseEnum
 
@@ -21,7 +21,7 @@ class DocumentJobJobs(BaseEnum):
 
 
 class DocumentJob(models.Model):
-    document = models.ForeignKey('Document', on_delete=models.CASCADE)
+    document = models.ForeignKey("Document", on_delete=models.CASCADE)
     job = models.TextField(choices=DocumentJobJobs.choices())
 
     current_status = models.TextField(choices=DocumentStatus.choices())
@@ -48,11 +48,13 @@ class DocumentJob(models.Model):
                 dest = settings.storage_path + "/" + dc.filename
                 logger.debug(f"Persisting to {dest}")
                 # TODO - no need to open / write, just move from temp to filestore path
-                with open(dest, mode="wb") as local_f, \
-                        open(dc.temp_path, "rb") as tmp_f:
+                with open(dest, mode="wb") as local_f, open(
+                    dc.temp_path, "rb"
+                ) as tmp_f:
                     local_f.write(bytearray(tmp_f.read()))
             elif settings.storage_mode == "nfs":
                 import libnfs
+
                 # read temp file into nfs
                 nfs = libnfs.NFS(settings.storage_path)
                 nfs_f = nfs.open("/" + dc.filename, mode="wb")
@@ -60,7 +62,9 @@ class DocumentJob(models.Model):
                     nfs_f.write(bytearray(tmp_f.read()))
                 nfs_f.close()
             else:
-                raise Exception(f"Storage mode {settings.storage_mode} not recognized, quitting")
+                raise Exception(
+                    f"Storage mode {settings.storage_mode} not recognized, quitting"
+                )
 
             # cleanup temp file
             os.remove(dc.temp_path)
@@ -86,7 +90,9 @@ class DocumentJob(models.Model):
             with open(fd, "w+b") as f:
                 f.write(b)
 
-            cmd = f"convert -density 150 {input_file} -quality 90 {image_dir}/output.png"
+            cmd = (
+                f"convert -density 150 {input_file} -quality 90 {image_dir}/output.png"
+            )
 
             start_time = datetime.now()
             logger.debug(f"Starting conversion...: \n{cmd}")
@@ -94,9 +100,7 @@ class DocumentJob(models.Model):
             subprocess.call(cmd.split(" "))
 
             duration = (datetime.now() - start_time).total_seconds()
-            logger.debug(
-                f"Starting conversion...done in {duration}s: \n{cmd}"
-            )
+            logger.debug(f"Starting conversion...done in {duration}s: \n{cmd}")
 
             seen = 0
             # list images from pdf split
@@ -110,11 +114,16 @@ class DocumentJob(models.Model):
                     # split "5.png" to 5
                     page_number, _ = filename_parts.split(".")
 
-                DocumentPageImage.objects.create(document=dc, temp_path=f"{image_dir}/{filename}",
-                                                 page_number=int(page_number))
+                DocumentPageImage.objects.create(
+                    document=dc,
+                    temp_path=f"{image_dir}/{filename}",
+                    page_number=int(page_number),
+                )
 
             if not seen:
-                logger.warning(f"No images detected from imagemagick convert command: '{cmd}'")
+                logger.warning(
+                    f"No images detected from imagemagick convert command: '{cmd}'"
+                )
             logger.debug(f"Stored {seen} pages from imagemagick convert command")
 
             # cleanup temp file,  but dont cleanup images: still needed for annotation
