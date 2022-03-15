@@ -1,7 +1,6 @@
 import json
 
-from django.http import HttpResponse, JsonResponse
-from rest_framework import status
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
 from librarian.api.models.settings import Settings

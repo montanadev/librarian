@@ -143,14 +143,14 @@ class DocumentJob(models.Model):
 
             logger.debug(f"Annotating {dc.pages.count()} pages...done")
 
-            logger.debug(f"Freeing up /tmp image files...")
+            logger.debug("Freeing up /tmp image files...")
 
             for page in dc.pages.all():
                 os.remove(page.temp_path)
                 page.temp_path = None
                 page.save()
 
-            logger.debug(f"Freeing up /tmp image files...done")
+            logger.debug("Freeing up /tmp image files...done")
 
             dc.status = self.desired_status
             dc.save()

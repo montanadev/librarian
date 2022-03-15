@@ -13,7 +13,7 @@ makemigrations:
 	poetry run ./manage.py makemigrations
 
 format:
-	poetry run black .
+	poetry run fourmat fix
 
 test:
 	poetry run ./manage.py test
