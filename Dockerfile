@@ -17,7 +17,7 @@ COPY --from=js /srv/client/build /srv/librarian/static
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN apt-get update && \
-    apt-get install -y make supervisor imagemagick
+    apt-get install -y make supervisor imagemagick gcc libnfs-dev
 
 RUN pip install -U pip && \
     pip install poetry
