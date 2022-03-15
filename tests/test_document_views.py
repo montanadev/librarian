@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from librarian.api.models import Document, DocumentStatus, DocumentPageImage
+from librarian.api.models import Document, DocumentStatus, DocumentPageImage, Folder
 from tests.helpers import reverse
 
 
@@ -38,11 +38,11 @@ class TestDocumentViews(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_search_document_pages(self):
-        doc_a = Document.objects.create(filename='a')
+        doc_a = Document.objects.create(filename='a', folder=Folder.objects.create())
         doc_a_page_1 = DocumentPageImage.objects.create(document=doc_a, page_number=1,
                                                         text='my egg is dirty, please may i have a new one')
 
-        doc_b = Document.objects.create(filename='b')
+        doc_b = Document.objects.create(filename='b', folder=Folder.objects.create())
         doc_b_page_1 = DocumentPageImage.objects.create(document=doc_b, page_number=1,
                                                         text='this omelette is eggcellent')
 

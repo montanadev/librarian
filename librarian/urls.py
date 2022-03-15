@@ -11,7 +11,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # config endpoints
-    path("api/settings", settings_views.get_or_create_settings_view, name='setup-data'),
+    path("api/settings", settings_views.get_or_create_settings_view, name='settings'),
 
     # search endpoints
     path("api/documents/search", document_views.document_search, name='document-search'),

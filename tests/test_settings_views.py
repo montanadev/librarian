@@ -2,40 +2,37 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from librarian.api.models.config_models import Setup
+from librarian.api.models.settings import Settings
 
 
 class TestConfigViews(TestCase):
 
     def test_config_create(self):
         client = APIClient()
-        test_data = {'google_cloud_api_key': 'test_api_key',
-                     'nfs_path': 'test_path',
-                     'secret_key': 'test_key'
-                     }
-
+        test_data = {'google_cloud_api_key': '{}',
+                     'storage_path': '10.0.1.1/volume1/test',
+                     'storage_mode': 'nfs'}
 
         # request is sending data to the model
-        url = reverse('setup-data')
+        url = reverse('settings')
         url_with_query_parameters = url + "?hello=world"
 
         response = client.post(url_with_query_parameters, test_data, format="json")
         self.assertEqual(response.status_code, 200)
 
-        setup_content = Setup.objects.all()
+        settings = Settings.objects.all()
         # the POST should have added data to the model
-        self.assertEqual(len(setup_content), 1)
+        self.assertEqual(len(settings), 1)
 
         # the data in the model should match what was sent
-        setup_data = setup_content[0]
-        self.assertEqual(setup_data.gc_api_key, 'test_api_key')
-        self.assertEqual(setup_data.nfs_path, 'test_path')
-        self.assertEqual(setup_data.secret_key, 'test_key')
-
+        settings_data = settings[0]
+        self.assertEqual(settings_data.google_cloud_api_key, test_data['google_cloud_api_key'])
+        self.assertEqual(settings_data.storage_path, test_data['storage_path'])
+        self.assertEqual(settings_data.storage_mode, test_data['storage_mode'])
 
     def test_config_get(self):
         client = APIClient()
 
-        url = reverse('get-data')
+        url = reverse('settings')
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
