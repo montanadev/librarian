@@ -1,16 +1,13 @@
 from rest_framework import status
-from rest_framework.generics import (
-    DestroyAPIView,
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-    UpdateAPIView,
-    get_object_or_404,
-)
+from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     UpdateAPIView, get_object_or_404)
 from rest_framework.response import Response
 
 from librarian.api.models import Document
 from librarian.api.models.folder import Folder
-from librarian.api.serializers import FolderAddDocumentViewSerializer, FolderSerializer
+from librarian.api.serializers import (FolderAddDocumentViewSerializer,
+                                       FolderSerializer)
 
 
 class FolderListView(ListCreateAPIView):

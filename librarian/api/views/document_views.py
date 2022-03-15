@@ -3,15 +3,13 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import (
-    ListAPIView,
-    RetrieveAPIView,
-    RetrieveUpdateDestroyAPIView,
-    get_object_or_404,
-)
+from rest_framework.generics import (ListAPIView, RetrieveAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     get_object_or_404)
 
 from librarian.api.models import Document, DocumentPageImage, Settings
-from librarian.api.serializers import DocumentPageImageSerializer, DocumentSerializer
+from librarian.api.serializers import (DocumentPageImageSerializer,
+                                       DocumentSerializer)
 from librarian.utils.hash import md5_for_bytes
 
 logger = logging.getLogger(__name__)

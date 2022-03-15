@@ -1,7 +1,8 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from librarian.api.models import Document, DocumentPageImage, DocumentStatus, Folder
+from librarian.api.models import (Document, DocumentPageImage, DocumentStatus,
+                                  Folder)
 from tests.helpers import reverse
 
 
