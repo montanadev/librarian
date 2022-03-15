@@ -27,7 +27,9 @@ function Search() {
         {links.map((l) => {
           return (
             <li>
-              <Link to={`documents/${l.id}`}>{l.filename}</Link>
+              <Link to={`/folders/${l.folder}/documents/${l.id}`}>
+                {l.filename}
+              </Link>
             </li>
           );
         })}
@@ -41,7 +43,13 @@ function Search() {
         {links.map((l) => {
           return (
             <li>
-              <Link to={`documents/${l.id}`}>{l.text}</Link>
+              <Link
+                to={`/folders/${l.folder}/documents/${l.document}/pages/${
+                  l.page_number + 1
+                }`}
+              >
+                {l.text}
+              </Link>
             </li>
           );
         })}

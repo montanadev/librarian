@@ -1,5 +1,6 @@
 export interface DocumentModel {
   id: number;
+  folder: number;
   filename: string;
   hash: string | null;
   temp_path: string | null;

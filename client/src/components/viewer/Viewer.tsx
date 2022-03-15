@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import "../Uploader.css";
 import Document from "./Document";
 import { AddToFolderModal } from "../modals/AddToFolderModal";
@@ -9,13 +9,16 @@ import { Button, Divider, Typography } from "antd";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons";
 import NavButtons from "./NavButtons";
 import { DocumentModel } from "../../models/Document";
+import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 
 function Viewer() {
   let { documentId, folderId, pageNumber } = useParams<any>();
 
   const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
+  const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
   const queryClient = useQueryClient();
   const api = new Api();
+  const history = useHistory();
 
   // if (pageNumber) {
   //   setJump(true);
@@ -45,12 +48,30 @@ function Viewer() {
     });
   };
 
+  const onDeleteDocument = () => {
+    api
+      .deleteDocument(documentId)
+      .then(() => {
+        queryClient.invalidateQueries("folders");
+        queryClient.invalidateQueries("document");
+      })
+      .then(() => {
+        history.push("/");
+      });
+  };
+
   return (
     <>
       <AddToFolderModal
         visible={openAddToFolderModal}
         onClose={() => setOpenAddToFolderModal(false)}
         onAddToFolder={onAddDocumentToFolder}
+      />
+
+      <DeleteDocumentModal
+        visible={openDeleteDocumentModal}
+        onClose={() => setOpenDeleteDocumentModal(false)}
+        onDeleteDocument={onDeleteDocument}
       />
 
       <div>
@@ -72,6 +93,10 @@ function Viewer() {
         </Button>
         <Divider type="vertical" />
         <Button disabled>Remove from folder</Button>
+        <Divider type="vertical" />
+        <Button onClick={() => setOpenDeleteDocumentModal(true)}>
+          Delete Document
+        </Button>
 
         <NavButtons documentId={documentId} folderId={folderId} />
       </div>

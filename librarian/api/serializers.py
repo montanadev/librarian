@@ -15,9 +15,15 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 
 class DocumentPageImageSerializer(serializers.ModelSerializer):
+    folder = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_folder(obj):
+        return obj.document.folder.id
+
     class Meta:
         model = DocumentPageImage
-        fields = ('id', 'document', 'text')
+        fields = ('id', 'document', 'text', 'folder', 'page_number')
 
 
 class SetupSerializer(serializers.ModelSerializer):

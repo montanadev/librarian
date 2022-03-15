@@ -74,4 +74,8 @@ export class Api {
       params: { q },
     });
   }
+
+  deleteDocument(documentId: string) {
+    return axios.delete(`/api/documents/${documentId}/details`);
+  }
 }
