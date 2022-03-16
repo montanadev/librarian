@@ -6,13 +6,16 @@
 - [ ] search
   - [x] filenames
   - [x] text
-  - [ ] seek to highlighted text in page
+  - [x] jump to page
+  - [ ] highlight search text on page
 - [x] docker builds
-- [ ] image support (png, jpg)
+- [x] image support (png, jpg)
 - [ ] wizard for first-time setup
   - [x] backend config storage
-  - [ ] frontend sending to storage
+  - [x] frontend sending to storage
+  - [ ] popup on first load
 - [x] support local file storage (disable nfs)
+- [x] support nfs
 - [ ] basic cypress tests
 
 ## Beta
@@ -23,5 +26,5 @@
 ## Nice to haves
 
 - [ ] toggle allow duplicate uploads / md5 hashes
-- [ ] delete document
+- [x] delete documents
 - [ ] combine multiple documents into single document

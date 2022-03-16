@@ -51,6 +51,7 @@ class DocumentJob(models.Model):
                 )
                 subprocess.call(cmd.split(" "))
                 dc.temp_path += '.pdf'
+                dc.filename += '.pdf'
                 dc.save()
 
                 logger.debug("Non-pdf detected, preconverting to pdf before persistence...done")
