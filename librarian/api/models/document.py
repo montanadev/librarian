@@ -54,7 +54,7 @@ class Document(models.Model):
         Folder = apps.get_model("api", "Folder")
 
         source_content_type = SourceContentTypes.PDF
-        if '.jpg' or '.jpeg' in filename:
+        if '.jpg' in filename or '.jpeg' in filename:
             source_content_type = SourceContentTypes.JPEG
         if '.png' in filename:
             source_content_type = SourceContentTypes.PNG

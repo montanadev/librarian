@@ -86,7 +86,7 @@ function Viewer() {
       <Button onClick={() => setOpenDeleteDocumentModal(true)}>
         Delete Document
       </Button>
-      \
+
       <NavButtons documentId={documentId} folderId={folderId} />
       <Document pageNumber={pageNumber} documentId={documentId} />
     </>
