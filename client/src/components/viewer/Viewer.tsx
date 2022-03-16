@@ -20,12 +20,6 @@ function Viewer() {
   const api = new Api();
   const history = useHistory();
 
-  // if (pageNumber) {
-  //   setJump(true);
-  // } else {
-  //   history.push(`/folders/${folderId}/documents/${documentId}/pages/1`);
-  // }
-
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );
@@ -67,40 +61,33 @@ function Viewer() {
         onClose={() => setOpenAddToFolderModal(false)}
         onAddToFolder={onAddDocumentToFolder}
       />
-
       <DeleteDocumentModal
         visible={openDeleteDocumentModal}
         onClose={() => setOpenDeleteDocumentModal(false)}
         onDeleteDocument={onDeleteDocument}
       />
-
-      <div>
-        {document ? (
-          <Typography.Title
-            style={{ margin: 0 }}
-            level={1}
-            editable={{
-              icon: <EditOutlined style={{ fontSize: 22 }} />,
-              onChange: onDocumentRename,
-              enterIcon: <CheckOutlined />,
-            }}
-          >
-            {document.data.filename}
-          </Typography.Title>
-        ) : null}
-        <Button onClick={() => setOpenAddToFolderModal(true)}>
-          Add to folder
-        </Button>
-        <Divider type="vertical" />
-        <Button disabled>Remove from folder</Button>
-        <Divider type="vertical" />
-        <Button onClick={() => setOpenDeleteDocumentModal(true)}>
-          Delete Document
-        </Button>
-
-        <NavButtons documentId={documentId} folderId={folderId} />
-      </div>
-
+      <Typography.Title
+        style={{ margin: 0 }}
+        level={1}
+        editable={{
+          icon: <EditOutlined style={{ fontSize: 22 }} />,
+          onChange: onDocumentRename,
+          enterIcon: <CheckOutlined />,
+        }}
+      >
+        {document.data.filename}
+      </Typography.Title>
+      <Button onClick={() => setOpenAddToFolderModal(true)}>
+        Add to folder
+      </Button>
+      <Divider type="vertical" />
+      <Button disabled>Remove from folder</Button>
+      <Divider type="vertical" />
+      <Button onClick={() => setOpenDeleteDocumentModal(true)}>
+        Delete Document
+      </Button>
+      \
+      <NavButtons documentId={documentId} folderId={folderId} />
       <Document pageNumber={pageNumber} documentId={documentId} />
     </>
   );

@@ -1,3 +1,4 @@
+from .source_content_types import *
 from .settings import *
 from .document_status import *
 from .document_page_image import *
