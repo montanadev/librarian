@@ -7,7 +7,7 @@ from datetime import datetime
 from django.db import models
 
 from librarian import annotate
-from librarian.api.models import DocumentPageImage, DocumentStatus, Settings
+from librarian.api.models import DocumentPageImage, DocumentStatus, Settings, SourceContentTypes
 from librarian.utils.attrs import setattrs
 from librarian.utils.enum import BaseEnum
 
@@ -43,6 +43,19 @@ class DocumentJob(models.Model):
         dc.save()
 
         if self.job == DocumentJobJobs.persist:
+            # non-pdfs need to be converted before persistence
+            if dc.source_content_type != SourceContentTypes.PDF:
+                logger.debug("Non-pdf detected, preconverting to pdf before persistence...")
+                cmd = (
+                    f"convert -density 150 {dc.temp_path} -quality 90 {dc.temp_path}.pdf"
+                )
+                subprocess.call(cmd.split(" "))
+                dc.temp_path += '.pdf'
+                dc.save()
+
+                logger.debug("Non-pdf detected, preconverting to pdf before persistence...done")
+                logger.debug(f"Pdf converted and saved to {dc.temp_path}")
+
             logger.debug(f"Persistence mode {settings.storage_mode}")
             if settings.storage_mode == "local":
                 dest = settings.storage_path + "/" + dc.filename
