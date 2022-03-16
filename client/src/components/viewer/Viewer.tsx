@@ -61,13 +61,11 @@ function Viewer() {
         onClose={() => setOpenAddToFolderModal(false)}
         onAddToFolder={onAddDocumentToFolder}
       />
-
       <DeleteDocumentModal
         visible={openDeleteDocumentModal}
         onClose={() => setOpenDeleteDocumentModal(false)}
         onDeleteDocument={onDeleteDocument}
       />
-
       <Typography.Title
         style={{ margin: 0 }}
         level={1}
@@ -79,7 +77,6 @@ function Viewer() {
       >
         {document.data.filename}
       </Typography.Title>
-
       <Button onClick={() => setOpenAddToFolderModal(true)}>
         Add to folder
       </Button>
@@ -89,9 +86,8 @@ function Viewer() {
       <Button onClick={() => setOpenDeleteDocumentModal(true)}>
         Delete Document
       </Button>
-
+      \
       <NavButtons documentId={documentId} folderId={folderId} />
-
       <Document pageNumber={pageNumber} documentId={documentId} />
     </>
   );
