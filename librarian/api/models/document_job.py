@@ -6,7 +6,7 @@ from datetime import datetime
 
 from django.db import models
 
-from librarian import annotate
+from librarian.utils.google_cloud_vision import annotate
 from librarian.api.models import DocumentPageImage, DocumentStatus, Settings, SourceContentTypes
 from librarian.utils.attrs import setattrs
 from librarian.utils.enum import BaseEnum

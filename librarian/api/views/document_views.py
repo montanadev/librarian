@@ -5,11 +5,12 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import (ListAPIView, RetrieveAPIView,
                                      RetrieveUpdateDestroyAPIView,
-                                     get_object_or_404)
+                                     get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView)
+from rest_framework.response import Response
 
-from librarian.api.models import Document, DocumentPageImage, Settings
+from librarian.api.models import Document, DocumentPageImage, Settings, Tag
 from librarian.api.serializers import (DocumentPageImageSerializer,
-                                       DocumentSerializer)
+                                       DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
 
 logger = logging.getLogger(__name__)
@@ -22,9 +23,7 @@ class DocumentListView(ListAPIView):
 
 class DocumentView(RetrieveUpdateDestroyAPIView):
     serializer_class = DocumentSerializer
-
-    def get_object(self):
-        return get_object_or_404(Document.objects, id=self.kwargs["id"])
+    queryset = Document.objects.all()
 
 
 class DocumentDataView(RetrieveAPIView):
@@ -33,7 +32,7 @@ class DocumentDataView(RetrieveAPIView):
         if not settings:
             return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
-        dc = get_object_or_404(Document.objects, id=self.kwargs["id"])
+        dc = self.get_object()
         data = dc.get_bytes_from_filestore(settings)
 
         return HttpResponse(
@@ -51,6 +50,37 @@ class DocumentTextSearchView(RetrieveAPIView):
 
         serializer = DocumentPageImageSerializer(pages, many=True)
         return JsonResponse(data=serializer.data, safe=False)
+
+
+class DocumentTagsView(ListCreateAPIView):
+    serializer_class = DocumentTagSerializer
+
+    def get_queryset(self):
+        return Tag.objects.filter(documents__id=self.kwargs['pk'])
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        tag = Tag.objects.filter(name=serializer.validated_data['name']).first()
+        if tag:
+            tag_id = tag.id
+        else:
+            self.perform_create(serializer)
+            tag_id = serializer.data['id']
+
+        document = get_object_or_404(Document, id=kwargs['pk'])
+        document.tag_set.add(tag_id)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class DocumentTagDetailView(RetrieveDestroyAPIView):
+    serializer_class = DocumentTagSerializer
+
+    def get_queryset(self):
+        return Tag.objects.filter(documents__id=self.kwargs['pk'])
 
 
 @api_view(["POST"])
@@ -71,7 +101,6 @@ def document_create(request, filename):
 @api_view(["GET"])
 def document_search(request):
     search_term = request.query_params["q"]
-
     search_results = Document.objects.filter(filename__contains=search_term)
 
     serializer = DocumentSerializer(search_results, many=True)

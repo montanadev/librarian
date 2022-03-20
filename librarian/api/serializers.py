@@ -1,6 +1,7 @@
+from django.db import transaction
 from rest_framework import serializers
 
-from librarian.api.models import Document, DocumentPageImage
+from librarian.api.models import Document, DocumentPageImage, Tag
 from librarian.api.models.folder import Folder
 from librarian.api.models.settings import Settings
 
@@ -43,32 +44,46 @@ class FolderSerializer(serializers.ModelSerializer):
         docs = validated_data.pop("documents")
         folder = Folder.objects.create(**validated_data)
 
-        for doc in docs:
-            doc_obj = Document.objects.get(id=doc["id"])
-            # TODO - not very efficient, is there a way to do in bulk? set?
-            doc_obj.folder = folder
-            doc_obj.save()
+        self.update_document_to_folder_links(folder, docs)
 
         return folder
 
-    def update(self, instance, validated_data):
+    def update(self, folder, validated_data):
         docs = validated_data.pop("documents", [])
 
-        for doc in docs:
-            doc_obj = Document.objects.get(id=doc["id"])
-            # TODO - not very efficient, is there a way to do in bulk? set?
-            doc_obj.folder = instance
-            doc_obj.save()
+        self.update_document_to_folder_links(folder, docs)
 
-        instance.__dict__.update(validated_data)
-        instance.save()
+        # update folder properties
+        folder.__dict__.update(validated_data)
+        folder.save()
 
-        return instance
+        return folder
+
+    @staticmethod
+    def update_document_to_folder_links(folder, docs):
+        with transaction.atomic():
+            doc_objs = Document.objects.filter(id__in=[d['id'] for d in docs])
+
+            for doc_obj in doc_objs:
+                doc_obj.folder = folder
+                doc_obj.save()
 
 
-class FolderAddDocumentViewSerializer(serializers.Serializer):
+class FolderAddDocumentViewSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
 
     class Meta:
         model = Document
         fields = ("id",)
+
+
+class DocumentTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("id", "name")
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("id", "name", "documents")

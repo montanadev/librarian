@@ -18,10 +18,7 @@ def get_or_create_settings_view(request):
 
     if request.method == "POST":
         # delete previous settings, if they exist
-        try:
-            Settings.objects.all().delete()
-        except Settings.DoesNotExist:
-            pass
+        Settings.objects.all().delete()
 
         data = json.loads(request.body)
         settings = Settings.objects.create(
