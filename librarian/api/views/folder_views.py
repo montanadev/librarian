@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView,
@@ -29,7 +30,6 @@ class FolderAddDocumentView(UpdateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # TODO - check if document already in folder?
         document = get_object_or_404(Document, id=serializer.validated_data["id"])
         document.folder = folder
         document.save()

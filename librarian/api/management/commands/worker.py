@@ -13,10 +13,8 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.info("Running worker...")
-        running = False
         while True:
             for job in DocumentJob.objects.filter(completed_at__isnull=True):
-                running = True
                 successful = True
                 failed_reason = None
 
@@ -39,8 +37,8 @@ class Command(BaseCommand):
 
                 logger.info(f"Running job '{job.job}'...done")
 
-            if running:
-                logger.info("\nNo more jobs, sleeping\n")
-                running = False
+            if DocumentJob.objects.filter(completed_at__isnull=True).exist():
+                # jobs appeared since processing started, skip sleep
+                continue
 
-            sleep(2)
+            sleep(3)

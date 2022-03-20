@@ -9,6 +9,6 @@ class Settings(models.Model):
     storage_path = models.TextField(null=True)
 
     def read_google_cloud_api_key(self):
-        # replaces the html textarea rendered content from the frontend into svalid json
+        # replaces the html textarea rendered content from the frontend into valid json
         content = self.google_cloud_api_key.replace("\n", "")
         return json.loads(content)
