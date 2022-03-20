@@ -3,13 +3,27 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from librarian.api.models import (Document, DocumentPageImage, DocumentStatus,
-                                  Folder)
+                                  Folder, Settings)
 from tests.helpers import reverse
 
 
 class TestDocumentViews(TestCase):
     def setUp(self):
         self.client = APIClient()
+
+        Settings.objects.create(storage_mode='local', storage_path='/tmp')
+
+    def test_document_data(self):
+        # simulate uploading a document
+        url = reverse("document-create", args=("testfile",))
+        response = self.client.post(url, {'file': 'data'}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # fetching uploaded binary should be successful
+        url = reverse("document-data", args=(response.json()['id'],))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_rename_document(self):
         url = reverse("document-create", args=("testfile",))

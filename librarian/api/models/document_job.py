@@ -59,7 +59,7 @@ class DocumentJob(models.Model):
 
             logger.debug(f"Persistence mode {settings.storage_mode}")
             if settings.storage_mode == "local":
-                dest = settings.storage_path + "/" + dc.filename
+                dest = os.path.join(settings.storage_path, dc.filename)
                 logger.debug(f"Persisting to {dest}")
                 # TODO - no need to open / write, just move from temp to filestore path
                 with open(dest, mode="wb") as local_f, open(
@@ -87,7 +87,6 @@ class DocumentJob(models.Model):
                 dc,
                 temp_path=None,
                 status=self.desired_status,
-                filestore_path=dc.filename,
             )
             dc.save()
 

@@ -27,10 +27,12 @@ class DocumentView(RetrieveUpdateDestroyAPIView):
 
 
 class DocumentDataView(RetrieveAPIView):
+    queryset = Document.objects.all()
+
     def get(self, request, *args, **kwargs):
         settings = Settings.objects.first()
         if not settings:
-            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"reason": "settings not created yet"}, status=status.HTTP_400_BAD_REQUEST)
 
         dc = self.get_object()
         data = dc.get_bytes_from_filestore(settings)
