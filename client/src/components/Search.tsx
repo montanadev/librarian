@@ -17,8 +17,8 @@ function Search() {
   const api = new Api();
 
   useEffect(() => {
-    api.searchDocumentTitles(q).then((d) => setDocumentSearch(d.data));
-    api.searchDocumentText(q).then((d) => setDocumentTextSearch(d.data));
+    api.searchDocumentTitles(q).then((data) => setDocumentSearch(data));
+    api.searchDocumentText(q).then((data) => setDocumentTextSearch(data));
   }, [q]);
 
   const formatDocumentLinks = (links: Array<DocumentModel>) => {
@@ -38,9 +38,23 @@ function Search() {
   };
 
   const formatDocumentTextLinks = (links: Array<DocumentTextModel>) => {
+    if (!q) {
+      return <></>;
+    }
     return (
       <ul>
         {links.map((l) => {
+          const startingIndex = l.text.indexOf(q);
+          let start = startingIndex - 100;
+          let end = startingIndex + 100;
+          if (start < 1) {
+            start = 0;
+          }
+          if (end > l.text.length - 1) {
+            end = l.text.length - 1;
+          }
+          let text = l.text.substring(start, end);
+
           return (
             <li>
               <Link
@@ -48,7 +62,11 @@ function Search() {
                   l.page_number + 1
                 }`}
               >
-                {l.text}
+                {text.substring(0, text.indexOf(q))}
+                <b>
+                  {text.substring(text.indexOf(q), text.indexOf(q) + q.length)}
+                </b>
+                {text.substring(text.indexOf(q) + q.length)}
               </Link>
             </li>
           );

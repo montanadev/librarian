@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import (ListAPIView, RetrieveAPIView,
                                      RetrieveUpdateDestroyAPIView,
-                                     get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView)
+                                     get_object_or_404, ListCreateAPIView, DestroyAPIView)
 from rest_framework.response import Response
 
 from librarian.api.models import Document, DocumentPageImage, Settings, Tag
@@ -78,11 +78,16 @@ class DocumentTagsView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class DocumentTagDetailView(RetrieveDestroyAPIView):
-    serializer_class = DocumentTagSerializer
+class DocumentTagDetailView(DestroyAPIView):
+    def destroy(self, request, *args, **kwargs):
+        tag = get_object_or_404(Tag, id=kwargs['tag_id'])
+        tag.documents.remove(kwargs['pk'])
 
-    def get_queryset(self):
-        return Tag.objects.filter(documents__id=self.kwargs['pk'])
+        # unreferenced tags should be deleted
+        if not tag.documents.count():
+            tag.delete()
+
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])

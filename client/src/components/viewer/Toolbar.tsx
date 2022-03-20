@@ -4,6 +4,11 @@ import "../Uploader.css";
 import { Button, Divider, Typography } from "antd";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons";
 import { DocumentModel } from "../../models/Document";
+import { Tags } from "./Tags";
+import { Api } from "../../utils/Api";
+import { useQuery, useQueryClient } from "react-query";
+import { TagModel } from "../../models/Tag";
+import { ResourceModel } from "../../models/Resource";
 
 interface Props {
   document: DocumentModel;
@@ -22,6 +27,20 @@ export function Toolbar({
   documentId,
   folderId,
 }: Props) {
+  const api = new Api();
+  const queryClient = useQueryClient();
+
+  const tags = useQuery<ResourceModel<TagModel>>("tags", () =>
+    api.getTagsByDocumentId(documentId)
+  );
+  const refreshTags = () => {
+    queryClient.invalidateQueries("tags");
+  };
+
+  if (!tags.data) {
+    return <>Loading...</>;
+  }
+
   return (
     <>
       <Typography.Title
@@ -41,6 +60,20 @@ export function Toolbar({
       <Button disabled>Remove from folder</Button>
       <Divider type="vertical" />
       <Button onClick={onDeleteDocument}>Delete Document</Button>
+
+      <Tags
+        tags={tags.data.results}
+        documentId={documentId}
+        onCreateTag={(newTagName) =>
+          api.createTag(documentId, newTagName).then(refreshTags)
+        }
+        onDeleteTag={(tagId) =>
+          api.deleteTag(documentId, tagId).then(refreshTags)
+        }
+        onReplaceTag={(oldTagId, newTagName) =>
+          api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
+        }
+      />
 
       <NavButtons documentId={documentId} folderId={folderId} />
     </>

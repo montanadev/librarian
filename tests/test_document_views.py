@@ -186,7 +186,7 @@ class TestDocumentViews(TestCase):
 
         # list should return single tag
         tag_list_response = self.client.get(url)
-        self.assertEqual(len(tag_list_response.json()['results']), 1)
+        self.assertEqual(tag_list_response.json()['count'], 1)
 
         tag_response = self.client.post(url, {
             'name': 'world'
@@ -195,7 +195,7 @@ class TestDocumentViews(TestCase):
 
         # list should return multiple tags
         tag_list_response = self.client.get(url)
-        self.assertEqual(len(tag_list_response.json()['results']), 2)
+        self.assertEqual(tag_list_response.json()['count'], 2)
 
     def test_delete_tags(self):
         # create document
@@ -216,4 +216,9 @@ class TestDocumentViews(TestCase):
 
         url = reverse("document-tags", args=(doc_response.json()['id'],))
         tag_list_response = self.client.get(url)
-        self.assertEqual(len(tag_list_response.json()['results']), 0)
+        self.assertEqual(tag_list_response.json()['count'], 0)
+
+        # tag isn't referenced, should have been cleaned up / destroyed
+        url = reverse("document-tags", args=(doc_response.json()['id'],))
+        tag_list = self.client.get(url)
+        self.assertEqual(tag_list.json()['count'], 0)
