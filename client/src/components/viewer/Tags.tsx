@@ -150,16 +150,6 @@ export function Tags({
         );
       })}
       {inputVisible && (
-        // <Input
-        //   ref={saveInputRef}
-        //   type="text"
-        //   size="small"
-        //   style={{ width: 250, marginRight: 8, verticalAlign: "top" }}
-        //   value={inputValue}
-        //   onChange={handleInputChange}
-        //   onBlur={handleInputConfirm}
-        //   onPressEnter={handleInputConfirm}
-        // />
         <AutoComplete
           ref={saveInputRef}
           value={inputValue}
@@ -170,12 +160,6 @@ export function Tags({
           onSelect={handleInputConfirm}
           onSearch={onSearch}
           onChange={handleInputChange}
-          // onKeyDown={(e) => {
-          //   if (e.key === "Enter" && inputValue) {
-          //     handleInputConfirm(inputValue);
-          //   }
-          // }}
-          placeholder="control mode"
         />
       )}
       {!inputVisible && (
