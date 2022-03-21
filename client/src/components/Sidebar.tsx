@@ -8,6 +8,7 @@ import { CreateFolderModal } from "./modals/CreateFolderModal";
 import { FolderModel } from "../models/Folder";
 import { ResourceModel } from "../models/Resource";
 import { useQuery } from "react-query";
+import { TagModel } from "../models/Tag";
 
 const { Paragraph } = Typography;
 const { SubMenu } = Menu;
@@ -22,6 +23,8 @@ function Sidebar() {
     "folders",
     api.getFolders
   );
+
+  const tags = useQuery<ResourceModel<TagModel>>("tags", api.getTags);
 
   const openDocuments = [`document-${documentId}`];
 
@@ -66,6 +69,22 @@ function Sidebar() {
                           );
                         })
                       : []}
+                  </Menu.ItemGroup>
+                ))
+              : null}
+          </SubMenu>
+
+          <SubMenu key={"tags"} title={"Tags"}>
+            {tags.data
+              ? tags.data.results.map((t: TagModel) => (
+                  <Menu.ItemGroup key={`tag-${t.id}`} title={t.name}>
+                    {t.documents.map((d) => (
+                      <Menu.Item key={`document-tag-${d.id}`}>
+                        <Link to={`/folders/${d.folder}/documents/${d.id}`}>
+                          {d.filename}
+                        </Link>
+                      </Menu.Item>
+                    ))}
                   </Menu.ItemGroup>
                 ))
               : null}

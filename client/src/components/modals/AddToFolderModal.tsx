@@ -2,7 +2,7 @@ import { Button, Cascader, Modal } from "antd";
 import { Api } from "../../utils/Api";
 import { ResourceModel } from "../../models/Resource";
 import { FolderModel } from "../../models/Folder";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "react-query";
 
 interface Props {
@@ -15,12 +15,13 @@ export function AddToFolderModal({ visible, onClose, onAddToFolder }: Props) {
   const [folderId, setFolderId] = useState<any>();
 
   const api = new Api();
-  const { isLoading, error, data, isFetching } = useQuery<
-    ResourceModel<FolderModel>
-  >("folders", api.getFolders);
+  const folders = useQuery<ResourceModel<FolderModel>>(
+    "folders",
+    api.getFolders
+  );
 
-  const options = data
-    ? data.results.map((f: FolderModel) => {
+  const options = folders.data
+    ? folders.data.results.map((f: FolderModel) => {
         return { value: f.id, label: f.name };
       })
     : [];
@@ -52,7 +53,7 @@ export function AddToFolderModal({ visible, onClose, onAddToFolder }: Props) {
         <Cascader
           options={options}
           showSearch={{ filter }}
-          onChange={(value: any, selectedOptions: any) => setFolderId(value)}
+          onChange={(value: any) => setFolderId(value)}
         />
       </form>
     </Modal>

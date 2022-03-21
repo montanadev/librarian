@@ -1,6 +1,8 @@
 import logging
+import os
 import tempfile
 
+import libnfs
 from django.apps import apps
 from django.db import models
 
@@ -16,6 +18,7 @@ class Document(models.Model):
     source_content_type = models.IntegerField(choices=SourceContentTypes.choices, default=SourceContentTypes.PDF)
     hash = models.TextField(null=True)
     temp_path = models.TextField(null=True)
+    # filestore_path is the original filename on disk, as the `filename` property can be changed by user
     filestore_path = models.TextField(null=True)
     folder = models.ForeignKey(
         Folder, null=True, related_name="documents", on_delete=models.SET_NULL
@@ -29,24 +32,26 @@ class Document(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def get_bytes_from_filestore(self, settings):
-        if settings.storage_mode == "local":
-            with open(
-                    settings.storage_path + "/" + self.filestore_path, mode="rb"
-            ) as f:
-                b = f.read()
-        elif settings.storage_mode == "nfs":
-            import libnfs
+        if self.status == DocumentStatus.created.value:
+            # document hasn't persisted yet, return temp path
+            with open(self.temp_path, mode="rb") as f:
+                return f.read()
 
+        if settings.storage_mode == "local":
+            with open(os.path.join(settings.storage_path, self.filestore_path), mode="rb") as f:
+                return f.read()
+
+        if settings.storage_mode == "nfs":
             nfs = libnfs.NFS(settings.storage_path)
             nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
             b = nfs_f.read()
             nfs_f.close()
-        else:
-            raise Exception(
-                f"Storage mode {settings.storage_mode} not recognized, quitting"
-            )
+            return b
 
-        return b
+        raise Exception(
+            f"Storage mode {settings.storage_mode} not recognized, quitting"
+        )
+
 
     @classmethod
     def create_from_filename(cls, filename, hash):
@@ -71,7 +76,7 @@ class Document(models.Model):
         # store file uploaded by user to tempfile until persistence to blob store is
         # complete
         fd, path = tempfile.mkstemp()
-        with open(fd, "w+b") as f:
+        with open(fd, "wb") as f:
             f.write(content)
 
         self.temp_path = path

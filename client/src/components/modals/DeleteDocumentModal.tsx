@@ -1,9 +1,4 @@
-import { Button, Cascader, Modal } from "antd";
-import { Api } from "../../utils/Api";
-import { ResourceModel } from "../../models/Resource";
-import { FolderModel } from "../../models/Folder";
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { Button, Modal } from "antd";
 
 interface Props {
   visible: boolean;

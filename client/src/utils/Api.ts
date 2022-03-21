@@ -64,18 +64,46 @@ export class Api {
   }
 
   searchDocumentTitles(q: string | null) {
-    return axios.get("/api/documents/search", {
-      params: { q },
-    });
+    return axios
+      .get("/api/documents/search", {
+        params: { q },
+      })
+      .then((d) => d.data);
   }
 
   searchDocumentText(q: string | null) {
-    return axios.get("/api/documents/text/search", {
-      params: { q },
-    });
+    return axios
+      .get("/api/documents/text/search", {
+        params: { q },
+      })
+      .then((d) => d.data);
   }
 
   deleteDocument(documentId: string) {
     return axios.delete(`/api/documents/${documentId}/details`);
+  }
+
+  replaceTag(documentId: string, oldTagId: number, newTagName: string) {
+    return this.deleteTag(documentId, oldTagId).then(() =>
+      this.createTag(documentId, newTagName)
+    );
+  }
+
+  createTag(documentId: string, newTagName: string) {
+    return axios.post(`/api/documents/${documentId}/tags`, {
+      name: newTagName,
+    });
+  }
+
+  deleteTag(documentId: string, tagId: number) {
+    return axios.delete(`/api/documents/${documentId}/tags/${tagId}`);
+  }
+
+  getTagsByDocumentId(documentId: string) {
+    return axios.get(`/api/documents/${documentId}/tags`).then((d) => d.data);
+  }
+
+  getTags() {
+    return axios.get("/api/tags/").then((d) => d.data);
   }
 }

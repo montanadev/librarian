@@ -32,7 +32,7 @@ class TestTagViews(TestCase):
         # call tag list, should have two tags
         url = reverse("tag-list")
         tag_list = self.client.get(url)
-        self.assertEqual(len(tag_list.json()['results']), 2)
+        self.assertEqual(tag_list.json()['count'], 2)
 
     def test_multiple_documents_with_same_tag(self):
         # create document

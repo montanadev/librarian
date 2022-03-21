@@ -40,8 +40,9 @@ function Document({ pageNumber, documentId }: Props) {
         onSourceError={(e) => toastError(`Error loading source: ${e.message}`)}
       >
         {Array.from(new Array(numPages), (el, index) => (
-          <>
+          <div key={`page_container_${index + 1}`}>
             <ReactPDFPage
+              renderMode="svg"
               renderAnnotationLayer={false}
               onRenderSuccess={() => {
                 if (pageNumber && parseInt(pageNumber) === index + 1) {
@@ -53,7 +54,7 @@ function Document({ pageNumber, documentId }: Props) {
               pageNumber={index + 1}
             />
             <PageBoundary pageNumber={index + 1} />
-          </>
+          </div>
         ))}
       </ReactPDFDocument>
     </div>

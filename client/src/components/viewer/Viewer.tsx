@@ -5,11 +5,9 @@ import Document from "./Document";
 import { AddToFolderModal } from "../modals/AddToFolderModal";
 import { Api } from "../../utils/Api";
 import { useQuery, useQueryClient } from "react-query";
-import { Button, Divider, Typography } from "antd";
-import { CheckOutlined, EditOutlined } from "@ant-design/icons";
-import NavButtons from "./NavButtons";
 import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
+import { Toolbar } from "./Toolbar";
 
 function Viewer() {
   let { documentId, folderId, pageNumber } = useParams<any>();
@@ -32,6 +30,7 @@ function Viewer() {
     api.renameDocument(document.data.id, newDocumentName).then(() => {
       queryClient.invalidateQueries("folders");
       queryClient.invalidateQueries("document");
+      queryClient.invalidateQueries("tags");
     });
   };
 
@@ -48,6 +47,7 @@ function Viewer() {
       .then(() => {
         queryClient.invalidateQueries("folders");
         queryClient.invalidateQueries("document");
+        queryClient.invalidateQueries("tags");
       })
       .then(() => {
         history.push("/");
@@ -66,28 +66,14 @@ function Viewer() {
         onClose={() => setOpenDeleteDocumentModal(false)}
         onDeleteDocument={onDeleteDocument}
       />
-      <Typography.Title
-        style={{ margin: 0 }}
-        level={1}
-        editable={{
-          icon: <EditOutlined style={{ fontSize: 22 }} />,
-          onChange: onDocumentRename,
-          enterIcon: <CheckOutlined />,
-        }}
-      >
-        {document.data.filename}
-      </Typography.Title>
-      <Button onClick={() => setOpenAddToFolderModal(true)}>
-        Add to folder
-      </Button>
-      <Divider type="vertical" />
-      <Button disabled>Remove from folder</Button>
-      <Divider type="vertical" />
-      <Button onClick={() => setOpenDeleteDocumentModal(true)}>
-        Delete Document
-      </Button>
-
-      <NavButtons documentId={documentId} folderId={folderId} />
+      <Toolbar
+        document={document.data}
+        documentId={documentId}
+        folderId={folderId}
+        onDocumentRename={onDocumentRename}
+        onAddToFolder={() => setOpenAddToFolderModal(true)}
+        onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
+      />
       <Document pageNumber={pageNumber} documentId={documentId} />
     </>
   );

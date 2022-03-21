@@ -84,6 +84,8 @@ class DocumentTagSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    documents = DocumentSerializer(many=True)
+
     class Meta:
         model = Tag
         fields = ("id", "name", "documents")

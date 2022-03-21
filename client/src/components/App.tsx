@@ -25,8 +25,10 @@ function App() {
       // TODO - alert?
       return;
     }
-
-    history.push(`/search?q=${encodeURIComponent(search)}`);
+    history.push({
+      pathname: "/search",
+      search: "?" + new URLSearchParams({ q: search }).toString(),
+    });
   };
 
   // withSidebar embeds the sidebar into the rendered component.

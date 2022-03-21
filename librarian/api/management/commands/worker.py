@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
                 logger.info(f"Running job '{job.job}'...done")
 
-            if DocumentJob.objects.filter(completed_at__isnull=True).exist():
+            if DocumentJob.objects.filter(completed_at__isnull=True).count():
                 # jobs appeared since processing started, skip sleep
                 continue
 

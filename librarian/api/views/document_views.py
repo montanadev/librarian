@@ -5,13 +5,14 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import (ListAPIView, RetrieveAPIView,
                                      RetrieveUpdateDestroyAPIView,
-                                     get_object_or_404, ListCreateAPIView, RetrieveDestroyAPIView)
+                                     get_object_or_404, ListCreateAPIView, DestroyAPIView)
 from rest_framework.response import Response
 
 from librarian.api.models import Document, DocumentPageImage, Settings, Tag
 from librarian.api.serializers import (DocumentPageImageSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +26,27 @@ class DocumentView(RetrieveUpdateDestroyAPIView):
     serializer_class = DocumentSerializer
     queryset = Document.objects.all()
 
+    def destroy(self, request, *args, **kwargs):
+        document = self.get_object()
+        tag_ids = [i['id'] for i in document.tag_set.values('id')]
+        self.perform_destroy(document)
+
+        # if the deleted document contains the last reference to a tag, delete the tag
+        for tag_id in tag_ids:
+            tag = Tag.objects.get(id=tag_id)
+            if not tag.documents.count():
+                tag.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class DocumentDataView(RetrieveAPIView):
+    queryset = Document.objects.all()
+
     def get(self, request, *args, **kwargs):
         settings = Settings.objects.first()
         if not settings:
-            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"reason": "settings not created yet"}, status=status.HTTP_400_BAD_REQUEST)
 
         dc = self.get_object()
         data = dc.get_bytes_from_filestore(settings)
@@ -76,17 +92,22 @@ class DocumentTagsView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class DocumentTagDetailView(RetrieveDestroyAPIView):
-    serializer_class = DocumentTagSerializer
+class DocumentTagDetailView(DestroyAPIView):
+    def destroy(self, request, *args, **kwargs):
+        tag = get_object_or_404(Tag, id=kwargs['tag_id'])
+        tag.documents.remove(kwargs['pk'])
 
-    def get_queryset(self):
-        return Tag.objects.filter(documents__id=self.kwargs['pk'])
+        # unreferenced tags should be deleted
+        if not tag.documents.count():
+            tag.delete()
+
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])
 def document_create(request, filename):
     doc_hash = md5_for_bytes(request.body)
-    if Document.objects.filter(hash=doc_hash).exists():
+    if Document.objects.filter(hash=doc_hash).exists() and not settings.ALLOW_REUPLOAD:
         logger.warning("Document hash already uploaded, skipping")
         return JsonResponse(
             {"reason": "Document already uploaded"}, status=status.HTTP_400_BAD_REQUEST

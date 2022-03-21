@@ -31,7 +31,7 @@ urlpatterns = [
     path("api/documents/<int:pk>/details", document_views.DocumentView.as_view(), name="document-detail"),
     path("api/documents/<int:pk>/tags", document_views.DocumentTagsView.as_view(), name="document-tags"),
     path("api/documents/<int:pk>/tags/<int:tag_id>", document_views.DocumentTagDetailView.as_view(), name="document-tag-detail"),
-    path("api/documents/<int:pk>/data", document_views.DocumentDataView.as_view()),
+    path("api/documents/<int:pk>/data", document_views.DocumentDataView.as_view(), name="document-data"),
     #
     # folder endpoints
     #

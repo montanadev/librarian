@@ -127,21 +127,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-LOCAL_FRONTEND = get_bool("LOCAL_FRONTEND", False)
-
-GOOGLE_APPLICATION_CREDENTIALS = get_env(
-    "GOOGLE_APPLICATION_CREDENTIALS", "service-account.json"
-)
-NFS_PATH = get_env("NFS_PATH", "nfs://192.168.1.1/volume1/librarian")
-LOCAL_STORAGE_PATH = get_env(
-    "LOCAL_STORAGE_PATH", str(BASE_DIR.joinpath(Path("local-storage")))
-)
-STORAGE_MODE = get_env("STORAGE_MODE", "local")
-
-# make local folder if not exists
-# TODO - this may be dangerous
-if STORAGE_MODE == "local":
-    try:
-        os.mkdir(LOCAL_STORAGE_PATH)
-    except FileExistsError:
-        pass
+# ALLOW_REUPLOAD skips the md5 hash check, effectively allowing the same document to be uploaded
+# multiple times. Useful for unit testing, should probably stay disabled for users
+ALLOW_REUPLOAD = get_env("ALLOW_REUPLOAD", False)
+# DISABLE_ANNOTATION skips annotation. Useful for unit testing, should stay enabled for users
+DISABLE_ANNOTATION = get_env("DISABLE_ANNOTATION", False)

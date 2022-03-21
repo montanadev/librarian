@@ -10,6 +10,7 @@ from librarian.utils.google_cloud_vision import annotate
 from librarian.api.models import DocumentPageImage, DocumentStatus, Settings, SourceContentTypes
 from librarian.utils.attrs import setattrs
 from librarian.utils.enum import BaseEnum
+from django.conf import settings as django_settings
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class DocumentJob(models.Model):
 
             logger.debug(f"Persistence mode {settings.storage_mode}")
             if settings.storage_mode == "local":
-                dest = settings.storage_path + "/" + dc.filename
+                dest = os.path.join(settings.storage_path, dc.filename)
                 logger.debug(f"Persisting to {dest}")
                 # TODO - no need to open / write, just move from temp to filestore path
                 with open(dest, mode="wb") as local_f, open(
@@ -87,7 +88,9 @@ class DocumentJob(models.Model):
                 dc,
                 temp_path=None,
                 status=self.desired_status,
-                filestore_path=dc.filename,
+                # filestore_path tracks the original filename as persisted on disk.
+                # necessary as the `filename` property may change over time
+                filestore_path=dc.filename
             )
             dc.save()
 
@@ -145,7 +148,12 @@ class DocumentJob(models.Model):
 
             dc.status = self.desired_status
             dc.save()
-            dc.annotate()
+
+            if django_settings.DISABLE_ANNOTATION:
+                dc.status = DocumentStatus.annotated.value
+                dc.save()
+            else:
+                dc.annotate()
 
         if self.job == DocumentJobJobs.annotate:
             logger.debug(f"Annotating {dc.pages.count()} pages...")

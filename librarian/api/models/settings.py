@@ -12,3 +12,7 @@ class Settings(models.Model):
         # replaces the html textarea rendered content from the frontend into valid json
         content = self.google_cloud_api_key.replace("\n", "")
         return json.loads(content)
+
+    @classmethod
+    def create_default(cls):
+        return cls.objects.create(storage_mode='local', storage_path='/tmp')

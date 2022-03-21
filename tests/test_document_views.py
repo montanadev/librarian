@@ -3,13 +3,27 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from librarian.api.models import (Document, DocumentPageImage, DocumentStatus,
-                                  Folder)
+                                  Folder, Settings)
 from tests.helpers import reverse
 
 
 class TestDocumentViews(TestCase):
     def setUp(self):
         self.client = APIClient()
+
+        Settings.create_default()
+
+    def test_document_data(self):
+        # simulate uploading a document
+        url = reverse("document-create", args=("testfile",))
+        response = self.client.post(url, {'file': 'data'}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # fetching uploaded binary should be successful
+        url = reverse("document-data", args=(response.json()['id'],))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_rename_document(self):
         url = reverse("document-create", args=("testfile",))
@@ -38,6 +52,31 @@ class TestDocumentViews(TestCase):
         # reposting same empty body generates the same hash, returns 400
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_document(self):
+        # create a doc
+        url = reverse("document-create", args=("testfile",))
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # create a tag
+        url = reverse("document-tags", args=(response.json()['id'],))
+        tag_response = self.client.post(url, {
+            'name': 'hello'
+        })
+        self.assertEqual(tag_response.status_code, status.HTTP_201_CREATED)
+
+        # delete the document
+        url = reverse("document-detail", args=(response.json()['id'],))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # deleting document should also delete tag (no remaining references)
+        url = reverse("tag-list")
+        tag_list = self.client.get(url)
+        # tag list endpoint is empty, confirming tag deletion
+        self.assertEqual(tag_list.status_code, status.HTTP_200_OK)
+        self.assertEqual(tag_list.json()['count'], 0)
 
     def test_search_document_pages(self):
         doc_a = Document.objects.create(filename="a", folder=Folder.objects.create())
@@ -172,7 +211,7 @@ class TestDocumentViews(TestCase):
 
         # list should return single tag
         tag_list_response = self.client.get(url)
-        self.assertEqual(len(tag_list_response.json()['results']), 1)
+        self.assertEqual(tag_list_response.json()['count'], 1)
 
         tag_response = self.client.post(url, {
             'name': 'world'
@@ -181,7 +220,7 @@ class TestDocumentViews(TestCase):
 
         # list should return multiple tags
         tag_list_response = self.client.get(url)
-        self.assertEqual(len(tag_list_response.json()['results']), 2)
+        self.assertEqual(tag_list_response.json()['count'], 2)
 
     def test_delete_tags(self):
         # create document
@@ -202,4 +241,9 @@ class TestDocumentViews(TestCase):
 
         url = reverse("document-tags", args=(doc_response.json()['id'],))
         tag_list_response = self.client.get(url)
-        self.assertEqual(len(tag_list_response.json()['results']), 0)
+        self.assertEqual(tag_list_response.json()['count'], 0)
+
+        # tag isn't referenced, should have been cleaned up / destroyed
+        url = reverse("document-tags", args=(doc_response.json()['id'],))
+        tag_list = self.client.get(url)
+        self.assertEqual(tag_list.json()['count'], 0)

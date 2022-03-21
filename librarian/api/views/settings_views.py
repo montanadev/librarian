@@ -12,7 +12,7 @@ def get_or_create_settings_view(request):
     if request.method == "GET":
         settings = Settings.objects.first()
         if not settings:
-            settings = Settings.objects.create()
+            settings = Settings.create_default()
 
         return JsonResponse(data=SetupSerializer(settings).data)
 
