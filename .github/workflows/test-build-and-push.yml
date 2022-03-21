@@ -1,4 +1,4 @@
-name: Build and push
+name: Test, build and push
 
 on: [push]
 
@@ -24,10 +24,6 @@ jobs:
 
         poetry install
     - name: Run Tests
-      env:
-          NFS_PATH: testing
-          GOOGLE_APPLICATION_CREDENTIALS: testing
-          SECRET_KEY: testing
       run: |
         make test
 

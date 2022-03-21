@@ -42,6 +42,7 @@ function Document({ pageNumber, documentId }: Props) {
         {Array.from(new Array(numPages), (el, index) => (
           <div key={`page_container_${index + 1}`}>
             <ReactPDFPage
+              renderMode="svg"
               renderAnnotationLayer={false}
               onRenderSuccess={() => {
                 if (pageNumber && parseInt(pageNumber) === index + 1) {

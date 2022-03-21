@@ -12,6 +12,7 @@ from librarian.api.models import Document, DocumentPageImage, Settings, Tag
 from librarian.api.serializers import (DocumentPageImageSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +107,7 @@ class DocumentTagDetailView(DestroyAPIView):
 @api_view(["POST"])
 def document_create(request, filename):
     doc_hash = md5_for_bytes(request.body)
-    if Document.objects.filter(hash=doc_hash).exists():
+    if Document.objects.filter(hash=doc_hash).exists() and not settings.ALLOW_REUPLOAD:
         logger.warning("Document hash already uploaded, skipping")
         return JsonResponse(
             {"reason": "Document already uploaded"}, status=status.HTTP_400_BAD_REQUEST

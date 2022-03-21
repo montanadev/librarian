@@ -11,7 +11,7 @@ class TestDocumentViews(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-        Settings.objects.create(storage_mode='local', storage_path='/tmp')
+        Settings.create_default()
 
     def test_document_data(self):
         # simulate uploading a document

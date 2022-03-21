@@ -138,6 +138,9 @@ LOCAL_STORAGE_PATH = get_env(
 )
 STORAGE_MODE = get_env("STORAGE_MODE", "local")
 
+ALLOW_REUPLOAD = get_env("ALLOW_REUPLOAD", False)
+DISABLE_ANNOTATION = get_env("DISABLE_ANNOTATION", False)
+
 # make local folder if not exists
 # TODO - this may be dangerous
 if STORAGE_MODE == "local":

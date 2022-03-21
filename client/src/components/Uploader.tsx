@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import "./Uploader.css";
 import { useDropzone } from "react-dropzone";
 import { List } from "antd";
-import { FileAddOutlined, FilePdfOutlined } from "@ant-design/icons";
+import { FilePdfOutlined } from "@ant-design/icons";
 import Job from "./Job";
 import { Api } from "../utils/Api";
 
@@ -34,9 +34,11 @@ const Uploader = () => {
         <FilePdfOutlined style={{ fontSize: 50 }} />
         <p />
         {isDragActive ? (
-          <p className="UploaderText">Drop the files here ...</p>
+          <p className="UploaderText" data-cy="dropzone">
+            Drop the files here ...
+          </p>
         ) : (
-          <p className="UploaderText">
+          <p className="UploaderText" data-cy="dropzone">
             Drag 'n' drop some PDFs here, or click to select files
           </p>
         )}

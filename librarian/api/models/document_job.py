@@ -10,6 +10,7 @@ from librarian.utils.google_cloud_vision import annotate
 from librarian.api.models import DocumentPageImage, DocumentStatus, Settings, SourceContentTypes
 from librarian.utils.attrs import setattrs
 from librarian.utils.enum import BaseEnum
+from django.conf import settings as django_settings
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +148,12 @@ class DocumentJob(models.Model):
 
             dc.status = self.desired_status
             dc.save()
-            dc.annotate()
+
+            if django_settings.DISABLE_ANNOTATION:
+                dc.status = DocumentStatus.annotated.value
+                dc.save()
+            else:
+                dc.annotate()
 
         if self.job == DocumentJobJobs.annotate:
             logger.debug(f"Annotating {dc.pages.count()} pages...")
