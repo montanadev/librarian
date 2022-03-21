@@ -25,6 +25,19 @@ class DocumentView(RetrieveUpdateDestroyAPIView):
     serializer_class = DocumentSerializer
     queryset = Document.objects.all()
 
+    def destroy(self, request, *args, **kwargs):
+        document = self.get_object()
+        tag_ids = [i['id'] for i in document.tag_set.values('id')]
+        self.perform_destroy(document)
+
+        # if the deleted document contains the last reference to a tag, delete the tag
+        for tag_id in tag_ids:
+            tag = Tag.objects.get(id=tag_id)
+            if not tag.documents.count():
+                tag.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class DocumentDataView(RetrieveAPIView):
     queryset = Document.objects.all()

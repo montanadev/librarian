@@ -46,6 +46,7 @@ function Viewer() {
       .then(() => {
         queryClient.invalidateQueries("folders");
         queryClient.invalidateQueries("document");
+        queryClient.invalidateQueries("tags");
       })
       .then(() => {
         history.push("/");

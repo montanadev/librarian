@@ -102,4 +102,8 @@ export class Api {
   getTagsByDocumentId(documentId: string) {
     return axios.get(`/api/documents/${documentId}/tags`).then((d) => d.data);
   }
+
+  getTags() {
+    return axios.get("/api/tags/").then((d) => d.data);
+  }
 }

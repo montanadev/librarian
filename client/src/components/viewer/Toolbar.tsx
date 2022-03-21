@@ -30,10 +30,11 @@ export function Toolbar({
   const api = new Api();
   const queryClient = useQueryClient();
 
-  const tags = useQuery<ResourceModel<TagModel>>("tags", () =>
+  const tags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
     api.getTagsByDocumentId(documentId)
   );
   const refreshTags = () => {
+    queryClient.invalidateQueries("document-tags");
     queryClient.invalidateQueries("tags");
   };
 

@@ -18,6 +18,8 @@ class Document(models.Model):
     source_content_type = models.IntegerField(choices=SourceContentTypes.choices, default=SourceContentTypes.PDF)
     hash = models.TextField(null=True)
     temp_path = models.TextField(null=True)
+    # filestore_path is the original filename on disk, as the `filename` property can be changed by user
+    filestore_path = models.TextField(null=True)
     folder = models.ForeignKey(
         Folder, null=True, related_name="documents", on_delete=models.SET_NULL
     )
@@ -36,12 +38,12 @@ class Document(models.Model):
                 return f.read()
 
         if settings.storage_mode == "local":
-            with open(os.path.join(settings.storage_path, self.filename), mode="rb") as f:
+            with open(os.path.join(settings.storage_path, self.filestore_path), mode="rb") as f:
                 return f.read()
 
         if settings.storage_mode == "nfs":
             nfs = libnfs.NFS(settings.storage_path)
-            nfs_f = nfs.open("/" + self.filename, mode="rb")
+            nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
             b = nfs_f.read()
             nfs_f.close()
             return b

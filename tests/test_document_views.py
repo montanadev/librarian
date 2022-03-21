@@ -53,6 +53,31 @@ class TestDocumentViews(TestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_delete_document(self):
+        # create a doc
+        url = reverse("document-create", args=("testfile",))
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # create a tag
+        url = reverse("document-tags", args=(response.json()['id'],))
+        tag_response = self.client.post(url, {
+            'name': 'hello'
+        })
+        self.assertEqual(tag_response.status_code, status.HTTP_201_CREATED)
+
+        # delete the document
+        url = reverse("document-detail", args=(response.json()['id'],))
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # deleting document should also delete tag (no remaining references)
+        url = reverse("tag-list")
+        tag_list = self.client.get(url)
+        # tag list endpoint is empty, confirming tag deletion
+        self.assertEqual(tag_list.status_code, status.HTTP_200_OK)
+        self.assertEqual(tag_list.json()['count'], 0)
+
     def test_search_document_pages(self):
         doc_a = Document.objects.create(filename="a", folder=Folder.objects.create())
         doc_a_page_1 = DocumentPageImage.objects.create(

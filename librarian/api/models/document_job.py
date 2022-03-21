@@ -87,6 +87,9 @@ class DocumentJob(models.Model):
                 dc,
                 temp_path=None,
                 status=self.desired_status,
+                # filestore_path tracks the original filename as persisted on disk.
+                # necessary as the `filename` property may change over time
+                filestore_path=dc.filename
             )
             dc.save()
 
