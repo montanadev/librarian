@@ -30,6 +30,7 @@ function Viewer() {
     api.renameDocument(document.data.id, newDocumentName).then(() => {
       queryClient.invalidateQueries("folders");
       queryClient.invalidateQueries("document");
+      queryClient.invalidateQueries("tags");
     });
   };
 

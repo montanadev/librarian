@@ -30,15 +30,19 @@ export function Toolbar({
   const api = new Api();
   const queryClient = useQueryClient();
 
-  const tags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
+  const documentTags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
     api.getTagsByDocumentId(documentId)
   );
+  const globalTags = useQuery<ResourceModel<TagModel>>("tags", () =>
+    api.getTags()
+  );
+
   const refreshTags = () => {
     queryClient.invalidateQueries("document-tags");
     queryClient.invalidateQueries("tags");
   };
 
-  if (!tags.data) {
+  if (!documentTags.data || !globalTags.data) {
     return <>Loading...</>;
   }
 
@@ -57,14 +61,12 @@ export function Toolbar({
       </Typography.Title>
 
       <Button onClick={onAddToFolder}>Add to folder</Button>
-      <Divider type="vertical" />
       <Button disabled>Remove from folder</Button>
-      <Divider type="vertical" />
       <Button onClick={onDeleteDocument}>Delete Document</Button>
 
       <Tags
-        tags={tags.data.results}
-        documentId={documentId}
+        documentTags={documentTags.data.results}
+        globalTags={globalTags.data.results}
         onCreateTag={(newTagName) =>
           api.createTag(documentId, newTagName).then(refreshTags)
         }

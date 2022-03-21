@@ -1,19 +1,19 @@
-import { Input, Tag, Tooltip } from "antd";
+import { AutoComplete, Input, Tag, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { TagModel } from "../../models/Tag";
 
 interface Props {
-  documentId: string;
-  tags: TagModel[];
+  documentTags: TagModel[];
+  globalTags: TagModel[];
   onReplaceTag: (oldTagId: number, newTagName: string) => void;
   onCreateTag: (newTagName: string) => void;
   onDeleteTag: (tagId: number) => void;
 }
 
 export function Tags({
-  tags,
-  documentId,
+  documentTags,
+  globalTags,
   onReplaceTag,
   onCreateTag,
   onDeleteTag,
@@ -22,6 +22,8 @@ export function Tags({
   const [inputValue, setInputValue] = useState<string>("");
   const [editInputValue, setEditInputValue] = useState<string>("");
   const [editInputIndex, setEditInputIndex] = useState<number>(-1);
+  const [filteredGlobalTags, setFilteredGlobalTags] =
+    useState<TagModel[]>(globalTags);
 
   const showInput = () => {
     setInputVisible(true);
@@ -40,11 +42,13 @@ export function Tags({
   }, [editInputIndex]);
 
   const handleInputChange = (e: any) => {
-    setInputValue(e.target.value);
+    setInputValue(e);
+    console.log("on change", e);
   };
 
-  const handleInputConfirm = () => {
-    onCreateTag(inputValue);
+  const handleInputConfirm = (tag: string) => {
+    onCreateTag(tag);
+    console.log("on confirm", tag);
 
     setInputVisible(false);
     setInputValue("");
@@ -55,7 +59,7 @@ export function Tags({
   };
 
   const handleEditInputConfirm = () => {
-    onReplaceTag(tags[editInputIndex].id, editInputValue);
+    onReplaceTag(documentTags[editInputIndex].id, editInputValue);
 
     setEditInputIndex(-1);
     setEditInputValue("");
@@ -71,9 +75,38 @@ export function Tags({
     editInput.current = i;
   };
 
+  const onSearch = (searchText: string) => {
+    if (searchText === "") {
+      setFilteredGlobalTags(globalTags);
+      return;
+    }
+
+    let matches = [];
+    let foundTag = false;
+    for (let tag of filteredGlobalTags) {
+      if (tag.name.indexOf(searchText) > -1) {
+        if (tag.name === searchText) {
+          foundTag = true;
+        }
+        matches.push(tag);
+      }
+    }
+    if (!foundTag) {
+      // If there's not a precise match, push the current search as a fake tag
+      // that can be used to create a new tag.
+      // Can't push both a precise match and fake new tag (key collision)
+      matches.push({
+        id: -1,
+        name: searchText,
+        documents: [],
+      } as TagModel);
+    }
+    setFilteredGlobalTags(matches);
+  };
+
   return (
     <>
-      {tags.map((tag, index) => {
+      {documentTags.map((tag, index) => {
         if (editInputIndex === index) {
           return (
             <Input
@@ -117,15 +150,32 @@ export function Tags({
         );
       })}
       {inputVisible && (
-        <Input
+        // <Input
+        //   ref={saveInputRef}
+        //   type="text"
+        //   size="small"
+        //   style={{ width: 250, marginRight: 8, verticalAlign: "top" }}
+        //   value={inputValue}
+        //   onChange={handleInputChange}
+        //   onBlur={handleInputConfirm}
+        //   onPressEnter={handleInputConfirm}
+        // />
+        <AutoComplete
           ref={saveInputRef}
-          type="text"
-          size="small"
-          style={{ width: 250, marginRight: 8, verticalAlign: "top" }}
           value={inputValue}
+          options={filteredGlobalTags.map((t) => {
+            return { value: t.name, id: t.id };
+          })}
+          style={{ width: 200 }}
+          onSelect={handleInputConfirm}
+          onSearch={onSearch}
           onChange={handleInputChange}
-          onBlur={handleInputConfirm}
-          onPressEnter={handleInputConfirm}
+          // onKeyDown={(e) => {
+          //   if (e.key === "Enter" && inputValue) {
+          //     handleInputConfirm(inputValue);
+          //   }
+          // }}
+          placeholder="control mode"
         />
       )}
       {!inputVisible && (
