@@ -10,6 +10,6 @@ describe("Librarian", () => {
     // high timeout because conversion time is variable
     cy.contains("click to view", { timeout: 30000 }).click();
     // the rendered document should have an svg with text 'snowflake_2'
-    cy.contains("snowflake_2");
+    cy.contains("snowflake_2", { timeout: 30000 });
   });
 });
