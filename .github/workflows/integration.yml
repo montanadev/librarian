@@ -1,0 +1,48 @@
+name: Integration tests
+
+on: [push]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Set up node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install python deps
+      run: |
+        sudo apt-get install -y libnfs-dev:
+
+        python -m pip install --upgrade pip
+        python -m pip install poetry
+
+        poetry install
+        make migrate
+    - name: Install javascript deps
+      run: |
+          cd client
+          npm install
+    - name: Cypress run
+      uses: cypress-io/github-action@v2
+      env:
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        CYPRESS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      with:
+        working-directory: client
+        record: true
+        wait-on: 'http://localhost:3000'
+        wait-on-timeout: 300
+        start: |
+          npm start
+          npm run server
+          npm run worker

@@ -36,7 +36,9 @@
     "test": "craco test",
     "eject": "react-scripts eject",
     "prettier": "prettier -w src",
-    "prettier-check": "prettier -c src"
+    "prettier-check": "prettier -c src",
+    "server": "cd .. && make run",
+    "worker": "cd .. && make run-worker"
   },
   "eslintConfig": {
     "extends": [
