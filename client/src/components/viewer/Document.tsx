@@ -1,64 +1,65 @@
-import React, { useRef, useState } from "react";
+import React, {useRef, useState} from "react";
 import "../Uploader.css";
-import { Spin } from "antd";
-import { Document as ReactPDFDocument, Page as ReactPDFPage } from "react-pdf";
-import { useContainerDimensions } from "../../utils/useContainerDimenstions";
-import { toastError } from "../../utils/toasts";
+import {Spin} from "antd";
+import {Document as ReactPDFDocument, Page as ReactPDFPage} from "react-pdf";
+import {useContainerDimensions} from "../../utils/useContainerDimenstions";
+import {toastError} from "../../utils/toasts";
 import PageBoundary from "./PageBoundary";
 
 interface Props {
-  pageNumber: string;
-  documentId: string;
+    pageNumber: string;
+    documentId: string;
+    percentWidth: number;
 }
 
-function Document({ pageNumber, documentId }: Props) {
-  const [numPages, setNumPages] = useState(null);
-  const [pdf, setPdf] = useState(null);
+function Document({percentWidth, pageNumber, documentId}: Props) {
+    const [numPages, setNumPages] = useState(null);
+    const [pdf, setPdf] = useState(null);
 
-  const onLoad = (pdf: any) => {
-    setNumPages(pdf.numPages);
-    setPdf(pdf);
-  };
+    const onLoad = (pdf: any) => {
+        setNumPages(pdf.numPages);
+        setPdf(pdf);
+    };
 
-  const ref = useRef<any>();
-  const { width } = useContainerDimensions(ref);
+    const ref = useRef<any>();
+    const {width} = useContainerDimensions(ref);
 
-  const tryJump = () => {
-    const pageEl = document.querySelector(`[data-page-number="${pageNumber}"`);
-    if (pageEl) {
-      pageEl.scrollIntoView();
-    }
-  };
+    const tryJump = () => {
+        const pageEl = document.querySelector(`[data-page-number="${pageNumber}"`);
+        if (pageEl) {
+            pageEl.scrollIntoView();
+        }
+    };
 
-  return (
-    <div ref={ref}>
-      <ReactPDFDocument
-        file={`/api/documents/${documentId}/data`}
-        loading={<Spin size="large" />}
-        onLoadSuccess={onLoad}
-        onLoadError={(e) => toastError(`Error loading document: ${e.message}`)}
-        onSourceError={(e) => toastError(`Error loading source: ${e.message}`)}
-      >
-        {Array.from(new Array(numPages), (el, index) => (
-          <div key={`page_container_${index + 1}`}>
-            <ReactPDFPage
-              renderMode="svg"
-              renderAnnotationLayer={false}
-              onRenderSuccess={() => {
-                if (pageNumber && parseInt(pageNumber) === index + 1) {
-                  tryJump();
-                }
-              }}
-              width={width}
-              key={`page_${index + 1}`}
-              pageNumber={index + 1}
-            />
-            <PageBoundary pageNumber={index + 1} />
-          </div>
-        ))}
-      </ReactPDFDocument>
-    </div>
-  );
+    return (
+        <div ref={ref}>
+            <ReactPDFDocument
+                file={`/api/documents/${documentId}/data`}
+                loading={<Spin size="large"/>}
+                onLoadSuccess={onLoad}
+                onLoadError={(e) => toastError(`Error loading document: ${e.message}`)}
+                onSourceError={(e) => toastError(`Error loading source: ${e.message}`)}
+            >
+                {Array.from(new Array(numPages), (el, index) => (
+                    <div key={`page_container_${index + 1}`} style={{width: width * percentWidth}}>
+                        <ReactPDFPage
+                            renderMode="svg"
+                            renderAnnotationLayer={false}
+                            onRenderSuccess={() => {
+                                if (pageNumber && parseInt(pageNumber) === index + 1) {
+                                    tryJump();
+                                }
+                            }}
+                            width={width * percentWidth}
+                            key={`page_${index + 1}`}
+                            pageNumber={index + 1}
+                        />
+                        <PageBoundary pageNumber={index + 1}/>
+                    </div>
+                ))}
+            </ReactPDFDocument>
+        </div>
+    );
 }
 
 export default Document;
