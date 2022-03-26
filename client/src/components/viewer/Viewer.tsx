@@ -8,12 +8,22 @@ import { useQuery, useQueryClient } from "react-query";
 import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
+import { Slider } from "antd";
 
 function Viewer() {
   let { documentId, folderId, pageNumber } = useParams<any>();
 
   const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
+
+  let width = 1;
+  if (window.localStorage.getItem("librarian.document.width") !== null) {
+    width = parseFloat(
+      window.localStorage.getItem("librarian.document.width")!
+    );
+  }
+  const [percentWidth, setPercentWidth] = useState(width);
+
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
@@ -74,7 +84,29 @@ function Viewer() {
         onAddToFolder={() => setOpenAddToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
       />
-      <Document pageNumber={pageNumber} documentId={documentId} />
+
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <label>Width:</label>
+        <Slider
+          style={{ width: 50 }}
+          min={0}
+          max={1}
+          step={0.1}
+          defaultValue={percentWidth}
+          onChange={(value) => {
+            setPercentWidth(value);
+            window.localStorage.setItem(
+              "librarian.document.width",
+              value.toString()
+            );
+          }}
+        />
+      </div>
+      <Document
+        percentWidth={percentWidth}
+        pageNumber={pageNumber}
+        documentId={documentId}
+      />
     </>
   );
 }

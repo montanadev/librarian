@@ -11,6 +11,7 @@ FROM python:3.9-slim
 
 EXPOSE 8000
 
+
 WORKDIR /srv
 COPY . /srv
 COPY --from=js /srv/client/build /srv/librarian/static

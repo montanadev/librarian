@@ -9,9 +9,10 @@ import PageBoundary from "./PageBoundary";
 interface Props {
   pageNumber: string;
   documentId: string;
+  percentWidth: number;
 }
 
-function Document({ pageNumber, documentId }: Props) {
+function Document({ percentWidth, pageNumber, documentId }: Props) {
   const [numPages, setNumPages] = useState(null);
   const [pdf, setPdf] = useState(null);
 
@@ -40,7 +41,10 @@ function Document({ pageNumber, documentId }: Props) {
         onSourceError={(e) => toastError(`Error loading source: ${e.message}`)}
       >
         {Array.from(new Array(numPages), (el, index) => (
-          <div key={`page_container_${index + 1}`}>
+          <div
+            key={`page_container_${index + 1}`}
+            style={{ width: width * percentWidth }}
+          >
             <ReactPDFPage
               renderMode="svg"
               renderAnnotationLayer={false}
@@ -49,7 +53,7 @@ function Document({ pageNumber, documentId }: Props) {
                   tryJump();
                 }
               }}
-              width={width}
+              width={width * percentWidth}
               key={`page_${index + 1}`}
               pageNumber={index + 1}
             />
