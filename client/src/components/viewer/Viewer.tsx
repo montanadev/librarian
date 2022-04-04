@@ -89,7 +89,7 @@ function Viewer() {
         <label>Width:</label>
         <Slider
           style={{ width: 50 }}
-          min={0}
+          min={.1}
           max={1}
           step={0.1}
           defaultValue={percentWidth}

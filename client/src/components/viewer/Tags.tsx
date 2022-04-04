@@ -25,10 +25,6 @@ export function Tags({
   const [filteredGlobalTags, setFilteredGlobalTags] =
     useState<TagModel[]>(globalTags);
 
-  const showInput = () => {
-    setInputVisible(true);
-  };
-
   useEffect(() => {
     if (inputVisible && input.current) {
       input.current.focus();
@@ -41,11 +37,6 @@ export function Tags({
     }
   }, [editInputIndex]);
 
-  const handleInputChange = (e: any) => {
-    setInputValue(e);
-    console.log("on change", e);
-  };
-
   const handleInputConfirm = (tag: string) => {
     onCreateTag(tag);
     console.log("on confirm", tag);
@@ -54,9 +45,6 @@ export function Tags({
     setInputValue("");
   };
 
-  const handleEditInputChange = (e: any) => {
-    setEditInputValue(e.target.value);
-  };
 
   const handleEditInputConfirm = () => {
     onReplaceTag(documentTags[editInputIndex].id, editInputValue);
@@ -115,7 +103,7 @@ export function Tags({
               size="small"
               style={{ width: 250, marginRight: 8, verticalAlign: "top" }}
               value={editInputValue}
-              onChange={handleEditInputChange}
+              onChange={(e) => setEditInputValue(e.target.value)}
               onBlur={handleEditInputConfirm}
               onPressEnter={handleEditInputConfirm}
             />
@@ -159,12 +147,13 @@ export function Tags({
           style={{ width: 200 }}
           onSelect={handleInputConfirm}
           onSearch={onSearch}
-          onChange={handleInputChange}
+          onChange={(value) => setInputValue(value)}
+          onBlur={() => setInputVisible(false)}
         />
       )}
       {!inputVisible && (
-        <Tag className="site-tag-plus" onClick={showInput}>
-          <PlusOutlined /> New Tag
+        <Tag style={{borderStyle: 'dashed'}} onClick={() => setInputVisible(true)}>
+          <PlusOutlined style={{verticalAlign: '0.1em'}}/><span>New Tag</span>
         </Tag>
       )}
     </>
