@@ -18,6 +18,7 @@ describe("Librarian", () => {
       subjectType: "drag-n-drop",
     });
     cy.contains("click to view", { timeout: 30000 }).click();
-    cy.contains("least", { timeout: 30000 });
+    cy.wait(10000);
+    cy.contains("Failed to load").should("not.exist");
   });
 });
