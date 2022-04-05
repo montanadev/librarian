@@ -4,7 +4,7 @@ run:
 	poetry run ./manage.py runserver
 
 run-worker:
-	ls /etc/ && cp policy.xml /etc/ImageMagick-6/policy.xml && poetry run ./manage.py worker
+	sudo cp policy.xml /etc/ImageMagick-6/policy.xml && poetry run ./manage.py worker
 
 migrate:
 	poetry run ./manage.py migrate
