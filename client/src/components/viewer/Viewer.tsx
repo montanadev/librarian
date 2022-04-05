@@ -66,42 +66,35 @@ function Viewer() {
 
   return (
     <>
-      <AddToFolderModal
-        visible={openAddToFolderModal}
-        onClose={() => setOpenAddToFolderModal(false)}
-        onAddToFolder={onAddDocumentToFolder}
-      />
-      <DeleteDocumentModal
-        visible={openDeleteDocumentModal}
-        onClose={() => setOpenDeleteDocumentModal(false)}
-        onDeleteDocument={onDeleteDocument}
-      />
+      {openAddToFolderModal && (
+        <AddToFolderModal
+          onClose={() => setOpenAddToFolderModal(false)}
+          onAddToFolder={onAddDocumentToFolder}
+        />
+      )}
+      {openDeleteDocumentModal && (
+        <DeleteDocumentModal
+          onClose={() => setOpenDeleteDocumentModal(false)}
+          onDeleteDocument={onDeleteDocument}
+        />
+      )}
       <Toolbar
         document={document.data}
         documentId={documentId}
         folderId={folderId}
+        defaultWidth={width}
         onDocumentRename={onDocumentRename}
         onAddToFolder={() => setOpenAddToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
+        onSetWidth={(width: number) => {
+          setPercentWidth(width);
+          window.localStorage.setItem(
+            "librarian.document.width",
+            width.toString()
+          );
+        }}
       />
 
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <label>Width:</label>
-        <Slider
-          style={{ width: 50 }}
-          min={.1}
-          max={1}
-          step={0.1}
-          defaultValue={percentWidth}
-          onChange={(value) => {
-            setPercentWidth(value);
-            window.localStorage.setItem(
-              "librarian.document.width",
-              value.toString()
-            );
-          }}
-        />
-      </div>
       <Document
         percentWidth={percentWidth}
         pageNumber={pageNumber}

@@ -26,6 +26,7 @@ function Document({ percentWidth, pageNumber, documentId }: Props) {
 
   const tryJump = () => {
     const pageEl = document.querySelector(`[data-page-number="${pageNumber}"`);
+
     if (pageEl) {
       pageEl.scrollIntoView();
     }

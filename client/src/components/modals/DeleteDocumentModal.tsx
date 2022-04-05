@@ -1,19 +1,14 @@
 import { Button, Modal } from "antd";
 
 interface Props {
-  visible: boolean;
   onClose: () => void;
   onDeleteDocument: () => void;
 }
 
-export function DeleteDocumentModal({
-  visible,
-  onClose,
-  onDeleteDocument,
-}: Props) {
+export function DeleteDocumentModal({ onClose, onDeleteDocument }: Props) {
   return (
     <Modal
-      visible={visible}
+      visible
       onCancel={onClose}
       title="Delete document"
       footer={[

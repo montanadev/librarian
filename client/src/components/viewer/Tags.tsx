@@ -45,7 +45,6 @@ export function Tags({
     setInputValue("");
   };
 
-
   const handleEditInputConfirm = () => {
     onReplaceTag(documentTags[editInputIndex].id, editInputValue);
 
@@ -81,7 +80,7 @@ export function Tags({
     }
     if (!foundTag) {
       // If there's not a precise match, push the current search as a fake tag
-      // that can be used to create a new tag.
+      // that can be used to select / create a new tag.
       // Can't push both a precise match and fake new tag (key collision)
       matches.push({
         id: -1,
@@ -93,7 +92,7 @@ export function Tags({
   };
 
   return (
-    <>
+    <div style={{ display: "flex" }}>
       {documentTags.map((tag, index) => {
         if (editInputIndex === index) {
           return (
@@ -139,6 +138,7 @@ export function Tags({
       })}
       {inputVisible && (
         <AutoComplete
+          size={"small"}
           ref={saveInputRef}
           value={inputValue}
           options={filteredGlobalTags.map((t) => {
@@ -152,10 +152,14 @@ export function Tags({
         />
       )}
       {!inputVisible && (
-        <Tag style={{borderStyle: 'dashed'}} onClick={() => setInputVisible(true)}>
-          <PlusOutlined style={{verticalAlign: '0.1em'}}/><span>New Tag</span>
+        <Tag
+          style={{ borderStyle: "dashed" }}
+          onClick={() => setInputVisible(true)}
+        >
+          <PlusOutlined style={{ verticalAlign: "0.1em" }} />
+          <span>New Tag</span>
         </Tag>
       )}
-    </>
+    </div>
   );
 }

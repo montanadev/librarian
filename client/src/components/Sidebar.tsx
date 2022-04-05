@@ -30,10 +30,9 @@ function Sidebar() {
 
   return (
     <div key={`sidebar-${documentId}-${folderId}`}>
-      <CreateFolderModal
-        visible={createFolderOpen}
-        onClose={() => setCreateFolderOpen(false)}
-      />
+      {createFolderOpen && (
+        <CreateFolderModal onClose={() => setCreateFolderOpen(false)} />
+      )}
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
@@ -41,9 +40,6 @@ function Sidebar() {
           defaultOpenKeys={["folders"]}
           style={{ height: "100%", borderRight: 0 }}
         >
-          <Menu.Item key="upload" icon={<FileAddOutlined />}>
-            <Link to="/">Upload</Link>
-          </Menu.Item>
           <Menu.Item
             key="create-folder"
             onClick={() => setCreateFolderOpen(true)}

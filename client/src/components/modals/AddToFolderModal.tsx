@@ -6,12 +6,11 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 
 interface Props {
-  visible: boolean;
   onClose: () => void;
   onAddToFolder: (folderId: number) => void;
 }
 
-export function AddToFolderModal({ visible, onClose, onAddToFolder }: Props) {
+export function AddToFolderModal({ onClose, onAddToFolder }: Props) {
   const [folderId, setFolderId] = useState<any>();
 
   const api = new Api();
@@ -34,7 +33,7 @@ export function AddToFolderModal({ visible, onClose, onAddToFolder }: Props) {
 
   return (
     <Modal
-      visible={visible}
+      visible
       onCancel={onClose}
       title="Add Document to Folder"
       footer={[
