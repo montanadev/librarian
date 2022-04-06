@@ -1,28 +1,28 @@
 import { Button, Input, Modal } from "antd";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useQueryClient } from "react-query";
 import { Api } from "../../utils/Api";
 
 interface Props {
-  visible: boolean;
   onClose: () => void;
 }
 
-export function CreateFolderModal({ visible, onClose }: Props) {
+export function CreateFolderModal({ onClose }: Props) {
   const api = new Api();
   const queryClient = useQueryClient();
-  const { register, handleSubmit } = useForm();
+  const { control, handleSubmit, reset } = useForm();
 
   const onSubmit = (data: any) => {
     api.createFolder(data.folderName).then(() => {
       queryClient.invalidateQueries("folders");
       onClose();
+      reset();
     });
   };
 
   return (
     <Modal
-      visible={visible}
+      visible
       onCancel={onClose}
       title="Create Folder"
       footer={[
@@ -36,13 +36,14 @@ export function CreateFolderModal({ visible, onClose }: Props) {
         </Button>,
       ]}
     >
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <h3>Folder name</h3>
-        <input
-          autoFocus
-          className="w-full"
-          type="text"
-          {...register("folderName")}
+        <Controller
+          name={"folderName"}
+          control={control}
+          render={({ field }: any) => (
+            <Input {...field} autoFocus className="w-full" type="text" />
+          )}
         />
       </form>
     </Modal>

@@ -1,4 +1,4 @@
-.PHONY: run migrate makemigrations format
+.PHONY: run rum-worker migrate makemigrations test test-coverage
 
 run:
 	poetry run ./manage.py runserver
@@ -14,3 +14,6 @@ makemigrations:
 
 test:
 	poetry run ./manage.py test
+
+test-coverage:
+	poetry run coverage run ./manage.py test && poetry run coverage xml

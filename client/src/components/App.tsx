@@ -17,7 +17,6 @@ const { Header, Content } = Layout;
 function App() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [search, setSearch] = useState<string>();
-  const [breadcrumbs, setBreadcrumbs] = useState<Array<string>>([]);
   const history = useHistory();
 
   const onSearch = () => {
@@ -37,13 +36,6 @@ function App() {
     return (
       <Layout>
         <Sidebar />
-        <Breadcrumb style={{ margin: "16px 0" }}>
-          {breadcrumbs
-            ? breadcrumbs.map((b, idx) => (
-                <Breadcrumb.Item key={idx}>{b}</Breadcrumb.Item>
-              ))
-            : null}
-        </Breadcrumb>
         <Content className="AppContent">{children}</Content>
       </Layout>
     );
@@ -62,7 +54,7 @@ function App() {
         <div className="AppLogo">librarian</div>
         <Menu theme="dark" mode="horizontal">
           <Menu.Item key="home">
-            <Link to={"/"}>Home</Link>
+            <Link to={"/"}>Upload</Link>
           </Menu.Item>
           <Menu.Item onClick={() => setWizardOpen(true)} key="settings">
             Settings

@@ -25,10 +25,6 @@ export function Tags({
   const [filteredGlobalTags, setFilteredGlobalTags] =
     useState<TagModel[]>(globalTags);
 
-  const showInput = () => {
-    setInputVisible(true);
-  };
-
   useEffect(() => {
     if (inputVisible && input.current) {
       input.current.focus();
@@ -41,21 +37,12 @@ export function Tags({
     }
   }, [editInputIndex]);
 
-  const handleInputChange = (e: any) => {
-    setInputValue(e);
-    console.log("on change", e);
-  };
-
   const handleInputConfirm = (tag: string) => {
     onCreateTag(tag);
     console.log("on confirm", tag);
 
     setInputVisible(false);
     setInputValue("");
-  };
-
-  const handleEditInputChange = (e: any) => {
-    setEditInputValue(e.target.value);
   };
 
   const handleEditInputConfirm = () => {
@@ -93,7 +80,7 @@ export function Tags({
     }
     if (!foundTag) {
       // If there's not a precise match, push the current search as a fake tag
-      // that can be used to create a new tag.
+      // that can be used to select / create a new tag.
       // Can't push both a precise match and fake new tag (key collision)
       matches.push({
         id: -1,
@@ -105,7 +92,7 @@ export function Tags({
   };
 
   return (
-    <>
+    <div style={{ display: "flex" }}>
       {documentTags.map((tag, index) => {
         if (editInputIndex === index) {
           return (
@@ -115,7 +102,7 @@ export function Tags({
               size="small"
               style={{ width: 250, marginRight: 8, verticalAlign: "top" }}
               value={editInputValue}
-              onChange={handleEditInputChange}
+              onChange={(e) => setEditInputValue(e.target.value)}
               onBlur={handleEditInputConfirm}
               onPressEnter={handleEditInputConfirm}
             />
@@ -151,6 +138,7 @@ export function Tags({
       })}
       {inputVisible && (
         <AutoComplete
+          size={"small"}
           ref={saveInputRef}
           value={inputValue}
           options={filteredGlobalTags.map((t) => {
@@ -159,14 +147,19 @@ export function Tags({
           style={{ width: 200 }}
           onSelect={handleInputConfirm}
           onSearch={onSearch}
-          onChange={handleInputChange}
+          onChange={(value) => setInputValue(value)}
+          onBlur={() => setInputVisible(false)}
         />
       )}
       {!inputVisible && (
-        <Tag className="site-tag-plus" onClick={showInput}>
-          <PlusOutlined /> New Tag
+        <Tag
+          style={{ borderStyle: "dashed" }}
+          onClick={() => setInputVisible(true)}
+        >
+          <PlusOutlined style={{ verticalAlign: "0.1em" }} />
+          <span>New Tag</span>
         </Tag>
       )}
-    </>
+    </div>
   );
 }

@@ -1,22 +1,26 @@
 import NavButtons from "./NavButtons";
 import React from "react";
 import "../Uploader.css";
-import { Button, Divider, Typography } from "antd";
-import { CheckOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Descriptions, Dropdown, Menu } from "antd";
 import { DocumentModel } from "../../models/Document";
 import { Tags } from "./Tags";
 import { Api } from "../../utils/Api";
 import { useQuery, useQueryClient } from "react-query";
 import { TagModel } from "../../models/Tag";
 import { ResourceModel } from "../../models/Resource";
+import { WidthSlider } from "./WidthSlider";
+import { EditableTitle } from "./EditableTitle";
 
 interface Props {
   document: DocumentModel;
   onDocumentRename: (name: string) => void;
   onAddToFolder: () => void;
   onDeleteDocument: () => void;
+  onSetWidth: (width: number) => void;
+  onCreateFolder: () => void;
   documentId: string;
   folderId: string;
+  defaultWidth: number;
 }
 
 export function Toolbar({
@@ -24,6 +28,9 @@ export function Toolbar({
   onDocumentRename,
   onAddToFolder,
   onDeleteDocument,
+  onCreateFolder,
+  onSetWidth,
+  defaultWidth,
   documentId,
   folderId,
 }: Props) {
@@ -46,39 +53,74 @@ export function Toolbar({
     return <>Loading...</>;
   }
 
+  const createButton = (text: string, callback: () => void) => {
+    return (
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" onClick={callback}>
+          {text}
+        </a>
+      </Menu.Item>
+    );
+  };
+
+  const folderDropdownButtons = (
+    <Menu>
+      {createButton("Create folder...", onCreateFolder)}
+      {createButton("Add to folder...", onAddToFolder)}
+      {createButton("Remove from folder...", () => {})}
+    </Menu>
+  );
+
+  const documentDropdownButtons = (
+    <Menu>{createButton("Delete document...", onDeleteDocument)}</Menu>
+  );
+
   return (
     <>
-      <Typography.Title
-        style={{ margin: 0 }}
-        level={1}
-        editable={{
-          icon: <EditOutlined style={{ fontSize: 22 }} />,
-          onChange: onDocumentRename,
-          enterIcon: <CheckOutlined />,
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
         }}
       >
-        {document.filename}
-      </Typography.Title>
+        <EditableTitle text={document.filename} onEdit={onDocumentRename} />
 
-      <Button onClick={onAddToFolder}>Add to folder</Button>
-      <Button disabled>Remove from folder</Button>
-      <Button onClick={onDeleteDocument}>Delete Document</Button>
+        <WidthSlider defaultWidth={defaultWidth} onSetWidth={onSetWidth} />
 
-      <Tags
-        documentTags={documentTags.data.results}
-        globalTags={globalTags.data.results}
-        onCreateTag={(newTagName) =>
-          api.createTag(documentId, newTagName).then(refreshTags)
-        }
-        onDeleteTag={(tagId) =>
-          api.deleteTag(documentId, tagId).then(refreshTags)
-        }
-        onReplaceTag={(oldTagId, newTagName) =>
-          api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
-        }
-      />
+        <div style={{ display: "flex" }}>
+          <Dropdown overlay={folderDropdownButtons} placement="bottomCenter">
+            <Button>Folders</Button>
+          </Dropdown>
 
-      <NavButtons documentId={documentId} folderId={folderId} />
+          <div style={{ padding: 6 }} />
+
+          <Dropdown overlay={documentDropdownButtons} placement="bottomCenter">
+            <Button>Document</Button>
+          </Dropdown>
+
+          <div style={{ padding: 6 }} />
+
+          <NavButtons documentId={documentId} folderId={folderId} />
+        </div>
+      </div>
+      <Descriptions size="small" column={1}>
+        <Descriptions.Item>
+          <Tags
+            documentTags={documentTags.data.results}
+            globalTags={globalTags.data.results}
+            onCreateTag={(newTagName) =>
+              api.createTag(documentId, newTagName).then(refreshTags)
+            }
+            onDeleteTag={(tagId) =>
+              api.deleteTag(documentId, tagId).then(refreshTags)
+            }
+            onReplaceTag={(oldTagId, newTagName) =>
+              api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
+            }
+          />
+        </Descriptions.Item>
+      </Descriptions>
     </>
   );
 }

@@ -35,9 +35,11 @@ class Document(models.Model):
         if self.status == DocumentStatus.created.value:
             # document hasn't persisted yet, return temp path
             with open(self.temp_path, mode="rb") as f:
+                logger.warning(f"Tried to access {self.filename} before persist, returning temp path")
                 return f.read()
 
         if settings.storage_mode == "local":
+            logger.debug(f"Returning data from {os.path.join(settings.storage_path, self.filestore_path)}")
             with open(os.path.join(settings.storage_path, self.filestore_path), mode="rb") as f:
                 return f.read()
 

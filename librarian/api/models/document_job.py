@@ -1,3 +1,4 @@
+import libnfs
 import logging
 import os
 import subprocess
@@ -68,8 +69,6 @@ class DocumentJob(models.Model):
                 ) as tmp_f:
                     local_f.write(bytearray(tmp_f.read()))
             elif settings.storage_mode == "nfs":
-                import libnfs
-
                 # read temp file into nfs
                 nfs = libnfs.NFS(settings.storage_path)
                 nfs_f = nfs.open("/" + dc.filename, mode="wb")
@@ -98,17 +97,16 @@ class DocumentJob(models.Model):
             dc.translate_pdf_to_images()
 
         if self.job == DocumentJobJobs.translate_pdf_to_images:
-            b = dc.get_bytes_from_filestore(settings)
-
             # temp dir to hold imagemagick output images
-            image_dir = tempfile.mkdtemp()
-            # temp file to write file to disk for imagemagick
-            fd, input_file = tempfile.mkstemp()
-            with open(fd, "w+b") as f:
-                f.write(b)
+            output_dir = tempfile.mkdtemp()
+            # source file may be nfs, which wouldn't exist locally on disk.
+            # write source file bytes to disk for imagemagick
+            file, filename = tempfile.mkstemp()
+            with open(file, "w+b") as f:
+                f.write(dc.get_bytes_from_filestore(settings))
 
             cmd = (
-                f"convert -density 150 {input_file} -quality 90 {image_dir}/output.png"
+                f"convert -density 150 {filename} -quality 90 {output_dir}/output.png"
             )
 
             start_time = datetime.now()
@@ -117,23 +115,23 @@ class DocumentJob(models.Model):
             subprocess.call(cmd.split(" "))
 
             duration = (datetime.now() - start_time).total_seconds()
-            logger.debug(f"Starting conversion...done in {duration}s: \n{cmd}")
+            logger.debug(f"Starting conversion...done in {duration}s")
 
             seen = 0
             # list images from pdf split
-            for filename in os.listdir(image_dir):
+            for output_file in os.listdir(output_dir):
                 seen += 1
                 page_number = 0
 
-                if filename != "output.png":
+                if output_file != "output.png":
                     # take "output-5.png" and split to "5.png"
-                    _, filename_parts = filename.split("-")
+                    _, filename_parts = output_file.split("-")
                     # split "5.png" to 5
                     page_number, _ = filename_parts.split(".")
 
                 DocumentPageImage.objects.create(
                     document=dc,
-                    temp_path=f"{image_dir}/{filename}",
+                    temp_path=f"{output_dir}/{output_file}",
                     page_number=int(page_number),
                 )
 
@@ -143,13 +141,15 @@ class DocumentJob(models.Model):
                 )
             logger.debug(f"Stored {seen} pages from imagemagick convert command")
 
-            # cleanup temp file,  but dont cleanup images: still needed for annotation
-            os.remove(input_file)
+            # cleanup temp file, but dont cleanup images: still needed for annotation
+            os.remove(filename)
 
             dc.status = self.desired_status
             dc.save()
 
             if django_settings.DISABLE_ANNOTATION:
+                # skip directly to annotated
+                logger.warning(f"Skipping annotation for {self.document.filename}")
                 dc.status = DocumentStatus.annotated.value
                 dc.save()
             else:

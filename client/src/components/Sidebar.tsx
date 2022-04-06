@@ -1,21 +1,17 @@
 import "./Sidebar.css";
-import { Layout, Menu, Typography } from "antd";
-import { FileAddOutlined, FolderAddOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import { Layout, Menu } from "antd";
+import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { Api } from "../utils/Api";
-import { CreateFolderModal } from "./modals/CreateFolderModal";
 import { FolderModel } from "../models/Folder";
 import { ResourceModel } from "../models/Resource";
 import { useQuery } from "react-query";
 import { TagModel } from "../models/Tag";
 
-const { Paragraph } = Typography;
 const { SubMenu } = Menu;
 const { Sider } = Layout;
 
 function Sidebar() {
-  const [createFolderOpen, setCreateFolderOpen] = useState(false);
   let { documentId, folderId } = useParams<any>();
 
   const api = new Api();
@@ -30,10 +26,6 @@ function Sidebar() {
 
   return (
     <div key={`sidebar-${documentId}-${folderId}`}>
-      <CreateFolderModal
-        visible={createFolderOpen}
-        onClose={() => setCreateFolderOpen(false)}
-      />
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
@@ -41,19 +33,6 @@ function Sidebar() {
           defaultOpenKeys={["folders"]}
           style={{ height: "100%", borderRight: 0 }}
         >
-          <Menu.Item key="upload" icon={<FileAddOutlined />}>
-            <Link to="/">Upload</Link>
-          </Menu.Item>
-          <Menu.Item
-            key="create-folder"
-            onClick={() => setCreateFolderOpen(true)}
-            icon={<FolderAddOutlined />}
-          >
-            Add Folder
-          </Menu.Item>
-
-          <Menu.Divider />
-
           <SubMenu key={"folders"} title={"Folders"}>
             {folders.data
               ? folders.data.results.map((f: FolderModel) => (

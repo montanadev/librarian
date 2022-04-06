@@ -9,12 +9,14 @@ import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
 import { Slider } from "antd";
+import { CreateFolderModal } from "../modals/CreateFolderModal";
 
 function Viewer() {
   let { documentId, folderId, pageNumber } = useParams<any>();
 
   const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
+  const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
 
   let width = 1;
   if (window.localStorage.getItem("librarian.document.width") !== null) {
@@ -66,42 +68,39 @@ function Viewer() {
 
   return (
     <>
-      <AddToFolderModal
-        visible={openAddToFolderModal}
-        onClose={() => setOpenAddToFolderModal(false)}
-        onAddToFolder={onAddDocumentToFolder}
-      />
-      <DeleteDocumentModal
-        visible={openDeleteDocumentModal}
-        onClose={() => setOpenDeleteDocumentModal(false)}
-        onDeleteDocument={onDeleteDocument}
-      />
+      {openAddToFolderModal && (
+        <AddToFolderModal
+          onClose={() => setOpenAddToFolderModal(false)}
+          onAddToFolder={onAddDocumentToFolder}
+        />
+      )}
+      {openDeleteDocumentModal && (
+        <DeleteDocumentModal
+          onClose={() => setOpenDeleteDocumentModal(false)}
+          onDeleteDocument={onDeleteDocument}
+        />
+      )}
+      {openCreateFolderModal && (
+        <CreateFolderModal onClose={() => setOpenCreateFolderModal(false)} />
+      )}
       <Toolbar
         document={document.data}
         documentId={documentId}
         folderId={folderId}
+        defaultWidth={width}
         onDocumentRename={onDocumentRename}
         onAddToFolder={() => setOpenAddToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
+        onCreateFolder={() => setOpenCreateFolderModal(true)}
+        onSetWidth={(width: number) => {
+          setPercentWidth(width);
+          window.localStorage.setItem(
+            "librarian.document.width",
+            width.toString()
+          );
+        }}
       />
 
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <label>Width:</label>
-        <Slider
-          style={{ width: 50 }}
-          min={0}
-          max={1}
-          step={0.1}
-          defaultValue={percentWidth}
-          onChange={(value) => {
-            setPercentWidth(value);
-            window.localStorage.setItem(
-              "librarian.document.width",
-              value.toString()
-            );
-          }}
-        />
-      </div>
       <Document
         percentWidth={percentWidth}
         pageNumber={pageNumber}

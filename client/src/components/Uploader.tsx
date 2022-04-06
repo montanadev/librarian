@@ -44,15 +44,17 @@ const Uploader = () => {
         )}
       </div>
       <div>
-        <List
-          itemLayout="horizontal"
-          dataSource={jobs}
-          renderItem={(job) => (
-            <List.Item>
-              <Job job={job} />
-            </List.Item>
-          )}
-        />
+        {jobs && (
+          <List
+            itemLayout="horizontal"
+            dataSource={jobs}
+            renderItem={(job) => (
+              <List.Item>
+                <Job job={job} />
+              </List.Item>
+            )}
+          />
+        )}
       </div>
     </div>
   );

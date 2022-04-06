@@ -4,7 +4,7 @@ import { ResourceModel } from "../../models/Resource";
 import { FolderModel } from "../../models/Folder";
 import { useQuery } from "react-query";
 import { Api } from "../../utils/Api";
-import { Button, Divider, Spin, Typography } from "antd";
+import { Button, Divider, Radio, Spin, Typography } from "antd";
 
 interface Props {
   documentId: string;
@@ -29,29 +29,20 @@ function NavButtons({ documentId, folderId }: Props) {
     documentId,
     folderId
   );
+
+  const goTo = (item: number[]) => () => {
+    if (!item) {
+      return;
+    }
+    history.push(`/folders/${item[0]}/documents/${item[1]}`);
+  };
+
   return (
     <div style={{ float: "right" }}>
-      <Button
-        onClick={() => {
-          if (!prev) {
-            return;
-          }
-          history.push(`/folders/${prev[0]}/documents/${prev[1]}`);
-        }}
-      >
-        Prev
-      </Button>
-      <Divider type="vertical" />
-      <Button
-        onClick={() => {
-          if (!next) {
-            return;
-          }
-          history.push(`/folders/${next[0]}/documents/${next[1]}`);
-        }}
-      >
-        Next
-      </Button>
+      <Radio.Group value="unset">
+        <Radio.Button onClick={goTo(next)}>Back</Radio.Button>
+        <Radio.Button onClick={goTo(prev)}>Next</Radio.Button>
+      </Radio.Group>
     </div>
   );
 }
