@@ -1,4 +1,4 @@
-![tests](https://github.com/de1ux/librarian/actions/workflows/test.yml/badge.svg)
+![tests](https://github.com/de1ux/librarian/actions/workflows/test-build-and-push.yml/badge.svg)
 
 # Librarian
 
