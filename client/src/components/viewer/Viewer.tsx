@@ -2,19 +2,18 @@ import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import "../Uploader.css";
 import Document from "./Document";
-import { AddToFolderModal } from "../modals/AddToFolderModal";
+import { MoveToFolderModal } from "../modals/MoveToFolderModal";
 import { Api } from "../../utils/Api";
 import { useQuery, useQueryClient } from "react-query";
 import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
-import { Slider } from "antd";
 import { CreateFolderModal } from "../modals/CreateFolderModal";
 
 function Viewer() {
   let { documentId, folderId, pageNumber } = useParams<any>();
 
-  const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
+  const [openAddToFolderModal, setOpenMoveToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
   const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
 
@@ -48,7 +47,7 @@ function Viewer() {
 
   const onAddDocumentToFolder = (folderId: number) => {
     api.addDocumentToFolder(documentId, folderId).then(() => {
-      setOpenAddToFolderModal(false);
+      setOpenMoveToFolderModal(false);
       queryClient.invalidateQueries("folders");
     });
   };
@@ -69,8 +68,9 @@ function Viewer() {
   return (
     <>
       {openAddToFolderModal && (
-        <AddToFolderModal
-          onClose={() => setOpenAddToFolderModal(false)}
+        <MoveToFolderModal
+          currentFolderId={document.data.folder}
+          onClose={() => setOpenMoveToFolderModal(false)}
           onAddToFolder={onAddDocumentToFolder}
         />
       )}
@@ -89,7 +89,7 @@ function Viewer() {
         folderId={folderId}
         defaultWidth={width}
         onDocumentRename={onDocumentRename}
-        onAddToFolder={() => setOpenAddToFolderModal(true)}
+        onMoveToFolder={() => setOpenMoveToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
         onCreateFolder={() => setOpenCreateFolderModal(true)}
         onSetWidth={(width: number) => {
