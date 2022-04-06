@@ -1,16 +1,7 @@
 import NavButtons from "./NavButtons";
 import React from "react";
 import "../Uploader.css";
-import {
-  Button,
-  Descriptions,
-  Divider,
-  Dropdown,
-  Menu,
-  PageHeader,
-  Typography,
-} from "antd";
-import { CheckOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Descriptions, Dropdown, Menu } from "antd";
 import { DocumentModel } from "../../models/Document";
 import { Tags } from "./Tags";
 import { Api } from "../../utils/Api";
@@ -19,7 +10,6 @@ import { TagModel } from "../../models/Tag";
 import { ResourceModel } from "../../models/Resource";
 import { WidthSlider } from "./WidthSlider";
 import { EditableTitle } from "./EditableTitle";
-import { on } from "cluster";
 
 interface Props {
   document: DocumentModel;
@@ -63,34 +53,26 @@ export function Toolbar({
     return <>Loading...</>;
   }
 
+  const createButton = (text: string, callback: () => void) => {
+    return (
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" onClick={callback}>
+          {text}
+        </a>
+      </Menu.Item>
+    );
+  };
+
   const folderDropdownButtons = (
     <Menu>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" onClick={onCreateFolder}>
-          Create folder...
-        </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" onClick={onAddToFolder}>
-          Add to folder...
-        </a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer">
-          Remove from folder...
-        </a>
-      </Menu.Item>
+      {createButton("Create folder...", onCreateFolder)}
+      {createButton("Add to folder...", onAddToFolder)}
+      {createButton("Remove from folder...", () => {})}
     </Menu>
   );
 
   const documentDropdownButtons = (
-    <Menu>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" onClick={onDeleteDocument}>
-          Delete document...
-        </a>
-      </Menu.Item>
-    </Menu>
+    <Menu>{createButton("Delete document...", onDeleteDocument)}</Menu>
   );
 
   return (
