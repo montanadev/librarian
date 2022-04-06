@@ -1,10 +1,10 @@
-.PHONY: run migrate makemigrations format
+.PHONY: run rum-worker migrate makemigrations test
 
 run:
 	poetry run ./manage.py runserver
 
 run-worker:
-	sudo cp policy.xml /etc/ImageMagick-6/policy.xml && poetry run ./manage.py worker
+	poetry run ./manage.py worker
 
 migrate:
 	poetry run ./manage.py migrate

@@ -119,19 +119,19 @@ class DocumentJob(models.Model):
 
             seen = 0
             # list images from pdf split
-            for filename in os.listdir(output_dir):
+            for output_file in os.listdir(output_dir):
                 seen += 1
                 page_number = 0
 
-                if filename != "output.png":
+                if output_file != "output.png":
                     # take "output-5.png" and split to "5.png"
-                    _, filename_parts = filename.split("-")
+                    _, filename_parts = output_file.split("-")
                     # split "5.png" to 5
                     page_number, _ = filename_parts.split(".")
 
                 DocumentPageImage.objects.create(
                     document=dc,
-                    temp_path=f"{output_dir}/{filename}",
+                    temp_path=f"{output_dir}/{output_file}",
                     page_number=int(page_number),
                 )
 
