@@ -6,6 +6,7 @@ from datetime import datetime
 
 import libnfs
 from django.conf import settings as django_settings
+from django.utils import timezone
 
 from librarian.api.models import DocumentJob
 from librarian.api.models import DocumentPageImage, DocumentStatus, Settings, SourceContentTypes
@@ -16,6 +17,28 @@ logger = logging.getLogger(__name__)
 
 
 def run(job: DocumentJob):
+    successful = True
+    failed_reason = None
+
+    logger.info(f"Running job '{job.kind}'...")
+    try:
+        _run(job)
+    except Exception as e:
+        successful = False
+        failed_reason = str(e)
+        logger.exception(e)
+    finally:
+        setattrs(
+            job,
+            completed_at=timezone.now(),
+            successful=successful,
+            failed_reason=failed_reason,
+        )
+        job.save()
+    logger.info(f"Running job '{job.kind}'...done")
+
+
+def _run(job: DocumentJob):
     settings = Settings.objects.first()
     if not settings:
         raise Exception("Settings not configured, exiting")
@@ -116,9 +139,9 @@ def run(job: DocumentJob):
             )
 
         if not seen:
-            logger.warning(
-                f"No images detected from imagemagick convert command: '{cmd}'"
-            )
+            # print(subprocess.check_output(f"cat {filename}", stderr=subprocess.STDOUT, shell=True))
+            raise Exception(f"No images detected from imagemagick convert command: '{cmd}'")
+
         logger.debug(f"Stored {seen} pages from imagemagick convert command")
 
         # cleanup temp file, but dont cleanup images: still needed for annotation

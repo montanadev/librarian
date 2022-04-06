@@ -1,3 +1,4 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -11,7 +12,9 @@ class TestFolderViews(TestCase):
 
         # create document
         url = reverse("document-create", args=("testfile",))
-        self.test_doc = self.client.post(url)
+        file = SimpleUploadedFile("file.jpg", None, content_type="application/pdf")
+        self.test_doc = self.client.post(url, {'file': file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(self.test_doc.status_code, status.HTTP_200_OK)
 
     def test_create_empty_folder(self):

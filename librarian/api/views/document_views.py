@@ -106,7 +106,9 @@ class DocumentTagDetailView(DestroyAPIView):
 
 @api_view(["POST"])
 def document_create(request, filename):
-    doc_hash = md5_for_bytes(request.body)
+    data = request.data['file'].read()
+    doc_hash = md5_for_bytes(data)
+
     if Document.objects.filter(hash=doc_hash).exists() and not settings.ALLOW_REUPLOAD:
         logger.warning("Document hash already uploaded, skipping")
         return JsonResponse(
@@ -114,7 +116,7 @@ def document_create(request, filename):
         )
 
     dc = Document.create_from_filename(filename, doc_hash)
-    dc.persist_to_filestore(request.body)
+    dc.persist_to_filestore(data)
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
 

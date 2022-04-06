@@ -1,3 +1,4 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -9,10 +10,14 @@ class TestTagViews(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+        self.file = SimpleUploadedFile("file.jpg", b"1", content_type="application/pdf")
+        self.file2 = SimpleUploadedFile("file.jpg", b"2", content_type="application/pdf")
+
     def test_list_tags(self):
         # create document
         url = reverse("document-create", args=("testfile",))
-        doc_a = self.client.post(url)
+        doc_a = self.client.post(url, {'file': self.file}, format='multipart',
+                                 headers={'Content-Type': 'application/pdf'})
         self.assertEqual(doc_a.status_code, status.HTTP_200_OK)
 
         # create a tag
@@ -37,12 +42,14 @@ class TestTagViews(TestCase):
     def test_multiple_documents_with_same_tag(self):
         # create document
         url = reverse("document-create", args=("testfile",))
-        doc_a = self.client.post(url)
+        doc_a = self.client.post(url, {'file': self.file}, format='multipart',
+                                 headers={'Content-Type': 'application/pdf'})
         self.assertEqual(doc_a.status_code, status.HTTP_200_OK)
 
         # create a second document
         url = reverse("document-create", args=("testfile",))
-        doc_b = self.client.post(url, {"dummy": "data"})
+        doc_b = self.client.post(url, {'file': self.file2}, format='multipart',
+                                 headers={'Content-Type': 'application/pdf'})
         self.assertEqual(doc_b.status_code, status.HTTP_200_OK)
 
         # tag first document

@@ -1,3 +1,4 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -11,12 +12,14 @@ class TestDocumentViews(TestCase):
     def setUp(self):
         self.client = APIClient()
 
+        self.file = SimpleUploadedFile("file.jpg", None, content_type="application/pdf")
+
         Settings.create_default()
 
     def test_document_data(self):
         # simulate uploading a document
         url = reverse("document-create", args=("testfile",))
-        response = self.client.post(url, {'file': 'data'}, format='multipart',
+        response = self.client.post(url, {'file': self.file}, format='multipart',
                                     headers={'Content-Type': 'application/pdf'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -27,7 +30,8 @@ class TestDocumentViews(TestCase):
 
     def test_rename_document(self):
         url = reverse("document-create", args=("testfile",))
-        response = self.client.post(url)
+        response = self.client.post(url, {'file': self.file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         url = reverse("document-detail", args=(response.json()["id"],))
@@ -39,7 +43,8 @@ class TestDocumentViews(TestCase):
 
     def test_create_document(self):
         url = reverse("document-create", args=("testfile",))
-        response = self.client.post(url)
+        response = self.client.post(url, {'file': self.file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         documents = Document.objects.all()
@@ -50,13 +55,15 @@ class TestDocumentViews(TestCase):
         self.assertEqual(document.filename, "testfile")
 
         # reposting same empty body generates the same hash, returns 400
-        response = self.client.post(url)
+        response = self.client.post(url, {'file': self.file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_document(self):
         # create a doc
         url = reverse("document-create", args=("testfile",))
-        response = self.client.post(url)
+        response = self.client.post(url, {'file': self.file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # create a tag
@@ -199,7 +206,8 @@ class TestDocumentViews(TestCase):
     def test_create_list_tags(self):
         # create document
         url = reverse("document-create", args=("testfile",))
-        doc_response = self.client.post(url)
+        doc_response = self.client.post(url, {'file': self.file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(doc_response.status_code, status.HTTP_200_OK)
 
         # create a tag
@@ -225,7 +233,8 @@ class TestDocumentViews(TestCase):
     def test_delete_tags(self):
         # create document
         url = reverse("document-create", args=("testfile",))
-        doc_response = self.client.post(url)
+        doc_response = self.client.post(url, {'file': self.file}, format='multipart',
+                                    headers={'Content-Type': 'application/pdf'})
         self.assertEqual(doc_response.status_code, status.HTTP_200_OK)
 
         # create a tag
