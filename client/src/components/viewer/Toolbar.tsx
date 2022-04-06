@@ -8,7 +8,7 @@ import { Api } from "../../utils/Api";
 import { useQuery, useQueryClient } from "react-query";
 import { TagModel } from "../../models/Tag";
 import { ResourceModel } from "../../models/Resource";
-import { WidthSlider } from "./WidthSlider";
+import { Zoom } from "./Zoom";
 import { EditableTitle } from "./EditableTitle";
 
 interface Props {
@@ -83,12 +83,18 @@ export function Toolbar({
             <EditableTitle text={document.filename} onEdit={onDocumentRename} />
           </Col>
 
-          <Col span={8}>
-            <WidthSlider defaultWidth={defaultWidth} onSetWidth={onSetWidth} />
+          <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
+            <Zoom defaultWidth={defaultWidth} onSetWidth={onSetWidth} />
           </Col>
 
           <Col span={8}>
-            <div style={{ display: "flex" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
+              }}
+            >
               <Dropdown
                 overlay={folderDropdownButtons}
                 placement="bottomCenter"
