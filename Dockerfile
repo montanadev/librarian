@@ -4,7 +4,7 @@ WORKDIR /srv
 COPY client /srv/client
 
 RUN cd client && \
-    npm i && \
+    npm i --only=prod && \
     npm run build
 
 FROM python:3.9-slim
