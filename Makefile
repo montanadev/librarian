@@ -13,4 +13,4 @@ makemigrations:
 	poetry run ./manage.py makemigrations
 
 test:
-	poetry run ./manage.py test
+	poetry run coverage run ./manage.py test
