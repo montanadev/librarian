@@ -27,6 +27,7 @@ interface Props {
   onAddToFolder: () => void;
   onDeleteDocument: () => void;
   onSetWidth: (width: number) => void;
+  onCreateFolder: () => void;
   documentId: string;
   folderId: string;
   defaultWidth: number;
@@ -37,6 +38,7 @@ export function Toolbar({
   onDocumentRename,
   onAddToFolder,
   onDeleteDocument,
+  onCreateFolder,
   onSetWidth,
   defaultWidth,
   documentId,
@@ -63,6 +65,11 @@ export function Toolbar({
 
   const folderDropdownButtons = (
     <Menu>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" onClick={onCreateFolder}>
+          Create folder...
+        </a>
+      </Menu.Item>
       <Menu.Item>
         <a target="_blank" rel="noopener noreferrer" onClick={onAddToFolder}>
           Add to folder...

@@ -9,12 +9,14 @@ import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
 import { Slider } from "antd";
+import { CreateFolderModal } from "../modals/CreateFolderModal";
 
 function Viewer() {
   let { documentId, folderId, pageNumber } = useParams<any>();
 
   const [openAddToFolderModal, setOpenAddToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
+  const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
 
   let width = 1;
   if (window.localStorage.getItem("librarian.document.width") !== null) {
@@ -78,6 +80,9 @@ function Viewer() {
           onDeleteDocument={onDeleteDocument}
         />
       )}
+      {openCreateFolderModal && (
+        <CreateFolderModal onClose={() => setOpenCreateFolderModal(false)} />
+      )}
       <Toolbar
         document={document.data}
         documentId={documentId}
@@ -86,6 +91,7 @@ function Viewer() {
         onDocumentRename={onDocumentRename}
         onAddToFolder={() => setOpenAddToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
+        onCreateFolder={() => setOpenCreateFolderModal(true)}
         onSetWidth={(width: number) => {
           setPercentWidth(width);
           window.localStorage.setItem(
