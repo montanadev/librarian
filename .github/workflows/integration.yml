@@ -21,7 +21,7 @@ jobs:
         node-version: '14'
     - name: Install python deps
       run: |
-        sudo apt-get install -y libnfs-dev:
+        sudo apt-get install -y libnfs-dev imagemagick ghostscript-x
 
         python -m pip install --upgrade pip
         python -m pip install poetry

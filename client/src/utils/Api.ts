@@ -20,8 +20,15 @@ export class Api {
   }
 
   uploadDocuments(file: any) {
+    const form = new FormData();
+    form.append("file", file);
+
     return axios
-      .post(`/api/documents/${file.name}`, file)
+      .post(`/api/documents/${file.name}`, form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((d) => d.data)
       .catch((error: any) => {
         return Promise.reject(error.response.data.reason);
