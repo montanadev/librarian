@@ -5,6 +5,7 @@ import { Document as ReactPDFDocument, Page as ReactPDFPage } from "react-pdf";
 import { useContainerDimensions } from "../../utils/useContainerDimenstions";
 import { toastError } from "../../utils/toasts";
 import PageBoundary from "./PageBoundary";
+import { Loading } from "../Loading";
 
 interface Props {
   pageNumber: string;
@@ -36,7 +37,7 @@ function Document({ percentWidth, pageNumber, documentId }: Props) {
     <div ref={ref}>
       <ReactPDFDocument
         file={`/api/documents/${documentId}/data`}
-        loading={<Spin size="large" />}
+        loading={<Loading />}
         onLoadSuccess={onLoad}
         onLoadError={(e) => toastError(`Error loading document: ${e.message}`)}
         onSourceError={(e) => toastError(`Error loading source: ${e.message}`)}
