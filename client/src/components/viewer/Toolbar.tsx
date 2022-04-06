@@ -14,7 +14,7 @@ import { EditableTitle } from "./EditableTitle";
 interface Props {
   document: DocumentModel;
   onDocumentRename: (name: string) => void;
-  onAddToFolder: () => void;
+  onMoveToFolder: () => void;
   onDeleteDocument: () => void;
   onSetWidth: (width: number) => void;
   onCreateFolder: () => void;
@@ -26,7 +26,7 @@ interface Props {
 export function Toolbar({
   document,
   onDocumentRename,
-  onAddToFolder,
+  onMoveToFolder,
   onDeleteDocument,
   onCreateFolder,
   onSetWidth,
@@ -66,7 +66,7 @@ export function Toolbar({
   const folderDropdownButtons = (
     <Menu>
       {createButton("Create folder...", onCreateFolder)}
-      {createButton("Add to folder...", onAddToFolder)}
+      {createButton("Move to folder...", onMoveToFolder)}
       {createButton("Remove from folder...", () => {})}
     </Menu>
   );

@@ -6,11 +6,16 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 
 interface Props {
+  currentFolderId: number;
   onClose: () => void;
   onAddToFolder: (folderId: number) => void;
 }
 
-export function AddToFolderModal({ onClose, onAddToFolder }: Props) {
+export function MoveToFolderModal({
+  currentFolderId,
+  onClose,
+  onAddToFolder,
+}: Props) {
   const [folderId, setFolderId] = useState<any>();
 
   const api = new Api();
@@ -35,7 +40,7 @@ export function AddToFolderModal({ onClose, onAddToFolder }: Props) {
     <Modal
       visible
       onCancel={onClose}
-      title="Add Document to Folder"
+      title="Move Document to Folder"
       footer={[
         <Button onClick={onClose}>Return</Button>,
         <Button
@@ -48,9 +53,10 @@ export function AddToFolderModal({ onClose, onAddToFolder }: Props) {
       ]}
     >
       <form>
-        <h3>Folder name {folderId}</h3>
+        <h3>Folder name</h3>
         <Cascader
           options={options}
+          defaultValue={[currentFolderId]}
           showSearch={{ filter }}
           onChange={(value: any) => setFolderId(value)}
         />
