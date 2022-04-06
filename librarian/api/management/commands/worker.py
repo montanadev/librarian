@@ -4,6 +4,7 @@ from time import sleep
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from librarian.engine import engine
 from librarian.api.models import DocumentJob
 from librarian.utils.attrs import setattrs
 
@@ -21,7 +22,7 @@ class Command(BaseCommand):
                 logger.info(f"Running job '{job.job}'...")
 
                 try:
-                    job.run()
+                    engine.run(job)
                 except Exception as e:
                     successful = False
                     failed_reason = str(e)

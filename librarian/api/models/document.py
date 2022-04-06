@@ -6,7 +6,7 @@ import libnfs
 from django.apps import apps
 from django.db import models
 
-from librarian.api.models import DocumentJobJobs, DocumentStatus, SourceContentTypes
+from librarian.api.models import DocumentStatus, SourceContentTypes
 from librarian.api.models.folder import Folder
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class Document(models.Model):
 
         DocumentJob = apps.get_model("api", "DocumentJob")
         DocumentJob.objects.create(
-            job=DocumentJobJobs.persist,
+            kind=DocumentJob.Kind.persist,
             document=self,
             current_status=DocumentStatus.persisting,
             desired_status=DocumentStatus.persisted,
@@ -96,7 +96,7 @@ class Document(models.Model):
     def translate_pdf_to_images(self):
         DocumentJob = apps.get_model("api", "DocumentJob")
         DocumentJob.objects.create(
-            job=DocumentJobJobs.translate_pdf_to_images,
+            kind=DocumentJob.Kind.translate_pdf_to_images,
             document=self,
             current_status=DocumentStatus.translating_pdf_to_images,
             desired_status=DocumentStatus.translated_pdf_to_images,
@@ -105,7 +105,7 @@ class Document(models.Model):
     def annotate(self):
         DocumentJob = apps.get_model("api", "DocumentJob")
         DocumentJob.objects.create(
-            job=DocumentJobJobs.annotate,
+            kind=DocumentJob.Kind.annotate,
             document=self,
             current_status=DocumentStatus.annotating,
             desired_status=DocumentStatus.annotated,
