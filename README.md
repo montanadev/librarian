@@ -10,6 +10,10 @@ Features
 * document OCR (via Google Cloud Vision)
 * document search
 
+## Demo
+
+Check out a demo at https://librarian-demo.montanadev.com
+
 ![demo](demo.gif)
 
 ## Contributing
