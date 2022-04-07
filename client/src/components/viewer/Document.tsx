@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import "../Uploader.css";
-import { Spin } from "antd";
 import { Document as ReactPDFDocument, Page as ReactPDFPage } from "react-pdf";
 import { useContainerDimensions } from "../../utils/useContainerDimenstions";
 import { toastError } from "../../utils/toasts";

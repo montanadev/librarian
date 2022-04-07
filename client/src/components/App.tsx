@@ -1,34 +1,19 @@
 import React, { useState } from "react";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
-
-import { Breadcrumb, Button, Input, Layout, Menu } from "antd";
+import { Layout, Menu } from "antd";
 import Sidebar from "./Sidebar";
-import { SetupWizardModal } from "./modals/SetupWizardModal";
-import { SearchOutlined } from "@ant-design/icons";
-import { useHistory } from "react-router";
+import { SettingsModal } from "./modals/SettingsModal";
 import { Link, Route, Switch } from "react-router-dom";
-import Search from "./Search";
+import SearchResults from "./SearchResults";
 import Uploader from "./Uploader";
 import Viewer from "./viewer/Viewer";
+import { Searchbar } from "./Searchbar";
 
 const { Header, Content } = Layout;
 
 function App() {
-  const [wizardOpen, setWizardOpen] = useState(false);
-  const [search, setSearch] = useState<string>();
-  const history = useHistory();
-
-  const onSearch = () => {
-    if (!search) {
-      // TODO - alert?
-      return;
-    }
-    history.push({
-      pathname: "/search",
-      search: "?" + new URLSearchParams({ q: search }).toString(),
-    });
-  };
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
   // withSidebar embeds the sidebar into the rendered component.
   // needed to inform the sidebar what is currently selected
@@ -45,10 +30,9 @@ function App() {
     <Layout>
       <ToastContainer />
 
-      <SetupWizardModal
-        visible={wizardOpen}
-        onClose={() => setWizardOpen(false)}
-      />
+      {settingsModalOpen && (
+        <SettingsModal visible onClose={() => setSettingsModalOpen(false)} />
+      )}
 
       <Header className="header AppHeader">
         <div className="AppLogo">librarian</div>
@@ -56,22 +40,10 @@ function App() {
           <Menu.Item key="home">
             <Link to={"/"}>Upload</Link>
           </Menu.Item>
-          <Menu.Item onClick={() => setWizardOpen(true)} key="settings">
+          <Menu.Item onClick={() => setSettingsModalOpen(true)} key="settings">
             Settings
           </Menu.Item>
-          <li style={{ order: 2, width: "100%" }}>
-            <div className="items-center h-16 flex float-right pr-4 w-auto">
-              <Input
-                onChange={(e) => setSearch(e.target.value)}
-                onPressEnter={onSearch}
-                type="text"
-                placeholder="Search"
-              />
-              <Button onClick={onSearch} className="items-center">
-                <SearchOutlined />
-              </Button>
-            </div>
-          </li>
+          <Searchbar />
         </Menu>
       </Header>
       <Layout>
@@ -79,7 +51,7 @@ function App() {
           <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
             {withSidebar(<Viewer />)}
           </Route>
-          <Route path="/search">{withSidebar(<Search />)}</Route>
+          <Route path="/search">{withSidebar(<SearchResults />)}</Route>
           <Route path="/folders/:folderId/documents/:documentId">
             {withSidebar(<Viewer />)}
           </Route>

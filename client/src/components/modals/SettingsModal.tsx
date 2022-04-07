@@ -11,7 +11,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function SetupWizardModal({ visible, onClose }: Props) {
+export function SettingsModal({ visible, onClose }: Props) {
   const api = new Api();
 
   const queryClient = useQueryClient();
