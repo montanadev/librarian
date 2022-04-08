@@ -12,7 +12,7 @@ class Viewer extends PureComponent {
   };
 
   static defaultProps = {
-    scale: 1.2,
+    scale: 1.0,
   };
   private _list: React.RefObject<unknown>;
   private _callResizeHandler: OmitThisParameter<() => void>;
@@ -98,6 +98,7 @@ class Viewer extends PureComponent {
     const { cachedPageDimensions, responsiveScale } = this.state as any;
 
     if (cachedPageDimensions && responsiveScale) {
+      console.log(responsiveScale);
       return cachedPageDimensions.get(index + 1)[1] / responsiveScale;
     }
 

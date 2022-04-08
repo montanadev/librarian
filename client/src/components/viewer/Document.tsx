@@ -105,7 +105,11 @@ function Document({ percentWidth, pageNumber, documentId }: Props) {
 
   return (
     <div id="document-container" ref={ref}>
-      <Viewer file={`/api/documents/${documentId}/data`} width={width} />
+      <Viewer
+        file={`/api/documents/${documentId}/data`}
+        width={width}
+        scale={percentWidth}
+      />
     </div>
 
     // <div id="document-container" ref={ref}>

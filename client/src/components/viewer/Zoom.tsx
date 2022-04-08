@@ -15,7 +15,7 @@ export function Zoom({ onSetWidth, defaultWidth }: Props) {
         <Slider
           style={{ width: 50 }}
           min={0.1}
-          max={1}
+          max={2}
           step={0.1}
           defaultValue={defaultWidth}
           onChange={onSetWidth}
