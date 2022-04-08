@@ -41,7 +41,7 @@ def run(job: DocumentJob):
 def _run(job: DocumentJob):
     settings = Settings.objects.first()
     if not settings:
-        raise Exception("Settings not configured, exiting")
+        settings = Settings.create_default()
 
     dc = job.document
     dc.status = job.current_status
