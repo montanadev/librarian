@@ -25,7 +25,7 @@ export function Searchbar() {
           onChange={(e) => setSearch(e.target.value)}
           onPressEnter={onSearch}
           type="text"
-          placeholder="SearchResults"
+          placeholder="Search"
         />
         <Button onClick={onSearch} className="items-center">
           <SearchOutlined />

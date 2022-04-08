@@ -172,7 +172,7 @@ class Viewer extends PureComponent {
               onItemsRendered={this.updateCurrentVisiblePage.bind(this)}
               ref={this._list as any}
             >
-              {PageRenderer as any}
+              {PageRenderer}
             </VariableSizeList>
           </Fragment>
         )}
