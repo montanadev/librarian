@@ -16,11 +16,11 @@ interface Props {
   onDocumentRename: (name: string) => void;
   onMoveToFolder: () => void;
   onDeleteDocument: () => void;
-  onSetWidth: (width: number) => void;
+  onSetZoom: (zoom: number) => void;
   onCreateFolder: () => void;
   documentId: string;
   folderId: string;
-  defaultWidth: number;
+  defaultZoom: number;
 }
 
 export function Toolbar({
@@ -29,8 +29,8 @@ export function Toolbar({
   onMoveToFolder,
   onDeleteDocument,
   onCreateFolder,
-  onSetWidth,
-  defaultWidth,
+  onSetZoom,
+  defaultZoom,
   documentId,
   folderId,
 }: Props) {
@@ -136,7 +136,7 @@ export function Toolbar({
         </Col>
 
         <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
-          <Zoom defaultWidth={defaultWidth} onSetWidth={onSetWidth} />
+          <Zoom defaultZoom={defaultZoom} onSetZoom={onSetZoom} />
         </Col>
 
         <Col span={8} />

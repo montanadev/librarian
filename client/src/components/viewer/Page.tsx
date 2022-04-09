@@ -1,50 +1,47 @@
+import React from "react";
 import { Page as ReactPDFPage } from "react-pdf";
-import React, { useEffect, useRef } from "react";
 
 interface Props {
-  index: any;
+  index: number;
   data: any;
   style: any;
 }
 
-export function Page({ index, data, style }: Props) {
-  const pageNumber = index + 1;
-  const ref = useRef<any>();
+export default function Page({ index, data, style }: Props) {
+  const { scale, numPages, triggerResize } = data;
 
-  useEffect(() => {
-    if (!ref || !ref.current) {
-      return;
-    }
-    // set a ref in the Document map of each page.
-    // Used to compute the scaling that react-pdf applies to each page
-    if (!data.pageRefs.get(index)) {
-      data.pageRefs.set(index, ref);
-    }
-  }, [ref]);
+  const pageNumber = index + 1;
 
   return (
-    <div
-      id={`page_container_${pageNumber}`}
-      key={`page_container_${pageNumber}`}
-      style={{ ...style }}
-    >
-      <ReactPDFPage
-        inputRef={ref}
-        renderMode="svg"
-        renderAnnotationLayer={false}
-        onRenderSuccess={() => {
-          // if (pageNumber && parseInt(pageNumber) === index + 1) {
-          //   tryJump();
-          // }
-          data.recalc();
+    <div {...{ style }}>
+      <div
+        ref={(ref) => {
+          const { pages, pageNumbers } = data;
+
+          if (!pageNumbers.has(pageNumber)) {
+            const key = { pageNumber };
+            pageNumbers.set(pageNumber, key);
+          }
+
+          pages.set(pageNumbers.get(pageNumber), ref);
         }}
-        onLoadSuccess={(page) => {
-          //data.recalc();
-        }}
-        width={data.width}
-        key={`page_${pageNumber}`}
-        pageNumber={pageNumber}
-      />
+      >
+        <ReactPDFPage
+          {...{ pageNumber }}
+          {...{ scale }}
+          renderAnnotationLayer={false}
+          onLoadError={
+            (error) => console.error(error) /* eslint-disable-line no-console */
+          }
+          onLoadSuccess={(page) => {
+            // This is necessary to ensure the row heights of
+            // the variable list are correctly initialised.
+            if (page.pageNumber === numPages) {
+              triggerResize();
+            }
+          }}
+        />
+      </div>
     </div>
   );
 }
