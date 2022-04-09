@@ -1,70 +1,153 @@
-import React, { useRef, useState } from "react";
-import "../Uploader.css";
-import { Spin } from "antd";
-import { Document as ReactPDFDocument, Page as ReactPDFPage } from "react-pdf";
-import { useContainerDimensions } from "../../utils/useContainerDimenstions";
-import { toastError } from "../../utils/toasts";
-import PageBoundary from "./PageBoundary";
-import { Loading } from "../Loading";
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import { Document as ReactPDFDocument } from "react-pdf/dist/esm/entry.webpack";
+import { VariableSizeList } from "react-window";
+import Page from "./Page";
+import { debounce } from "throttle-debounce";
 
 interface Props {
-  pageNumber: string;
-  documentId: string;
-  percentWidth: number;
+  scale: number;
+  file: string;
+  pageNumber?: number;
 }
 
-function Document({ percentWidth, pageNumber, documentId }: Props) {
-  const [numPages, setNumPages] = useState(null);
-  const [pdf, setPdf] = useState(null);
+export default function Document({
+  scale = 1.0,
+  file,
+  pageNumber = undefined,
+}: Props) {
+  const [pdf, setPdf] = useState<any>();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [cachedPageDimensions, setCachedPageDimensions] =
+    useState<Map<any, any>>();
+  const [responsiveScale, setResponsiveScale] = useState(1);
+  const [pageNumbers, setPageNumbers] = useState<Map<any, any>>(new Map());
+  const [pages, setPages] = useState<Map<any, any>>(new Map());
+  const [containerHeight, setContainerHeight] = useState(window.innerHeight);
+  const [jumped, setJumped] = useState(false);
 
-  const onLoad = (pdf: any) => {
-    setNumPages(pdf.numPages);
-    setPdf(pdf);
+  const listRef = useRef<any>();
+
+  const handleResize = () => {
+    // Recompute the responsive scale factor on window resize
+    const newResponsiveScale = computeResponsiveScale(currentPage);
+
+    if (newResponsiveScale && responsiveScale !== newResponsiveScale) {
+      setResponsiveScale(newResponsiveScale);
+    }
+
+    setContainerHeight(window.innerHeight);
   };
 
-  const ref = useRef<any>();
-  const { width } = useContainerDimensions(ref);
+  const _callResizeHandler = debounce(50, handleResize);
 
-  const tryJump = () => {
-    const pageEl = document.querySelector(`[data-page-number="${pageNumber}"`);
+  useEffect(() => {
+    _callResizeHandler();
+  }, [scale]);
 
-    if (pageEl) {
-      pageEl.scrollIntoView();
+  useEffect(() => {
+    recomputeRowHeights();
+  }, [responsiveScale]);
+
+  useEffect(() => {
+    if (listRef.current && !jumped && pdf && pageNumber) {
+      // try to jump to the provided page number
+      listRef.current.scrollToItem(pageNumber - 1);
+      setJumped(true);
     }
+  }, [listRef.current, pdf, pageNumber, jumped]);
+
+  const cachePageDimensions = (pdf: any) => {
+    const promises = Array.from({ length: pdf.numPages }, (v, i) => i + 1).map(
+      (pageNumber) => {
+        return pdf.getPage(pageNumber);
+      }
+    );
+
+    // Assuming all pages may have different heights. Otherwise we can just
+    // load the first page and use its height for determining all the row
+    // heights.
+    Promise.all(promises).then((pages) => {
+      const pageDimensions = new Map();
+
+      for (const page of pages) {
+        const w = page.view[2] * scale;
+        const h = page.view[3] * scale;
+
+        pageDimensions.set(page._pageIndex + 1, [w, h]);
+      }
+
+      setCachedPageDimensions(pageDimensions);
+    });
+  };
+
+  const recomputeRowHeights = () => {
+    if (!listRef.current) {
+      console.log("no ref, cant recompute");
+      return;
+    }
+    listRef.current.resetAfterIndex(0);
+  };
+
+  const computeRowHeight = (index: any) => {
+    if (cachedPageDimensions && responsiveScale) {
+      console.log(
+        cachedPageDimensions.get(index + 1)[1] / responsiveScale,
+        responsiveScale
+      );
+      return cachedPageDimensions.get(index + 1)[1] / responsiveScale;
+    }
+
+    return 768; // Initial height
+  };
+
+  const onDocumentLoadSuccess = (pdf: any) => {
+    setPdf(pdf);
+    cachePageDimensions(pdf);
+  };
+
+  const updateCurrentVisiblePage = ({ visibleStopIndex }: any) => {
+    setCurrentPage(visibleStopIndex + 1);
+  };
+
+  const computeResponsiveScale = (pageNumber: number) => {
+    if (!pages || !pageNumbers || !cachedPageDimensions) {
+      return;
+    }
+    const node = pages.get(pageNumbers.get(pageNumber));
+
+    if (!node) return;
+
+    return cachedPageDimensions.get(pageNumber)[1] / node.clientHeight;
   };
 
   return (
-    <div ref={ref}>
-      <ReactPDFDocument
-        file={`/api/documents/${documentId}/data`}
-        loading={<Loading />}
-        onLoadSuccess={onLoad}
-        onLoadError={(e) => toastError(`Error loading document: ${e.message}`)}
-        onSourceError={(e) => toastError(`Error loading source: ${e.message}`)}
-      >
-        {Array.from(new Array(numPages), (el, index) => (
-          <div
-            key={`page_container_${index + 1}`}
-            style={{ width: width * percentWidth }}
+    <ReactPDFDocument
+      file={file}
+      onLoadSuccess={onDocumentLoadSuccess}
+      onLoadError={(error) => console.error(error)} // eslint-disable-line no-console
+    >
+      {cachedPageDimensions && (
+        <Fragment>
+          <VariableSizeList
+            height={containerHeight}
+            width={"100%"}
+            itemCount={pdf.numPages}
+            itemSize={computeRowHeight}
+            itemData={{
+              scale,
+              pages,
+              pageNumbers,
+              numPages: pdf.numPages,
+              triggerResize: _callResizeHandler,
+            }}
+            overscanCount={2}
+            onItemsRendered={updateCurrentVisiblePage}
+            ref={listRef}
           >
-            <ReactPDFPage
-              renderMode="svg"
-              renderAnnotationLayer={false}
-              onRenderSuccess={() => {
-                if (pageNumber && parseInt(pageNumber) === index + 1) {
-                  tryJump();
-                }
-              }}
-              width={width * percentWidth}
-              key={`page_${index + 1}`}
-              pageNumber={index + 1}
-            />
-            <PageBoundary pageNumber={index + 1} />
-          </div>
-        ))}
-      </ReactPDFDocument>
-    </div>
+            {Page}
+          </VariableSizeList>
+        </Fragment>
+      )}
+    </ReactPDFDocument>
   );
 }
-
-export default Document;

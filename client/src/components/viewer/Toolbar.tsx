@@ -16,11 +16,11 @@ interface Props {
   onDocumentRename: (name: string) => void;
   onMoveToFolder: () => void;
   onDeleteDocument: () => void;
-  onSetWidth: (width: number) => void;
+  onSetZoom: (zoom: number) => void;
   onCreateFolder: () => void;
   documentId: string;
   folderId: string;
-  defaultWidth: number;
+  defaultZoom: number;
 }
 
 export function Toolbar({
@@ -29,8 +29,8 @@ export function Toolbar({
   onMoveToFolder,
   onDeleteDocument,
   onCreateFolder,
-  onSetWidth,
-  defaultWidth,
+  onSetZoom,
+  defaultZoom,
   documentId,
   folderId,
 }: Props) {
@@ -79,12 +79,8 @@ export function Toolbar({
     <>
       <div>
         <Row>
-          <Col span={8}>
+          <Col span={16}>
             <EditableTitle text={document.filename} onEdit={onDocumentRename} />
-          </Col>
-
-          <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
-            <Zoom defaultWidth={defaultWidth} onSetWidth={onSetWidth} />
           </Col>
 
           <Col span={8}>
@@ -118,23 +114,33 @@ export function Toolbar({
           </Col>
         </Row>
       </div>
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item>
-          <Tags
-            documentTags={documentTags.data.results}
-            globalTags={globalTags.data.results}
-            onCreateTag={(newTagName) =>
-              api.createTag(documentId, newTagName).then(refreshTags)
-            }
-            onDeleteTag={(tagId) =>
-              api.deleteTag(documentId, tagId).then(refreshTags)
-            }
-            onReplaceTag={(oldTagId, newTagName) =>
-              api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
-            }
-          />
-        </Descriptions.Item>
-      </Descriptions>
+      <Row>
+        <Col span={8}>
+          <Descriptions.Item>
+            <Tags
+              documentTags={documentTags.data.results}
+              globalTags={globalTags.data.results}
+              onCreateTag={(newTagName) =>
+                api.createTag(documentId, newTagName).then(refreshTags)
+              }
+              onDeleteTag={(tagId) =>
+                api.deleteTag(documentId, tagId).then(refreshTags)
+              }
+              onReplaceTag={(oldTagId, newTagName) =>
+                api
+                  .replaceTag(documentId, oldTagId, newTagName)
+                  .then(refreshTags)
+              }
+            />
+          </Descriptions.Item>
+        </Col>
+
+        <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
+          <Zoom defaultZoom={defaultZoom} onSetZoom={onSetZoom} />
+        </Col>
+
+        <Col span={8} />
+      </Row>
     </>
   );
 }
