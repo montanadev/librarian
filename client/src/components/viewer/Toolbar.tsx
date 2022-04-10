@@ -77,49 +77,11 @@ export function Toolbar({
 
   return (
     <>
-      <div>
-        <Row>
-          <Col span={8}>
-            <EditableTitle text={document.filename} onEdit={onDocumentRename} />
-          </Col>
-
-          <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
-            <Zoom defaultZoom={defaultZoom} onSetZoom={onSetZoom} />
-          </Col>
-
-          <Col span={8}>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "flex-end",
-              }}
-            >
-              <Dropdown
-                overlay={folderDropdownButtons}
-                placement="bottomCenter"
-              >
-                <Button>Folders</Button>
-              </Dropdown>
-
-              <div style={{ padding: 6 }} />
-
-              <Dropdown
-                overlay={documentDropdownButtons}
-                placement="bottomCenter"
-              >
-                <Button>Document</Button>
-              </Dropdown>
-
-              <div style={{ padding: 6 }} />
-
-              <NavButtons documentId={documentId} folderId={folderId} />
-            </div>
-          </Col>
-        </Row>
-      </div>
-      <Descriptions size="small" column={1}>
-        <Descriptions.Item>
+      <Row>
+        <EditableTitle text={document.filename} onEdit={onDocumentRename} />
+      </Row>
+      <Row>
+        <Col span={8}>
           <Tags
             documentTags={documentTags.data.results}
             globalTags={globalTags.data.results}
@@ -133,8 +95,39 @@ export function Toolbar({
               api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
             }
           />
-        </Descriptions.Item>
-      </Descriptions>
+        </Col>
+
+        <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
+          <Zoom defaultZoom={defaultZoom} onSetZoom={onSetZoom} />
+        </Col>
+
+        <Col span={8}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Dropdown overlay={folderDropdownButtons} placement="bottomCenter">
+              <Button>Folders</Button>
+            </Dropdown>
+
+            <div style={{ padding: 6 }} />
+
+            <Dropdown
+              overlay={documentDropdownButtons}
+              placement="bottomCenter"
+            >
+              <Button>Document</Button>
+            </Dropdown>
+
+            <div style={{ padding: 6 }} />
+
+            <NavButtons documentId={documentId} folderId={folderId} />
+          </div>
+        </Col>
+      </Row>
     </>
   );
 }

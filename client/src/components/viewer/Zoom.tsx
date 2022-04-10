@@ -13,7 +13,7 @@ export function Zoom({ onSetZoom, defaultZoom }: Props) {
       <div className="icon-wrapper">
         <ZoomOutOutlined />
         <Slider
-          style={{ width: 50 }}
+          style={{ width: 100, marginTop: "6px" }}
           min={0.1}
           max={4}
           step={0.1}

@@ -1,4 +1,3 @@
-import "./Sidebar.css";
 import { Layout, Menu } from "antd";
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -29,12 +28,12 @@ function Sidebar() {
     api.getFolders
   );
   const tags = useQuery<ResourceModel<TagModel>>("tags", api.getTags);
-
   return (
     <div key={`sidebar-${documentId}-${folderId}`}>
       <Sider
         collapsible
-        collapsed={collapsed}
+        collapsed
+        defaultCollapsed={collapsed}
         onCollapse={(newCollapsed: boolean) => {
           if (newCollapsed) {
             window.localStorage.setItem("librarian.document.collapsed", "1");
@@ -49,7 +48,6 @@ function Sidebar() {
         <Menu
           mode="inline"
           defaultSelectedKeys={[`document-${documentId}`]}
-          defaultOpenKeys={["folders"]}
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu
