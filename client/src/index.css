@@ -57,3 +57,7 @@ code {
 .ant-tag .anticon {
   vertical-align: 0.1em;
 }
+
+.ant-layout-sider-trigger {
+  bottom: unset !important;
+}

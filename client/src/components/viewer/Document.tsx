@@ -10,10 +10,10 @@ import { Loading } from "../Loading";
 interface Props {
   pageNumber: string;
   documentId: string;
-  percentWidth: number;
+  zoom: number;
 }
 
-function Document({ percentWidth, pageNumber, documentId }: Props) {
+function Document({ zoom, pageNumber, documentId }: Props) {
   const [numPages, setNumPages] = useState(null);
   const [pdf, setPdf] = useState(null);
 
@@ -45,7 +45,7 @@ function Document({ percentWidth, pageNumber, documentId }: Props) {
         {Array.from(new Array(numPages), (el, index) => (
           <div
             key={`page_container_${index + 1}`}
-            style={{ width: width * percentWidth }}
+            style={{ width: width * zoom }}
           >
             <ReactPDFPage
               renderMode="svg"
@@ -55,7 +55,7 @@ function Document({ percentWidth, pageNumber, documentId }: Props) {
                   tryJump();
                 }
               }}
-              width={width * percentWidth}
+              width={width * zoom}
               key={`page_${index + 1}`}
               pageNumber={index + 1}
             />

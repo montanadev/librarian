@@ -11,27 +11,24 @@ import { Toolbar } from "./Toolbar";
 import { CreateFolderModal } from "../modals/CreateFolderModal";
 
 function Viewer() {
-  let { documentId, folderId, pageNumber } = useParams<any>();
-
+  const { documentId, folderId, pageNumber } = useParams<any>();
   const [openAddToFolderModal, setOpenMoveToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
   const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
-
-  let width = 1;
-  if (window.localStorage.getItem("librarian.document.width") !== null) {
-    width = parseFloat(
-      window.localStorage.getItem("librarian.document.width")!
-    );
-  }
-  const [percentWidth, setPercentWidth] = useState(width);
-
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
-
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );
+
+  let storedZoom = 1;
+  if (window.localStorage.getItem("librarian.document.zoom") !== null) {
+    storedZoom = parseFloat(
+      window.localStorage.getItem("librarian.document.zoom")!
+    );
+  }
+  const [zoom, setZoom] = useState(storedZoom);
 
   if (!document.data || document.isLoading) {
     return <div />;
@@ -87,25 +84,17 @@ function Viewer() {
         document={document.data}
         documentId={documentId}
         folderId={folderId}
-        defaultWidth={width}
+        defaultZoom={zoom}
         onDocumentRename={onDocumentRename}
         onMoveToFolder={() => setOpenMoveToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
         onCreateFolder={() => setOpenCreateFolderModal(true)}
-        onSetWidth={(width: number) => {
-          setPercentWidth(width);
-          window.localStorage.setItem(
-            "librarian.document.width",
-            width.toString()
-          );
+        onSetZoom={(zoom: number) => {
+          setZoom(zoom);
         }}
       />
 
-      <Document
-        percentWidth={percentWidth}
-        pageNumber={pageNumber}
-        documentId={documentId}
-      />
+      <Document zoom={zoom} pageNumber={pageNumber} documentId={documentId} />
     </>
   );
 }
