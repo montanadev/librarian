@@ -3,7 +3,7 @@ import React from "react";
 import { ZoomInOutlined, ZoomOutOutlined } from "@ant-design/icons";
 
 interface Props {
-  onSetZoom: (width: number) => void;
+  onSetZoom: (zoom: number) => void;
   defaultZoom: number;
 }
 
@@ -13,7 +13,7 @@ export function Zoom({ onSetZoom, defaultZoom }: Props) {
       <div className="icon-wrapper">
         <ZoomOutOutlined />
         <Slider
-          style={{ width: 50 }}
+          style={{ width: 100, marginTop: "6px" }}
           min={0.1}
           max={2}
           step={0.1}

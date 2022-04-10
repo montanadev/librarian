@@ -12,8 +12,7 @@ import { CreateFolderModal } from "../modals/CreateFolderModal";
 import { useContainerDimensions } from "../../utils/useContainerDimenstions";
 
 function Viewer() {
-  let { documentId, folderId, pageNumber } = useParams<any>();
-
+  const { documentId, folderId, pageNumber } = useParams<any>();
   const [openAddToFolderModal, setOpenMoveToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
   const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
@@ -32,7 +31,6 @@ function Viewer() {
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
-
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );

@@ -38,7 +38,7 @@ code {
   width: 16px;
   height: 16px;
   color: rgba(0, 0, 0, 0.25);
-  margin-top: 8px;
+  margin-top: 4px;
   line-height: 1;
 }
 
@@ -56,4 +56,8 @@ code {
 
 .ant-tag .anticon {
   vertical-align: 0.1em;
+}
+
+.ant-layout-sider-trigger {
+  bottom: unset !important;
 }

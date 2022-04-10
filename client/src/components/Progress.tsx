@@ -1,4 +1,3 @@
-import "./Sidebar.css";
 import { Progress as ProgressT } from "antd";
 import React from "react";
 

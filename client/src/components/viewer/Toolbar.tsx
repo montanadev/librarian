@@ -1,7 +1,7 @@
 import NavButtons from "./NavButtons";
 import React from "react";
 import "../Uploader.css";
-import { Button, Col, Descriptions, Dropdown, Menu, Row } from "antd";
+import { Button, Col, Dropdown, Menu, Row } from "antd";
 import { DocumentModel } from "../../models/Document";
 import { Tags } from "./Tags";
 import { Api } from "../../utils/Api";
@@ -77,69 +77,56 @@ export function Toolbar({
 
   return (
     <>
-      <div>
-        <Row>
-          <Col span={16}>
-            <EditableTitle text={document.filename} onEdit={onDocumentRename} />
-          </Col>
-
-          <Col span={8}>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "flex-end",
-              }}
-            >
-              <Dropdown
-                overlay={folderDropdownButtons}
-                placement="bottomCenter"
-              >
-                <Button>Folders</Button>
-              </Dropdown>
-
-              <div style={{ padding: 6 }} />
-
-              <Dropdown
-                overlay={documentDropdownButtons}
-                placement="bottomCenter"
-              >
-                <Button>Document</Button>
-              </Dropdown>
-
-              <div style={{ padding: 6 }} />
-
-              <NavButtons documentId={documentId} folderId={folderId} />
-            </div>
-          </Col>
-        </Row>
-      </div>
+      <Row>
+        <EditableTitle text={document.filename} onEdit={onDocumentRename} />
+      </Row>
       <Row>
         <Col span={8}>
-          <Descriptions.Item>
-            <Tags
-              documentTags={documentTags.data.results}
-              globalTags={globalTags.data.results}
-              onCreateTag={(newTagName) =>
-                api.createTag(documentId, newTagName).then(refreshTags)
-              }
-              onDeleteTag={(tagId) =>
-                api.deleteTag(documentId, tagId).then(refreshTags)
-              }
-              onReplaceTag={(oldTagId, newTagName) =>
-                api
-                  .replaceTag(documentId, oldTagId, newTagName)
-                  .then(refreshTags)
-              }
-            />
-          </Descriptions.Item>
+          <Tags
+            documentTags={documentTags.data.results}
+            globalTags={globalTags.data.results}
+            onCreateTag={(newTagName) =>
+              api.createTag(documentId, newTagName).then(refreshTags)
+            }
+            onDeleteTag={(tagId) =>
+              api.deleteTag(documentId, tagId).then(refreshTags)
+            }
+            onReplaceTag={(oldTagId, newTagName) =>
+              api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
+            }
+          />
         </Col>
 
         <Col span={8} style={{ display: "flex", justifyContent: "center" }}>
           <Zoom defaultZoom={defaultZoom} onSetZoom={onSetZoom} />
         </Col>
 
-        <Col span={8} />
+        <Col span={8}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Dropdown overlay={folderDropdownButtons} placement="bottomCenter">
+              <Button>Folders</Button>
+            </Dropdown>
+
+            <div style={{ padding: 6 }} />
+
+            <Dropdown
+              overlay={documentDropdownButtons}
+              placement="bottomCenter"
+            >
+              <Button>Document</Button>
+            </Dropdown>
+
+            <div style={{ padding: 6 }} />
+
+            <NavButtons documentId={documentId} folderId={folderId} />
+          </div>
+        </Col>
       </Row>
     </>
   );

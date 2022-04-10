@@ -1,39 +1,60 @@
-import "./Sidebar.css";
 import { Layout, Menu } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Api } from "../utils/Api";
 import { FolderModel } from "../models/Folder";
 import { ResourceModel } from "../models/Resource";
 import { useQuery } from "react-query";
 import { TagModel } from "../models/Tag";
+import { FolderOpenOutlined, TagsOutlined } from "@ant-design/icons";
 
 const { SubMenu } = Menu;
 const { Sider } = Layout;
 
 function Sidebar() {
-  let { documentId, folderId } = useParams<any>();
+  const { documentId, folderId } = useParams<any>();
+
+  let collapsedInt = 0;
+  if (window.localStorage.getItem("librarian.document.collapsed") !== null) {
+    collapsedInt = parseInt(
+      window.localStorage.getItem("librarian.document.collapsed")!
+    );
+  }
+  const [collapsed, setCollapsed] = useState(collapsedInt === 1);
 
   const api = new Api();
   const folders = useQuery<ResourceModel<FolderModel>>(
     "folders",
     api.getFolders
   );
-
   const tags = useQuery<ResourceModel<TagModel>>("tags", api.getTags);
-
-  const openDocuments = [`document-${documentId}`];
-
   return (
     <div key={`sidebar-${documentId}-${folderId}`}>
-      <Sider width={200} className="site-layout-background">
+      <Sider
+        collapsible
+        collapsed
+        defaultCollapsed={collapsed}
+        onCollapse={(newCollapsed: boolean) => {
+          if (newCollapsed) {
+            window.localStorage.setItem("librarian.document.collapsed", "1");
+          } else {
+            window.localStorage.setItem("librarian.document.collapsed", "0");
+          }
+          setCollapsed(newCollapsed);
+        }}
+        width={200}
+        className="site-layout-background"
+      >
         <Menu
           mode="inline"
-          defaultSelectedKeys={openDocuments}
-          defaultOpenKeys={["folders"]}
+          defaultSelectedKeys={[`document-${documentId}`]}
           style={{ height: "100%", borderRight: 0 }}
         >
-          <SubMenu key={"folders"} title={"Folders"}>
+          <SubMenu
+            key={"folders"}
+            title={"Folders"}
+            icon={<FolderOpenOutlined />}
+          >
             {folders.data
               ? folders.data.results.map((f: FolderModel) => (
                   <Menu.ItemGroup key={`folder-${f.id}`} title={f.name}>
@@ -53,7 +74,7 @@ function Sidebar() {
               : null}
           </SubMenu>
 
-          <SubMenu key={"tags"} title={"Tags"}>
+          <SubMenu key={"tags"} title={"Tags"} icon={<TagsOutlined />}>
             {tags.data
               ? tags.data.results.map((t: TagModel) => (
                   <Menu.ItemGroup key={`tag-${t.id}`} title={t.name}>
