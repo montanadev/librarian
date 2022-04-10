@@ -9,7 +9,8 @@ import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
 import { CreateFolderModal } from "../modals/CreateFolderModal";
-import { useContainerDimensions } from "../../utils/useContainerDimenstions";
+import { ResourceModel } from "../../models/Resource";
+import { TagModel } from "../../models/Tag";
 
 function Viewer() {
   const { documentId, folderId, pageNumber } = useParams<any>();
@@ -24,22 +25,25 @@ function Viewer() {
     );
   }
   const [zoom, setZoom] = useState(localZoom);
-
   const documentRef = useRef<any>();
-  const { width } = useContainerDimensions(documentRef);
-
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );
-
-  if (!document.data || document.isLoading) {
-    return <div />;
-  }
+  const documentTags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
+    api.getTagsByDocumentId(documentId)
+  );
+  const globalTags = useQuery<ResourceModel<TagModel>>("tags", () =>
+    api.getTags()
+  );
 
   const onDocumentRename = (newDocumentName: string) => {
+    if (!document.data) {
+      return;
+    }
+
     api.renameDocument(document.data.id, newDocumentName).then(() => {
       queryClient.invalidateQueries("folders");
       queryClient.invalidateQueries("document");
@@ -62,16 +66,18 @@ function Viewer() {
         queryClient.invalidateQueries("document");
         queryClient.invalidateQueries("tags");
       })
-      .then(() => {
-        history.push("/");
-      });
+      .then(() => history.push("/"));
   };
+
+  if (!document.data || !documentTags.data || !globalTags.data) {
+    return <div />;
+  }
 
   return (
     <>
       {openAddToFolderModal && (
         <MoveToFolderModal
-          currentFolderId={document.data.folder}
+          currentFolderId={document.data?.folder ?? -1}
           onClose={() => setOpenMoveToFolderModal(false)}
           onAddToFolder={onAddDocumentToFolder}
         />
@@ -85,8 +91,11 @@ function Viewer() {
       {openCreateFolderModal && (
         <CreateFolderModal onClose={() => setOpenCreateFolderModal(false)} />
       )}
+
       <Toolbar
         document={document.data}
+        documentTags={documentTags.data.results}
+        globalTags={globalTags.data.results}
         documentId={documentId}
         folderId={folderId}
         defaultZoom={zoom}
@@ -103,13 +112,12 @@ function Viewer() {
         }}
       />
 
-      <div id="document-container" ref={documentRef}>
-        <Document
-          file={`/api/documents/${documentId}/data`}
-          scale={zoom}
-          pageNumber={pageNumber ? parseInt(pageNumber) : undefined}
-        />
-      </div>
+      <Document
+        key={`document-${documentId}-${folderId}`}
+        file={`/api/documents/${documentId}/data`}
+        scale={zoom}
+        pageNumber={pageNumber ? parseInt(pageNumber) : undefined}
+      />
     </>
   );
 }

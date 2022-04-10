@@ -19,46 +19,50 @@ function App() {
   // needed to inform the sidebar what is currently selected
   const withSidebar = (children: any) => {
     return (
-      <Layout>
-        <Sidebar />
-        <Content className="AppContent">{children}</Content>
-      </Layout>
+      <>
+        <div className="flex">
+          <Sidebar />
+          <div style={{ height: "100vh", width: "100%" }}>
+            <Header className="header AppHeader">
+              <Menu theme="dark" mode="horizontal">
+                <Menu.Item key="home">
+                  <Link to={"/"}>Upload</Link>
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => setSettingsModalOpen(true)}
+                  key="settings"
+                >
+                  Settings
+                </Menu.Item>
+                <Searchbar />
+              </Menu>
+            </Header>
+            <div style={{ padding: "20px" }}>{children}</div>
+          </div>
+        </div>
+      </>
     );
   };
 
   return (
-    <Layout>
+    <>
       <ToastContainer />
 
       {settingsModalOpen && (
         <SettingsModal visible onClose={() => setSettingsModalOpen(false)} />
       )}
 
-      <Header className="header AppHeader">
-        <div className="AppLogo">librarian</div>
-        <Menu theme="dark" mode="horizontal">
-          <Menu.Item key="home">
-            <Link to={"/"}>Upload</Link>
-          </Menu.Item>
-          <Menu.Item onClick={() => setSettingsModalOpen(true)} key="settings">
-            Settings
-          </Menu.Item>
-          <Searchbar />
-        </Menu>
-      </Header>
-      <Layout>
-        <Switch>
-          <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
-            {withSidebar(<Viewer />)}
-          </Route>
-          <Route path="/search">{withSidebar(<SearchResults />)}</Route>
-          <Route path="/folders/:folderId/documents/:documentId">
-            {withSidebar(<Viewer />)}
-          </Route>
-          <Route path="/">{withSidebar(<Uploader />)}</Route>
-        </Switch>
-      </Layout>
-    </Layout>
+      <Switch>
+        <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
+          {withSidebar(<Viewer />)}
+        </Route>
+        <Route path="/search">{withSidebar(<SearchResults />)}</Route>
+        <Route path="/folders/:folderId/documents/:documentId">
+          {withSidebar(<Viewer />)}
+        </Route>
+        <Route path="/">{withSidebar(<Uploader />)}</Route>
+      </Switch>
+    </>
   );
 }
 

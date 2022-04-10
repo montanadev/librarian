@@ -13,6 +13,8 @@ import { EditableTitle } from "./EditableTitle";
 
 interface Props {
   document: DocumentModel;
+  documentTags: TagModel[];
+  globalTags: TagModel[];
   onDocumentRename: (name: string) => void;
   onMoveToFolder: () => void;
   onDeleteDocument: () => void;
@@ -25,6 +27,8 @@ interface Props {
 
 export function Toolbar({
   document,
+  documentTags,
+  globalTags,
   onDocumentRename,
   onMoveToFolder,
   onDeleteDocument,
@@ -37,21 +41,10 @@ export function Toolbar({
   const api = new Api();
   const queryClient = useQueryClient();
 
-  const documentTags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
-    api.getTagsByDocumentId(documentId)
-  );
-  const globalTags = useQuery<ResourceModel<TagModel>>("tags", () =>
-    api.getTags()
-  );
-
   const refreshTags = () => {
     queryClient.invalidateQueries("document-tags");
     queryClient.invalidateQueries("tags");
   };
-
-  if (!documentTags.data || !globalTags.data) {
-    return <>Loading...</>;
-  }
 
   const createButton = (text: string, callback: () => void) => {
     return (
@@ -83,8 +76,8 @@ export function Toolbar({
       <Row>
         <Col span={8}>
           <Tags
-            documentTags={documentTags.data.results}
-            globalTags={globalTags.data.results}
+            documentTags={documentTags}
+            globalTags={globalTags}
             onCreateTag={(newTagName) =>
               api.createTag(documentId, newTagName).then(refreshTags)
             }
@@ -109,21 +102,15 @@ export function Toolbar({
               justifyContent: "flex-end",
             }}
           >
-            <Dropdown overlay={folderDropdownButtons} placement="bottomCenter">
-              <Button>Folders</Button>
-            </Dropdown>
+            <>
+              <Dropdown overlay={folderDropdownButtons} placement="bottom">
+                <Button>Folders</Button>
+              </Dropdown>
 
-            <div style={{ padding: 6 }} />
-
-            <Dropdown
-              overlay={documentDropdownButtons}
-              placement="bottomCenter"
-            >
-              <Button>Document</Button>
-            </Dropdown>
-
-            <div style={{ padding: 6 }} />
-
+              <Dropdown overlay={documentDropdownButtons} placement="bottom">
+                <Button>Document</Button>
+              </Dropdown>
+            </>
             <NavButtons documentId={documentId} folderId={folderId} />
           </div>
         </Col>
