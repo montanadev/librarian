@@ -7,6 +7,7 @@ import { ResourceModel } from "../models/Resource";
 import { useQuery } from "react-query";
 import { TagModel } from "../models/Tag";
 import { FolderOpenOutlined, TagsOutlined } from "@ant-design/icons";
+import { Header } from "antd/es/layout/layout";
 
 const { SubMenu } = Menu;
 const { Sider } = Layout;
@@ -45,6 +46,13 @@ function Sidebar() {
         width={200}
         className="site-layout-background"
       >
+        <Header className="header AppHeader">
+          {collapsed ? (
+            <h3 style={{ color: "white", textAlign: "center" }}>Librarian</h3>
+          ) : (
+            <h3 style={{ color: "white", paddingLeft: "48px" }}>Librarian</h3>
+          )}
+        </Header>
         <Menu
           mode="inline"
           defaultSelectedKeys={[`document-${documentId}`]}

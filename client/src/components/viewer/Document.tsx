@@ -3,6 +3,7 @@ import { Document as ReactPDFDocument } from "react-pdf/dist/esm/entry.webpack";
 import { VariableSizeList } from "react-window";
 import Page from "./Page";
 import { debounce } from "throttle-debounce";
+import { Loading } from "../Loading";
 
 interface Props {
   scale: number;
@@ -24,8 +25,20 @@ export default function Document({
   const [pages, setPages] = useState<Map<any, any>>(new Map());
   const [containerHeight, setContainerHeight] = useState(window.innerHeight);
   const [jumped, setJumped] = useState(false);
+  const [height, setHeight] = useState(0);
 
   const listRef = useRef<any>();
+  const documentRef = useRef<any>();
+  useEffect(() => {
+    if (!documentRef.current) {
+      return;
+    }
+
+    const bbox = documentRef.current.getBoundingClientRect();
+    const measuredHeight = window.innerHeight - bbox.top;
+    console.log("Measured viewer height ", measuredHeight);
+    setHeight(measuredHeight);
+  }, [documentRef.current]);
 
   const handleResize = () => {
     // Recompute the responsive scale factor on window resize
@@ -89,6 +102,14 @@ export default function Document({
 
   const computeRowHeight = (index: any) => {
     if (cachedPageDimensions && responsiveScale) {
+      if (!cachedPageDimensions.get(index + 1)) {
+        return 768;
+      }
+      console.log(
+        cachedPageDimensions.get(index + 1)[1] / responsiveScale,
+        cachedPageDimensions.get(index + 1)[1],
+        responsiveScale
+      );
       return cachedPageDimensions.get(index + 1)[1] / responsiveScale;
     }
     return 768; // Initial height
@@ -115,33 +136,40 @@ export default function Document({
   };
 
   return (
-    <ReactPDFDocument
-      file={file}
-      onLoadSuccess={onDocumentLoadSuccess}
-      onLoadError={(error) => console.error(error)} // eslint-disable-line no-console
+    <div
+      id="document-container"
+      style={{ width: "100%", height: `100vh` }}
+      ref={documentRef}
     >
-      {cachedPageDimensions && (
-        <Fragment>
-          <VariableSizeList
-            height={700}
-            width={"100%"}
-            itemCount={pdf.numPages}
-            itemSize={computeRowHeight}
-            itemData={{
-              scale,
-              pages,
-              pageNumbers,
-              numPages: pdf.numPages,
-              triggerResize: _callResizeHandler,
-            }}
-            overscanCount={2}
-            onItemsRendered={updateCurrentVisiblePage}
-            ref={listRef}
-          >
-            {Page}
-          </VariableSizeList>
-        </Fragment>
-      )}
-    </ReactPDFDocument>
+      <ReactPDFDocument
+        file={file}
+        loading={<Loading />}
+        onLoadSuccess={onDocumentLoadSuccess}
+        onLoadError={(error) => console.error(error)} // eslint-disable-line no-console
+      >
+        {cachedPageDimensions && (
+          <Fragment>
+            <VariableSizeList
+              height={height}
+              width={"100%"}
+              itemCount={pdf.numPages}
+              itemSize={computeRowHeight}
+              itemData={{
+                scale,
+                pages,
+                pageNumbers,
+                numPages: pdf.numPages,
+                triggerResize: _callResizeHandler,
+              }}
+              overscanCount={2}
+              onItemsRendered={updateCurrentVisiblePage}
+              ref={listRef}
+            >
+              {Page}
+            </VariableSizeList>
+          </Fragment>
+        )}
+      </ReactPDFDocument>
+    </div>
   );
 }

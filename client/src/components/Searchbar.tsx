@@ -19,7 +19,7 @@ export function Searchbar() {
   };
 
   return (
-    <li style={{ order: 2 }}>
+    <li style={{ order: 2 }} className="w-full">
       <div
         className="items-center h-16 flex float-right pr-4 w-auto"
         style={{ display: "flex" }}

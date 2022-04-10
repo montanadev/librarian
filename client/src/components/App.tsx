@@ -19,10 +19,28 @@ function App() {
   // needed to inform the sidebar what is currently selected
   const withSidebar = (children: any) => {
     return (
-      <Layout>
-        <Sidebar />
-        <Content>{children}</Content>
-      </Layout>
+      <>
+        <div className="flex">
+          <Sidebar />
+          <div style={{ height: "100vh", width: "100%" }}>
+            <Header className="header AppHeader">
+              <Menu theme="dark" mode="horizontal">
+                <Menu.Item key="home">
+                  <Link to={"/"}>Upload</Link>
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => setSettingsModalOpen(true)}
+                  key="settings"
+                >
+                  Settings
+                </Menu.Item>
+                <Searchbar />
+              </Menu>
+            </Header>
+            <div style={{ padding: "20px" }}>{children}</div>
+          </div>
+        </div>
+      </>
     );
   };
 
@@ -34,18 +52,6 @@ function App() {
         <SettingsModal visible onClose={() => setSettingsModalOpen(false)} />
       )}
 
-      <Header className="header AppHeader">
-        <div className="AppLogo">librarian</div>
-        <Menu theme="dark" mode="horizontal">
-          <Menu.Item key="home">
-            <Link to={"/"}>Upload</Link>
-          </Menu.Item>
-          <Menu.Item onClick={() => setSettingsModalOpen(true)} key="settings">
-            Settings
-          </Menu.Item>
-          <Searchbar />
-        </Menu>
-      </Header>
       <Switch>
         <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
           {withSidebar(<Viewer />)}

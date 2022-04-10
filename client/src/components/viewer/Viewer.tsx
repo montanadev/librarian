@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import "../Uploader.css";
 import Document from "./Document";
@@ -9,7 +9,8 @@ import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
 import { CreateFolderModal } from "../modals/CreateFolderModal";
-import { useContainerDimensions } from "../../utils/useContainerDimenstions";
+import { ResourceModel } from "../../models/Resource";
+import { TagModel } from "../../models/Tag";
 
 function Viewer() {
   const { documentId, folderId, pageNumber } = useParams<any>();
@@ -24,17 +25,20 @@ function Viewer() {
     );
   }
   const [zoom, setZoom] = useState(localZoom);
-
   const documentRef = useRef<any>();
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
+
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );
-
-  const { height } = useContainerDimensions(documentRef);
-  console.log(height);
+  const documentTags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
+    api.getTagsByDocumentId(documentId)
+  );
+  const globalTags = useQuery<ResourceModel<TagModel>>("tags", () =>
+    api.getTags()
+  );
 
   const onDocumentRename = (newDocumentName: string) => {
     if (!document.data) {
@@ -66,6 +70,10 @@ function Viewer() {
       .then(() => history.push("/"));
   };
 
+  if (!document.data || !documentTags.data || !globalTags.data) {
+    return <div />;
+  }
+
   return (
     <>
       {openAddToFolderModal && (
@@ -84,33 +92,33 @@ function Viewer() {
       {openCreateFolderModal && (
         <CreateFolderModal onClose={() => setOpenCreateFolderModal(false)} />
       )}
-      {document.data && (
-        <Toolbar
-          document={document.data}
-          documentId={documentId}
-          folderId={folderId}
-          defaultZoom={zoom}
-          onDocumentRename={onDocumentRename}
-          onMoveToFolder={() => setOpenMoveToFolderModal(true)}
-          onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
-          onCreateFolder={() => setOpenCreateFolderModal(true)}
-          onSetZoom={(newZoom: number) => {
-            setZoom(newZoom);
-            window.localStorage.setItem(
-              "librarian.document.zoom",
-              newZoom.toString()
-            );
-          }}
-        />
-      )}
 
-      <div id="document-container" style={{ height: "100%" }} ref={documentRef}>
-        <Document
-          file={`/api/documents/${documentId}/data`}
-          scale={zoom}
-          pageNumber={pageNumber ? parseInt(pageNumber) : undefined}
-        />
-      </div>
+      <Toolbar
+        document={document.data}
+        documentTags={documentTags.data.results}
+        globalTags={globalTags.data.results}
+        documentId={documentId}
+        folderId={folderId}
+        defaultZoom={zoom}
+        onDocumentRename={onDocumentRename}
+        onMoveToFolder={() => setOpenMoveToFolderModal(true)}
+        onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
+        onCreateFolder={() => setOpenCreateFolderModal(true)}
+        onSetZoom={(newZoom: number) => {
+          setZoom(newZoom);
+          window.localStorage.setItem(
+            "librarian.document.zoom",
+            newZoom.toString()
+          );
+        }}
+      />
+
+      <Document
+        key={`document-${documentId}-${folderId}`}
+        file={`/api/documents/${documentId}/data`}
+        scale={zoom}
+        pageNumber={pageNumber ? parseInt(pageNumber) : undefined}
+      />
     </>
   );
 }
