@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import "../Uploader.css";
 import Document from "./Document";
@@ -26,8 +26,6 @@ function Viewer() {
   const [zoom, setZoom] = useState(localZoom);
 
   const documentRef = useRef<any>();
-  const { width } = useContainerDimensions(documentRef);
-
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
@@ -35,11 +33,14 @@ function Viewer() {
     api.getDocumentById(documentId)
   );
 
-  if (!document.data || document.isLoading) {
-    return <div />;
-  }
+  const { height } = useContainerDimensions(documentRef);
+  console.log(height);
 
   const onDocumentRename = (newDocumentName: string) => {
+    if (!document.data) {
+      return;
+    }
+
     api.renameDocument(document.data.id, newDocumentName).then(() => {
       queryClient.invalidateQueries("folders");
       queryClient.invalidateQueries("document");
@@ -62,16 +63,14 @@ function Viewer() {
         queryClient.invalidateQueries("document");
         queryClient.invalidateQueries("tags");
       })
-      .then(() => {
-        history.push("/");
-      });
+      .then(() => history.push("/"));
   };
 
   return (
     <>
       {openAddToFolderModal && (
         <MoveToFolderModal
-          currentFolderId={document.data.folder}
+          currentFolderId={document.data?.folder ?? -1}
           onClose={() => setOpenMoveToFolderModal(false)}
           onAddToFolder={onAddDocumentToFolder}
         />
@@ -85,25 +84,27 @@ function Viewer() {
       {openCreateFolderModal && (
         <CreateFolderModal onClose={() => setOpenCreateFolderModal(false)} />
       )}
-      <Toolbar
-        document={document.data}
-        documentId={documentId}
-        folderId={folderId}
-        defaultZoom={zoom}
-        onDocumentRename={onDocumentRename}
-        onMoveToFolder={() => setOpenMoveToFolderModal(true)}
-        onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
-        onCreateFolder={() => setOpenCreateFolderModal(true)}
-        onSetZoom={(newZoom: number) => {
-          setZoom(newZoom);
-          window.localStorage.setItem(
-            "librarian.document.zoom",
-            newZoom.toString()
-          );
-        }}
-      />
+      {document.data && (
+        <Toolbar
+          document={document.data}
+          documentId={documentId}
+          folderId={folderId}
+          defaultZoom={zoom}
+          onDocumentRename={onDocumentRename}
+          onMoveToFolder={() => setOpenMoveToFolderModal(true)}
+          onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
+          onCreateFolder={() => setOpenCreateFolderModal(true)}
+          onSetZoom={(newZoom: number) => {
+            setZoom(newZoom);
+            window.localStorage.setItem(
+              "librarian.document.zoom",
+              newZoom.toString()
+            );
+          }}
+        />
+      )}
 
-      <div id="document-container" ref={documentRef}>
+      <div id="document-container" style={{ height: "100%" }} ref={documentRef}>
         <Document
           file={`/api/documents/${documentId}/data`}
           scale={zoom}

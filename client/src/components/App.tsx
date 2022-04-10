@@ -21,13 +21,13 @@ function App() {
     return (
       <Layout>
         <Sidebar />
-        <Content className="AppContent">{children}</Content>
+        <Content>{children}</Content>
       </Layout>
     );
   };
 
   return (
-    <Layout>
+    <>
       <ToastContainer />
 
       {settingsModalOpen && (
@@ -46,19 +46,17 @@ function App() {
           <Searchbar />
         </Menu>
       </Header>
-      <Layout>
-        <Switch>
-          <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
-            {withSidebar(<Viewer />)}
-          </Route>
-          <Route path="/search">{withSidebar(<SearchResults />)}</Route>
-          <Route path="/folders/:folderId/documents/:documentId">
-            {withSidebar(<Viewer />)}
-          </Route>
-          <Route path="/">{withSidebar(<Uploader />)}</Route>
-        </Switch>
-      </Layout>
-    </Layout>
+      <Switch>
+        <Route path="/folders/:folderId/documents/:documentId/pages/:pageNumber">
+          {withSidebar(<Viewer />)}
+        </Route>
+        <Route path="/search">{withSidebar(<SearchResults />)}</Route>
+        <Route path="/folders/:folderId/documents/:documentId">
+          {withSidebar(<Viewer />)}
+        </Route>
+        <Route path="/">{withSidebar(<Uploader />)}</Route>
+      </Switch>
+    </>
   );
 }
 

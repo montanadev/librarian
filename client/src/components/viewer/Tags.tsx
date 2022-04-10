@@ -39,7 +39,6 @@ export function Tags({
 
   const handleInputConfirm = (tag: string) => {
     onCreateTag(tag);
-    console.log("on confirm", tag);
 
     setInputVisible(false);
     setInputValue("");

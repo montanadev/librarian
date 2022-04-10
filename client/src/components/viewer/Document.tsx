@@ -82,7 +82,6 @@ export default function Document({
 
   const recomputeRowHeights = () => {
     if (!listRef.current) {
-      console.log("no ref, cant recompute");
       return;
     }
     listRef.current.resetAfterIndex(0);
@@ -90,13 +89,8 @@ export default function Document({
 
   const computeRowHeight = (index: any) => {
     if (cachedPageDimensions && responsiveScale) {
-      console.log(
-        cachedPageDimensions.get(index + 1)[1] / responsiveScale,
-        responsiveScale
-      );
       return cachedPageDimensions.get(index + 1)[1] / responsiveScale;
     }
-
     return 768; // Initial height
   };
 
@@ -129,7 +123,7 @@ export default function Document({
       {cachedPageDimensions && (
         <Fragment>
           <VariableSizeList
-            height={containerHeight}
+            height={700}
             width={"100%"}
             itemCount={pdf.numPages}
             itemSize={computeRowHeight}

@@ -32,7 +32,7 @@ function Sidebar() {
     <div key={`sidebar-${documentId}-${folderId}`}>
       <Sider
         collapsible
-        collapsed
+        collapsed={collapsed}
         defaultCollapsed={collapsed}
         onCollapse={(newCollapsed: boolean) => {
           if (newCollapsed) {

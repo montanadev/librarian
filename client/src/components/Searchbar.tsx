@@ -19,8 +19,11 @@ export function Searchbar() {
   };
 
   return (
-    <li style={{ order: 2, width: "100%" }}>
-      <div className="items-center h-16 flex float-right pr-4 w-auto">
+    <li style={{ order: 2 }}>
+      <div
+        className="items-center h-16 flex float-right pr-4 w-auto"
+        style={{ display: "flex" }}
+      >
         <Input
           onChange={(e) => setSearch(e.target.value)}
           onPressEnter={onSearch}
