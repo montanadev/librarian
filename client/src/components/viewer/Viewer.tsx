@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import "../Uploader.css";
 import Document from "./Document";
@@ -9,26 +9,31 @@ import { DocumentModel } from "../../models/Document";
 import { DeleteDocumentModal } from "../modals/DeleteDocumentModal";
 import { Toolbar } from "./Toolbar";
 import { CreateFolderModal } from "../modals/CreateFolderModal";
+import { useContainerDimensions } from "../../utils/useContainerDimenstions";
 
 function Viewer() {
   const { documentId, folderId, pageNumber } = useParams<any>();
   const [openAddToFolderModal, setOpenMoveToFolderModal] = useState(false);
   const [openDeleteDocumentModal, setOpenDeleteDocumentModal] = useState(false);
   const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
+
+  let localZoom = 1;
+  if (window.localStorage.getItem("librarian.document.zoom") !== null) {
+    localZoom = parseFloat(
+      window.localStorage.getItem("librarian.document.zoom")!
+    );
+  }
+  const [zoom, setZoom] = useState(localZoom);
+
+  const documentRef = useRef<any>();
+  const { width } = useContainerDimensions(documentRef);
+
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );
-
-  let storedZoom = 1;
-  if (window.localStorage.getItem("librarian.document.zoom") !== null) {
-    storedZoom = parseFloat(
-      window.localStorage.getItem("librarian.document.zoom")!
-    );
-  }
-  const [zoom, setZoom] = useState(storedZoom);
 
   if (!document.data || document.isLoading) {
     return <div />;
@@ -89,12 +94,22 @@ function Viewer() {
         onMoveToFolder={() => setOpenMoveToFolderModal(true)}
         onDeleteDocument={() => setOpenDeleteDocumentModal(true)}
         onCreateFolder={() => setOpenCreateFolderModal(true)}
-        onSetZoom={(zoom: number) => {
-          setZoom(zoom);
+        onSetZoom={(newZoom: number) => {
+          setZoom(newZoom);
+          window.localStorage.setItem(
+            "librarian.document.zoom",
+            newZoom.toString()
+          );
         }}
       />
 
-      <Document zoom={zoom} pageNumber={pageNumber} documentId={documentId} />
+      <div id="document-container" ref={documentRef}>
+        <Document
+          file={`/api/documents/${documentId}/data`}
+          scale={zoom}
+          pageNumber={pageNumber ? parseInt(pageNumber) : undefined}
+        />
+      </div>
     </>
   );
 }

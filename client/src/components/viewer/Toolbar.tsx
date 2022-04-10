@@ -1,15 +1,15 @@
 import NavButtons from "./NavButtons";
 import React from "react";
 import "../Uploader.css";
-import { Button, Col, Descriptions, Dropdown, Menu, Row } from "antd";
-import { DocumentModel } from "../../models/Document";
-import { Tags } from "./Tags";
-import { Api } from "../../utils/Api";
-import { useQuery, useQueryClient } from "react-query";
-import { TagModel } from "../../models/Tag";
-import { ResourceModel } from "../../models/Resource";
-import { Zoom } from "./Zoom";
-import { EditableTitle } from "./EditableTitle";
+import {Button, Col, Dropdown, Menu, Row} from "antd";
+import {DocumentModel} from "../../models/Document";
+import {Tags} from "./Tags";
+import {Api} from "../../utils/Api";
+import {useQuery, useQueryClient} from "react-query";
+import {TagModel} from "../../models/Tag";
+import {ResourceModel} from "../../models/Resource";
+import {Zoom} from "./Zoom";
+import {EditableTitle} from "./EditableTitle";
 
 interface Props {
   document: DocumentModel;
@@ -95,6 +95,7 @@ export function Toolbar({
               api.replaceTag(documentId, oldTagId, newTagName).then(refreshTags)
             }
           />
+
         </Col>
 
         <Col span={8} style={{ display: "flex", justifyContent: "center" }}>

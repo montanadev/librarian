@@ -9,7 +9,7 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-function Search() {
+function SearchResults() {
   const [documentSearch, setDocumentSearch] = useState([]);
   const [documentTextSearch, setDocumentTextSearch] = useState([]);
   const query = useQuery();
@@ -94,4 +94,4 @@ function Search() {
   );
 }
 
-export default Search;
+export default SearchResults;
