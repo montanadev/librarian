@@ -29,7 +29,6 @@ function Viewer() {
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
-
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );

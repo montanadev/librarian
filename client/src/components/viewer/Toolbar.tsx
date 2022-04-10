@@ -111,7 +111,6 @@ export function Toolbar({
                 <Button>Document</Button>
               </Dropdown>
             </>
-
             <NavButtons documentId={documentId} folderId={folderId} />
           </div>
         </Col>
