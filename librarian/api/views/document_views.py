@@ -1,15 +1,17 @@
 import logging
 
+from django.contrib.postgres.search import SearchHeadline, SearchQuery
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import (ListAPIView, RetrieveAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      get_object_or_404, ListCreateAPIView, DestroyAPIView)
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from librarian.api.models import Document, DocumentPageImage, Settings, Tag
-from librarian.api.serializers import (DocumentPageImageSerializer,
+from librarian.api.serializers import (DocumentPageTextSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
 from django.conf import settings
@@ -58,14 +60,47 @@ class DocumentDataView(RetrieveAPIView):
         )
 
 
-class DocumentTextSearchView(RetrieveAPIView):
-    def get(self, request, *args, **kwargs):
-        pages = DocumentPageImage.objects.filter(
-            text__contains=request.query_params["q"]
+class DocumentTextSearchView(ListAPIView):
+    serializer_class = DocumentPageTextSerializer
+
+    def list(self, request, *args, **kwargs):
+        query_text = request.query_params['q'].lower()
+        if len(query_text.split(" ")) == 1:
+            query = SearchQuery(query_text + ":*", search_type='raw')
+        else:
+            query = SearchQuery(query_text, search_type='phrase')
+
+        queryset = DocumentPageImage.objects \
+            .annotate(headline=SearchHeadline('text',
+                                              query,
+                                              start_sel='<b>',
+                                              stop_sel='</b>',
+                                              highlight_all=True)) \
+            .filter(headline__isnull=False) \
+            .filter(headline__contains='<b>')
+
+        # each page may have multiple submatches
+        # TODO - it looks like postgres has something native like this 'ts_headline'
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def get_queryset(self):
+        return DocumentPageImage.objects.filter(
+            text__icontains=self.request.query_params["q"]
         )
 
-        serializer = DocumentPageImageSerializer(pages, many=True)
-        return JsonResponse(data=serializer.data, safe=False)
+
+class DocumentTitleSearchView(ListAPIView):
+    serializer_class = DocumentSerializer
+
+    def get_queryset(self):
+        return Document.objects.filter(filename__icontains=self.request.query_params['q'])
 
 
 class DocumentTagsView(ListCreateAPIView):
@@ -119,12 +154,3 @@ def document_create(request, filename):
     dc.persist_to_filestore(data)
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
-
-
-@api_view(["GET"])
-def document_search(request):
-    search_term = request.query_params["q"]
-    search_results = Document.objects.filter(filename__contains=search_term)
-
-    serializer = DocumentSerializer(search_results, many=True)
-    return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)

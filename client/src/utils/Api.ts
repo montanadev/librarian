@@ -70,18 +70,26 @@ export class Api {
     });
   }
 
-  searchDocumentTitles(q: string | null) {
+  searchDocumentTitles(
+    q: string | null,
+    limit: number | null = null,
+    offset: number | null = null
+  ) {
     return axios
       .get("/api/documents/search", {
-        params: { q },
+        params: { q, limit, offset },
       })
       .then((d) => d.data);
   }
 
-  searchDocumentText(q: string | null) {
+  searchDocumentText(
+    q: string | null,
+    limit: number | null = null,
+    offset: number | null = null
+  ) {
     return axios
       .get("/api/documents/text/search", {
-        params: { q },
+        params: { q, limit, offset },
       })
       .then((d) => d.data);
   }

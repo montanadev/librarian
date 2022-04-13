@@ -3,7 +3,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 
-export function Searchbar() {
+export function SearchBox() {
   const [search, setSearch] = useState<string>();
   const history = useHistory();
 

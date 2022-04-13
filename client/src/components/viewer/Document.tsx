@@ -136,11 +136,7 @@ export default function Document({
   };
 
   return (
-    <div
-      id="document-container"
-      style={{ width: "100%", height: `100vh` }}
-      ref={documentRef}
-    >
+    <div id="document-container" style={{ width: "100%" }} ref={documentRef}>
       <ReactPDFDocument
         file={file}
         loading={<Loading />}
