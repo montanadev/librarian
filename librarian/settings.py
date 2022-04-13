@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.postgres',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +87,7 @@ WSGI_APPLICATION = "librarian.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASE_URL = get_env("DATABASE_URL", f"sqlite:///{BASE_DIR}/db.sqlite3")
+DATABASE_URL = get_env("DATABASE_URL", f"postgres://localhost/librarian")
 DATABASES = {
     "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 }

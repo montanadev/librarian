@@ -15,10 +15,8 @@ urlpatterns = [
     #
     # search endpoints
     #
-    path(
-        "api/documents/search", document_views.document_search, name="document-search"
-    ),
-    path("api/documents/text/search", document_views.DocumentTextSearchView.as_view(), name="document-text-search"),
+    path("api/documents/search/title", document_views.DocumentTitleSearchView.as_view(), name="document-title-search"),
+    path("api/documents/search/text", document_views.DocumentTextSearchView.as_view(), name="document-text-search"),
     #
     # tag endpoints
     #

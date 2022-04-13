@@ -15,16 +15,27 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class DocumentPageImageSerializer(serializers.ModelSerializer):
+class DocumentPageTextSerializer(serializers.ModelSerializer):
     folder = serializers.SerializerMethodField()
+    document_filename = serializers.SerializerMethodField()
+    matches = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_matches(obj):
+        return obj.matches
+
 
     @staticmethod
     def get_folder(obj):
         return obj.document.folder.id
 
+    @staticmethod
+    def get_document_filename(obj):
+        return obj.document.filename
+
     class Meta:
         model = DocumentPageImage
-        fields = ("id", "document", "text", "folder", "page_number")
+        fields = ("id", "document", "document_filename", "text", "folder", "page_number", "matches")
 
 
 class SetupSerializer(serializers.ModelSerializer):

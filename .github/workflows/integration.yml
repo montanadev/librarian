@@ -9,16 +9,34 @@ env:
 jobs:
   cypress:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: librarian
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: librarian
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up python
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+
     - name: Set up node
       uses: actions/setup-node@v2
       with:
         node-version: '14'
+
     - name: Install python deps
       run: |
         sudo apt-get install -y libnfs-dev imagemagick ghostscript-x
@@ -27,15 +45,22 @@ jobs:
         python -m pip install poetry
 
         poetry install
-        make migrate
 
         # Needed to fix imagemagick, see Dockerfile or
         # https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
         sudo cp policy.xml /etc/ImageMagick-6/policy.xml
+
+    - name: Run migrations
+      run: |
+          make migrate
+      env:
+          DATABASE_URL: postgres://librarian:password@localhost/librarian
+
     - name: Install javascript deps
       run: |
           cd client
           npm install
+
     - name: Cypress run
       uses: cypress-io/github-action@v2
       env:
@@ -43,6 +68,7 @@ jobs:
         CYPRESS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
         DISABLE_ANNOTATION: true
         ALLOW_REUPLOAD: true
+        DATABASE_URL: postgres://librarian:password@localhost/librarian
       with:
         working-directory: client
         record: true

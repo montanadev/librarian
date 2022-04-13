@@ -32,6 +32,7 @@ function Sidebar() {
   return (
     <div key={`sidebar-${documentId}-${folderId}`}>
       <Sider
+        style={{ height: "100vh", overflowY: "scroll" }}
         collapsible
         collapsed={collapsed}
         defaultCollapsed={collapsed}
@@ -56,6 +57,7 @@ function Sidebar() {
         <Menu
           mode="inline"
           defaultSelectedKeys={[`document-${documentId}`]}
+          defaultOpenKeys={collapsed ? [] : ["folders"]}
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu

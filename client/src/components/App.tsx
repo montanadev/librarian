@@ -5,10 +5,10 @@ import { Layout, Menu } from "antd";
 import Sidebar from "./Sidebar";
 import { SettingsModal } from "./modals/SettingsModal";
 import { Link, Route, Switch } from "react-router-dom";
-import SearchResults from "./SearchResults";
+import SearchResults from "./search/SearchResults";
 import Uploader from "./Uploader";
 import Viewer from "./viewer/Viewer";
-import { Searchbar } from "./Searchbar";
+import { SearchBox } from "./search/SearchBox";
 
 const { Header, Content } = Layout;
 
@@ -34,10 +34,10 @@ function App() {
                 >
                   Settings
                 </Menu.Item>
-                <Searchbar />
+                <SearchBox />
               </Menu>
             </Header>
-            <div style={{ padding: "20px" }}>{children}</div>
+            <div style={{ padding: "20px 20px 0px 20px" }}>{children}</div>
           </div>
         </div>
       </>
