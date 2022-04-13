@@ -20,8 +20,15 @@ logger = logging.getLogger(__name__)
 
 
 class DocumentListView(ListAPIView):
-    queryset = Document.objects.all()
     serializer_class = DocumentSerializer
+
+    def get_queryset(self):
+        qs = Document.objects.all()
+
+        created_after = self.request.query_params.get('created_after')
+        if created_after is not None:
+            qs = qs.filter(created_at__gte=created_after)
+        return qs.order_by('-created_at')
 
 
 class DocumentView(RetrieveUpdateDestroyAPIView):

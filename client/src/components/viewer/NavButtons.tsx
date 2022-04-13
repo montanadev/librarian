@@ -5,7 +5,7 @@ import { FolderModel } from "../../models/Folder";
 import { useQuery } from "react-query";
 import { Api } from "../../utils/Api";
 import { Button } from "antd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface Props {
   documentId: string;
@@ -15,23 +15,32 @@ interface Props {
 function NavButtons({ documentId, folderId }: Props) {
   const history = useHistory();
   const api = new Api();
+  const [next, setNext] = useState<number[]>();
+  const [prev, setPrev] = useState<number[]>();
 
   const folders = useQuery<ResourceModel<FolderModel>>(
     "folders",
     api.getFolders
   );
 
+  useEffect(() => {
+    if (!folders.data || folders.isLoading) {
+      return;
+    }
+    const [nextItem, prevItem] = findNextAndPrev(
+      folders.data.results,
+      documentId,
+      folderId
+    );
+    setNext(nextItem);
+    setPrev(prevItem);
+  }, [folders.data]);
+
   if (!folders.data || folders.isLoading) {
     return <div />;
   }
 
-  const [next, prev] = findNextAndPrev(
-    folders.data.results,
-    documentId,
-    folderId
-  );
-
-  const goTo = (item: number[]) => () => {
+  const goTo = (item: number[] | undefined) => () => {
     if (!item) {
       return;
     }

@@ -1,10 +1,13 @@
-.PHONY: run rum-worker migrate makemigrations test test-coverage
+.PHONY: run run-worker shell migrate makemigrations test test-coverage
 
 run:
 	poetry run ./manage.py runserver
 
 run-worker:
 	poetry run ./manage.py worker
+
+shell:
+	poetry run ./manage.py shell
 
 migrate:
 	poetry run ./manage.py migrate

@@ -23,7 +23,6 @@ export default function Document({
   const [responsiveScale, setResponsiveScale] = useState(1);
   const [pageNumbers, setPageNumbers] = useState<Map<any, any>>(new Map());
   const [pages, setPages] = useState<Map<any, any>>(new Map());
-  const [containerHeight, setContainerHeight] = useState(window.innerHeight);
   const [jumped, setJumped] = useState(false);
   const [height, setHeight] = useState(0);
 
@@ -36,7 +35,6 @@ export default function Document({
 
     const bbox = documentRef.current.getBoundingClientRect();
     const measuredHeight = window.innerHeight - bbox.top;
-    console.log("Measured viewer height ", measuredHeight);
     setHeight(measuredHeight);
   }, [documentRef.current]);
 
@@ -47,12 +45,9 @@ export default function Document({
     if (newResponsiveScale && responsiveScale !== newResponsiveScale) {
       setResponsiveScale(newResponsiveScale);
     }
-
-    setContainerHeight(window.innerHeight);
   };
 
   const _callResizeHandler = debounce(50, handleResize);
-
   useEffect(() => {
     _callResizeHandler();
   }, [scale]);
@@ -141,7 +136,7 @@ export default function Document({
         file={file}
         loading={<Loading />}
         onLoadSuccess={onDocumentLoadSuccess}
-        onLoadError={(error) => console.error(error)} // eslint-disable-line no-console
+        onLoadError={(error) => console.error(error)}
       >
         {cachedPageDimensions && (
           <Fragment>
