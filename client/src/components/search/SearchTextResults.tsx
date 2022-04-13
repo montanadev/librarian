@@ -40,7 +40,8 @@ export function SearchTextResults({ q }: { q: string }) {
                 title={<Link to={link}>{l.document_filename}</Link>}
                 style={{ marginBottom: "15px" }}
               >
-                <div dangerouslySetInnerHTML={{ __html: l.headline }} />
+                {/* TODO - fix */}
+                <div dangerouslySetInnerHTML={{ __html: l.matches }} />
               </Card>
             );
           })}

@@ -18,11 +18,11 @@ class DocumentSerializer(serializers.ModelSerializer):
 class DocumentPageTextSerializer(serializers.ModelSerializer):
     folder = serializers.SerializerMethodField()
     document_filename = serializers.SerializerMethodField()
-    headline = serializers.SerializerMethodField()
+    matches = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_headline(obj):
-        return obj.headline
+    def get_matches(obj):
+        return obj.matches
 
 
     @staticmethod
@@ -35,7 +35,7 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DocumentPageImage
-        fields = ("id", "document", "document_filename", "text", "folder", "page_number", "headline")
+        fields = ("id", "document", "document_filename", "text", "folder", "page_number", "matches")
 
 
 class SetupSerializer(serializers.ModelSerializer):

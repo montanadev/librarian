@@ -76,7 +76,7 @@ export class Api {
     offset: number | null = null
   ) {
     return axios
-      .get("/api/documents/search", {
+      .get("/api/documents/search/title", {
         params: { q, limit, offset },
       })
       .then((d) => d.data);
@@ -88,7 +88,7 @@ export class Api {
     offset: number | null = null
   ) {
     return axios
-      .get("/api/documents/text/search", {
+      .get("/api/documents/search/text", {
         params: { q, limit, offset },
       })
       .then((d) => d.data);

@@ -20,7 +20,7 @@ export function SettingsModal({ visible, onClose }: Props) {
   const { handleSubmit, control } = useForm();
 
   if (settings.isLoading || !settings.data) {
-    return <div />;
+    return null;
   }
 
   return (

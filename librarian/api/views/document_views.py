@@ -65,22 +65,20 @@ class DocumentTextSearchView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         query_text = request.query_params['q'].lower()
-        if len(query_text.split(" ")) == 1:
-            query = SearchQuery(query_text + ":*", search_type='raw')
-        else:
+
+        query = SearchQuery(query_text + ":*", search_type='raw')
+        if len(query_text.split(" ")) > 1:
+            # multiple words, use phrase search
             query = SearchQuery(query_text, search_type='phrase')
 
         queryset = DocumentPageImage.objects \
-            .annotate(headline=SearchHeadline('text',
-                                              query,
-                                              start_sel='<b>',
-                                              stop_sel='</b>',
-                                              highlight_all=True)) \
-            .filter(headline__isnull=False) \
-            .filter(headline__contains='<b>')
-
-        # each page may have multiple submatches
-        # TODO - it looks like postgres has something native like this 'ts_headline'
+            .annotate(matches=SearchHeadline('text',
+                                             query,
+                                             start_sel='<b>',
+                                             stop_sel='</b>',
+                                             highlight_all=True)) \
+            .filter(matches__isnull=False) \
+            .filter(matches__contains='<b>')
 
         page = self.paginate_queryset(queryset)
         if page is not None:

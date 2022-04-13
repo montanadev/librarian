@@ -9,12 +9,27 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: librarian
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: librarian
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+
     - name: Install Dependencies
       run: |
         sudo apt-get install -y libnfs-dev imagemagick ghostscript-x
@@ -27,9 +42,13 @@ jobs:
         # Needed to fix imagemagick, see Dockerfile or
         # https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
         sudo cp policy.xml /etc/ImageMagick-6/policy.xml
+
     - name: Run Tests
       run: |
         make test-coverage
+      env:
+        DATABASE_URL: postgres://librarian:password@localhost/librarian
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:

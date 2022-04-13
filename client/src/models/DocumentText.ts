@@ -4,6 +4,6 @@ export interface DocumentTextModel {
   folder: number;
   document: number;
   document_filename: string;
-  headline: string;
+  matches: string;
   text: string;
 }
