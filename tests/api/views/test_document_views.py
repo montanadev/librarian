@@ -101,19 +101,19 @@ class TestDocumentViews(TestCase):
         url = reverse("document-text-search", query_params={"q": "egg"})
         response = self.client.get(url)
         # should return two results
-        self.assertTrue(len(response.json()), 2)
+        self.assertTrue(response.json()['count'], 2)
 
         # should contain both page ids
-        page_ids = [i["id"] for i in response.json()]
+        page_ids = [i["id"] for i in response.json()['results']]
         self.assertTrue(all([i.id in page_ids for i in [doc_a_page_1, doc_b_page_1]]))
 
         url = reverse("document-text-search", query_params={"q": "dirt"})
         response = self.client.get(url)
         # should return one result
-        self.assertTrue(len(response.json()), 1)
+        self.assertTrue(response.json()['count'], 1)
 
         # should contain the single page id
-        self.assertTrue(response.json()[0]["id"] == doc_a_page_1.id)
+        self.assertTrue(response.json()['results'][0]["id"] == doc_a_page_1.id)
 
     def test_find_document(self):
         Document.objects.create(
@@ -161,7 +161,7 @@ class TestDocumentViews(TestCase):
         Document.objects.create(filename="dog vaccine record")
         Document.objects.create(filename="birth certificate")
 
-        url = reverse("document-search")
+        url = reverse("document-title-search")
         url_with_query_parameters = url + "?q=taxes"
         response = self.client.get(url_with_query_parameters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

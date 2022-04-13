@@ -45,11 +45,16 @@ jobs:
         python -m pip install poetry
 
         poetry install
-        make migrate
 
         # Needed to fix imagemagick, see Dockerfile or
         # https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
         sudo cp policy.xml /etc/ImageMagick-6/policy.xml
+
+    - name: Run migrations
+      run: |
+          make migrate
+      env:
+          DATABASE_URL: postgres://librarian:password@localhost/librarian
 
     - name: Install javascript deps
       run: |
