@@ -4,19 +4,20 @@ import { ResourceModel } from "../models/Resource";
 import axios from "axios";
 
 export class Api {
-  getDocuments(): Promise<ResourceModel<DocumentModel>> {
-    return axios.get("/api/documents/").then((d) => d.data);
+  getDocuments(
+    createdAfter: Date | null = null
+  ): Promise<ResourceModel<DocumentModel>> {
+    return axios
+      .get("/api/documents/", {
+        params: { created_after: createdAfter, limit: 100 },
+      })
+      .then((d) => d.data);
   }
 
   getDocumentById(documentId: string): Promise<DocumentModel> {
     return axios
       .get(`/api/documents/${documentId}/details`)
       .then((d) => d.data);
-  }
-
-  refreshJob(jobId: number): Promise<JobModel> {
-    // TODO - dedupe this with `getDocumentById`
-    return axios.get(`/api/documents/${jobId}/details`).then((d) => d.data);
   }
 
   uploadDocuments(file: any) {
@@ -29,10 +30,7 @@ export class Api {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then((d) => d.data)
-      .catch((error: any) => {
-        return Promise.reject(error.response.data.reason);
-      });
+      .then((d) => d.data);
   }
 
   getSettings() {
