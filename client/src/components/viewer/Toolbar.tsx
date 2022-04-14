@@ -5,11 +5,10 @@ import { Button, Col, Dropdown, Menu, Row } from "antd";
 import { DocumentModel } from "../../models/Document";
 import { Tags } from "./Tags";
 import { Api } from "../../utils/Api";
-import { useQuery, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
 import { TagModel } from "../../models/Tag";
-import { ResourceModel } from "../../models/Resource";
 import { Zoom } from "./Zoom";
-import { EditableTitle } from "./EditableTitle";
+import { EditableText } from "../EditableText";
 
 interface Props {
   document: DocumentModel;
@@ -71,7 +70,7 @@ export function Toolbar({
   return (
     <>
       <Row>
-        <EditableTitle text={document.filename} onEdit={onDocumentRename} />
+        <EditableText text={document.filename} onEdit={onDocumentRename} />
       </Row>
       <Row>
         <Col span={8}>

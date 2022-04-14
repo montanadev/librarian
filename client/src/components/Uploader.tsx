@@ -14,7 +14,7 @@ import { toastError } from "../utils/toasts";
 const Uploader = () => {
   const api = new Api();
   const fifteenMinutesAgo = new Date(Date.now() - 1000 * 60 * 15);
-  const [createdAfter, setCreatedAfter] = useState(fifteenMinutesAgo);
+  const [createdAfter] = useState(fifteenMinutesAgo);
 
   const onDropInternal = useCallback((acceptedFiles) => {
     for (let file of acceptedFiles) {

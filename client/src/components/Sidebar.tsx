@@ -4,16 +4,18 @@ import { Link, useParams } from "react-router-dom";
 import { Api } from "../utils/Api";
 import { FolderModel } from "../models/Folder";
 import { ResourceModel } from "../models/Resource";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { TagModel } from "../models/Tag";
 import { FolderOpenOutlined, TagsOutlined } from "@ant-design/icons";
 import { Header } from "antd/es/layout/layout";
+import { EditableText } from "./EditableText";
 
 const { SubMenu } = Menu;
 const { Sider } = Layout;
 
 function Sidebar() {
   const { documentId, folderId } = useParams<any>();
+  const queryClient = useQueryClient();
 
   let collapsedInt = 0;
   if (window.localStorage.getItem("librarian.document.collapsed") !== null) {
@@ -57,7 +59,7 @@ function Sidebar() {
         <Menu
           mode="inline"
           defaultSelectedKeys={[`document-${documentId}`]}
-          defaultOpenKeys={collapsed ? [] : ["folders"]}
+          defaultOpenKeys={collapsed ? [] : ["folders", `folder-${folderId}`]}
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu
@@ -67,7 +69,22 @@ function Sidebar() {
           >
             {folders.data
               ? folders.data.results.map((f: FolderModel) => (
-                  <Menu.ItemGroup key={`folder-${f.id}`} title={f.name}>
+                  <SubMenu
+                    key={`folder-${f.id}`}
+                    title={
+                      <EditableText
+                        small
+                        text={f.name}
+                        onEdit={(newFolderName) =>
+                          api
+                            .renameFolder(f.id, newFolderName)
+                            .then(() =>
+                              queryClient.invalidateQueries("folders")
+                            )
+                        }
+                      />
+                    }
+                  >
                     {f.documents
                       ? f.documents.map((d) => {
                           return (
@@ -79,7 +96,7 @@ function Sidebar() {
                           );
                         })
                       : []}
-                  </Menu.ItemGroup>
+                  </SubMenu>
                 ))
               : null}
           </SubMenu>
