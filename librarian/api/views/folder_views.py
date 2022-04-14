@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from librarian.api.models import Document
 from librarian.api.models.folder import Folder
+from librarian.api.permissions import DisableDemo
 from librarian.api.serializers import (FolderAddDocumentViewSerializer,
                                        FolderSerializer)
 
@@ -14,16 +15,19 @@ from librarian.api.serializers import (FolderAddDocumentViewSerializer,
 class FolderListView(ListCreateAPIView):
     queryset = Folder.objects.all()
     serializer_class = FolderSerializer
+    permission_classes = [DisableDemo]
 
 
 class FolderDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Folder.objects.all()
     serializer_class = FolderSerializer
+    permission_classes = [DisableDemo]
 
 
 class FolderAddDocumentView(UpdateAPIView):
     queryset = Folder.objects.all()
     serializer_class = FolderAddDocumentViewSerializer
+    permission_classes = [DisableDemo]
 
     def update(self, request, *args, **kwargs):
         folder = self.get_object()
@@ -42,6 +46,7 @@ class FolderAddDocumentView(UpdateAPIView):
 # TODO - might be better renamed if only exposing a destroy method
 class FolderDocumentDetailView(DestroyAPIView):
     queryset = Folder.objects.all()
+    permission_classes = [DisableDemo]
 
     def destroy(self, request, *args, **kwargs):
         document = get_object_or_404(Document, id=kwargs["doc_id"])

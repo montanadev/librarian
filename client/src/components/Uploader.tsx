@@ -23,12 +23,7 @@ const Uploader = () => {
         .then(() => {
           setWaitingToUpload((waitingToUpload) => waitingToUpload - 1);
         })
-        .catch((error: any) => {
-          if (error.response?.data?.reason) {
-            toastError(error.response?.data?.reason);
-          } else {
-            toastError(error.message);
-          }
+        .catch(() => {
           setWaitingToUpload((waitingToUpload) => waitingToUpload - 1);
         });
       setWaitingToUpload((waitingToUpload) => waitingToUpload + 1);

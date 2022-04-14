@@ -10,20 +10,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env("SECRET_KEY", "nvm5k(6t%ybnfd+8*)9r9p@hatnm#1%w3yx(#o1+zo44x2b3yd")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
-
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-)
+SECRET_KEY = get_env("SECRET_KEY", "super-secret-secret-key")
+DEBUG = get_env("DEBUG", False)
+ALLOWED_HOSTS = [get_env("ALLOWED_HOST", "*")]
 
 LOGGING = {
     "version": 1,
@@ -39,11 +28,8 @@ LOGGING = {
     },
 }
 
-# Application definition
-
 INSTALLED_APPS = [
     "librarian.api",
-    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -61,7 +47,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "librarian.urls"
@@ -124,12 +109,20 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "client", "build", "static"),)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
 }
 
 # ALLOW_REUPLOAD skips the md5 hash check, effectively allowing the same document to be uploaded
 # multiple times. Useful for unit testing, should probably stay disabled for users
-ALLOW_REUPLOAD = get_env("ALLOW_REUPLOAD", False)
+ALLOW_REUPLOAD = get_bool("ALLOW_REUPLOAD", False)
+
 # DISABLE_ANNOTATION skips annotation. Useful for unit testing, should stay enabled for users
-DISABLE_ANNOTATION = get_env("DISABLE_ANNOTATION", False)
+DISABLE_ANNOTATION = get_bool("DISABLE_ANNOTATION", False)
+
+# DEMO_MODE disables uploads and any user edits to files, folders, etc
+# It also hides some sensitive fields on the Settings model
+DEMO_MODE = get_bool("DEMO_MODE", False)
