@@ -1,4 +1,4 @@
-![tests](https://github.com/de1ux/librarian/actions/workflows/test-build-and-push.yml/badge.svg) 
+![tests](https://github.com/de1ux/librarian/actions/workflows/build-and-push.yml/badge.svg) 
 [![librarian](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/detailed/p6c21i&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/p6c21i/runs) 
 [![codecov](https://codecov.io/gh/montanadev/librarian/branch/main/graph/badge.svg?token=NPUS7FR2GZ)](https://codecov.io/gh/montanadev/librarian)
 
