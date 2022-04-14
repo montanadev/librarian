@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.postgres.search import SearchHeadline, SearchQuery
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
@@ -7,14 +8,12 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import (ListAPIView, RetrieveAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      get_object_or_404, ListCreateAPIView, DestroyAPIView)
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from librarian.api.models import Document, DocumentPageImage, Settings, Tag
 from librarian.api.serializers import (DocumentPageTextSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
-from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
