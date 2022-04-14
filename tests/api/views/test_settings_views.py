@@ -39,3 +39,18 @@ class TestConfigViews(TestCase):
         url = reverse("settings")
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_disable_demo_mode(self):
+        client = APIClient()
+        url = reverse("settings")
+
+        with self.settings(DEMO_MODE=True):
+            # shouldn't allow POST to settings
+            response = client.post(url, {}, format="json")
+            self.assertEqual(response.status_code, 403)
+
+            # shouldn't leak google_cloud_api_key
+            Settings.objects.create(google_cloud_api_key='sensitive')
+            response = client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['google_cloud_api_key'], '')
