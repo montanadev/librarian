@@ -24,10 +24,10 @@ class DocumentListView(ListAPIView):
     def get_queryset(self):
         qs = Document.objects.all()
 
-        created_after = self.request.query_params.get('created_after')
-        if created_after is not None:
-            qs = qs.filter(created_at__gte=created_after)
-        return qs.order_by('-created_at')
+        updated_after = self.request.query_params.get('updated_after')
+        if updated_after is not None:
+            qs = qs.filter(updated_at__gte=updated_after)
+        return qs.order_by('-updated_at')
 
 
 class DocumentView(RetrieveUpdateDestroyAPIView):
@@ -84,7 +84,8 @@ class DocumentTextSearchView(ListAPIView):
                                              stop_sel='</b>',
                                              highlight_all=True)) \
             .filter(matches__isnull=False) \
-            .filter(matches__contains='<b>')
+            .filter(matches__contains='<b>') \
+            .defer('text')
 
         page = self.paginate_queryset(queryset)
         if page is not None:

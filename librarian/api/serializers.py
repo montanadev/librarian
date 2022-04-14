@@ -35,7 +35,7 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DocumentPageImage
-        fields = ("id", "document", "document_filename", "text", "folder", "page_number", "matches")
+        fields = ("id", "document", "document_filename", "folder", "page_number", "matches")
 
 
 class SetupSerializer(serializers.ModelSerializer):
