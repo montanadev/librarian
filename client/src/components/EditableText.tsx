@@ -46,7 +46,7 @@ export function EditableText({ text, onEdit, small }: Props) {
             </Typography.Title>
           )}
           {small && (
-            <p>
+            <>
               {text}
               <a>
                 <EditOutlined
@@ -55,7 +55,7 @@ export function EditableText({ text, onEdit, small }: Props) {
                   style={{ fontSize: 14, verticalAlign: 0 }}
                 />
               </a>
-            </p>
+            </>
           )}
         </>
       )}

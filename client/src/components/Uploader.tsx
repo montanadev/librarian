@@ -15,16 +15,24 @@ const Uploader = () => {
   const api = new Api();
   const fifteenMinutesAgo = new Date(Date.now() - 1000 * 60 * 15);
   const [createdAfter] = useState(fifteenMinutesAgo);
+  const [waitingToUpload, setWaitingToUpload] = useState(0);
 
   const onDropInternal = useCallback((acceptedFiles) => {
     for (let file of acceptedFiles) {
-      api.uploadDocuments(file).catch((error: any) => {
-        if (error.response?.data?.reason) {
-          toastError(error.response?.data?.reason);
-        } else {
-          toastError(error.message);
-        }
-      });
+      api
+        .uploadDocuments(file)
+        .then(() => {
+          setWaitingToUpload((waitingToUpload) => waitingToUpload - 1);
+        })
+        .catch((error: any) => {
+          if (error.response?.data?.reason) {
+            toastError(error.response?.data?.reason);
+          } else {
+            toastError(error.message);
+          }
+          setWaitingToUpload((waitingToUpload) => waitingToUpload - 1);
+        });
+      setWaitingToUpload((waitingToUpload) => waitingToUpload + 1);
     }
   }, []);
 
@@ -47,7 +55,11 @@ const Uploader = () => {
         <input {...(getInputProps() as any)} />
         <p />
         <p />
-        <FilePdfOutlined style={{ fontSize: 50 }} />
+        {waitingToUpload ? (
+          <Loading text={"Uploading..."} />
+        ) : (
+          <FilePdfOutlined style={{ fontSize: 50 }} />
+        )}
         <p />
         {isDragActive ? (
           <p className="UploaderText" data-cy="dropzone">
@@ -55,7 +67,17 @@ const Uploader = () => {
           </p>
         ) : (
           <p className="UploaderText" data-cy="dropzone">
-            Drag 'n' drop some PDFs here, or click to select files
+            {waitingToUpload ? (
+              <span>
+                Uploading <b style={{ fontSize: "20px" }}>{waitingToUpload}</b>{" "}
+                documents from your computer to the server, don't close this
+                window yet!
+              </span>
+            ) : (
+              <span>
+                Drag 'n' drop some PDFs here, or click to select files
+              </span>
+            )}
           </p>
         )}
       </div>

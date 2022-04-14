@@ -1,7 +1,11 @@
 import { Spin } from "antd";
 import React from "react";
 
-export function Loading() {
+interface Props {
+  text?: string;
+}
+
+export function Loading({ text = "Loading..." }: Props) {
   return (
     <div
       style={{
@@ -10,7 +14,7 @@ export function Loading() {
         alignItems: "centers",
       }}
     >
-      <Spin size="large" tip="Loading..." />
+      <Spin size="large" tip={text} />
     </div>
   );
 }
