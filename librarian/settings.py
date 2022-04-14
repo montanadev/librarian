@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = get_env("SECRET_KEY", "super-secret-secret-key")
 DEBUG = get_env("DEBUG", False)
-ALLOWED_HOSTS = [get_env("ALLOWED_HOST", "*")]
+ALLOWED_HOSTS = get_env("ALLOWED_HOSTS", "*").split(",")
 
 LOGGING = {
     "version": 1,
