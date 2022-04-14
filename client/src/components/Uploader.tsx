@@ -14,7 +14,7 @@ import { toastError } from "../utils/toasts";
 const Uploader = () => {
   const api = new Api();
   const fifteenMinutesAgo = new Date(Date.now() - 1000 * 60 * 15);
-  const [createdAfter] = useState(fifteenMinutesAgo);
+  const [updatedAfter] = useState(fifteenMinutesAgo);
   const [waitingToUpload, setWaitingToUpload] = useState(0);
 
   const onDropInternal = useCallback((acceptedFiles) => {
@@ -42,7 +42,7 @@ const Uploader = () => {
 
   const documents = useQuery<ResourceModel<DocumentModel>>(
     "uploaded-documents",
-    () => api.getDocuments(createdAfter),
+    () => api.getDocuments(updatedAfter),
     { refetchInterval: 1000 }
   );
   if (documents.isLoading || !documents.data) {
@@ -82,15 +82,13 @@ const Uploader = () => {
         )}
       </div>
       <>
-        <List
-          itemLayout="horizontal"
-          dataSource={documents.data.results}
-          renderItem={(document) => (
-            <List.Item>
-              <Job document={document} />
-            </List.Item>
-          )}
-        />
+        <ul>
+          {documents.data.results.map((d) => (
+            <li key={`upload-${d.id}`}>
+              <Job document={d} />
+            </li>
+          ))}
+        </ul>
       </>
     </>
   );

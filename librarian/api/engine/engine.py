@@ -43,39 +43,39 @@ def _run(job: DocumentJob):
     if not settings:
         settings = Settings.create_default()
 
-    dc = job.document
-    dc.status = job.current_status
-    dc.save()
+    doc = job.document
+    doc.status = job.current_status
+    doc.save()
 
     if job.kind == DocumentJob.Kind.persist:
         # non-pdfs need to be converted before persistence
-        if dc.source_content_type != SourceContentTypes.PDF:
+        if doc.source_content_type != SourceContentTypes.PDF:
             logger.debug("Non-pdf detected, preconverting to pdf before persistence...")
             cmd = (
-                f"convert -density 150 {dc.temp_path} -quality 90 {dc.temp_path}.pdf"
+                f"convert -density 150 {doc.temp_path} -quality 90 {doc.temp_path}.pdf"
             )
             subprocess.call(cmd.split(" "))
-            dc.temp_path += '.pdf'
-            dc.filename += '.pdf'
-            dc.save()
+            doc.temp_path += '.pdf'
+            doc.filename += '.pdf'
+            doc.save()
 
             logger.debug("Non-pdf detected, preconverting to pdf before persistence...done")
-            logger.debug(f"Pdf converted and saved to {dc.temp_path}")
+            logger.debug(f"Pdf converted and saved to {doc.temp_path}")
 
         logger.debug(f"Persistence mode {settings.storage_mode}")
         if settings.storage_mode == "local":
-            dest = os.path.join(settings.storage_path, dc.filename)
+            dest = os.path.join(settings.storage_path, doc.filename)
             logger.debug(f"Persisting to {dest}")
             # TODO - no need to open / write, just move from temp to filestore path
             with open(dest, mode="wb") as local_f, open(
-                    dc.temp_path, "rb"
+                    doc.temp_path, "rb"
             ) as tmp_f:
                 local_f.write(bytearray(tmp_f.read()))
         elif settings.storage_mode == "nfs":
             # read temp file into nfs
             nfs = libnfs.NFS(settings.storage_path)
-            nfs_f = nfs.open("/" + dc.filename, mode="wb")
-            with open(dc.temp_path, "rb") as tmp_f:
+            nfs_f = nfs.open("/" + doc.filename, mode="wb")
+            with open(doc.temp_path, "rb") as tmp_f:
                 nfs_f.write(bytearray(tmp_f.read()))
             nfs_f.close()
         else:
@@ -84,20 +84,20 @@ def _run(job: DocumentJob):
             )
 
         # cleanup temp file
-        os.remove(dc.temp_path)
+        os.remove(doc.temp_path)
 
         setattrs(
-            dc,
+            doc,
             temp_path=None,
             status=job.desired_status,
             # filestore_path tracks the original filename as persisted on disk.
             # necessary as the `filename` property may change over time
-            filestore_path=dc.filename
+            filestore_path=doc.filename
         )
-        dc.save()
+        doc.save()
 
         # TODO - this might not be the best place to kick off next transition
-        dc.translate_pdf_to_images()
+        doc.translate_pdf_to_images()
 
     if job.kind == DocumentJob.Kind.translate_pdf_to_images:
         # temp dir to hold imagemagick output images
@@ -106,7 +106,7 @@ def _run(job: DocumentJob):
         # write source file bytes to disk for imagemagick
         file, filename = tempfile.mkstemp()
         with open(file, "w+b") as f:
-            f.write(dc.get_bytes_from_filestore(settings))
+            f.write(doc.get_bytes_from_filestore(settings))
 
         cmd = (
             f"convert -density 150 {filename} -quality 90 {output_dir}/output.png"
@@ -133,7 +133,7 @@ def _run(job: DocumentJob):
                 page_number, _ = filename_parts.split(".")
 
             DocumentPageImage.objects.create(
-                document=dc,
+                document=doc,
                 temp_path=f"{output_dir}/{output_file}",
                 page_number=int(page_number),
             )
@@ -147,34 +147,34 @@ def _run(job: DocumentJob):
         # cleanup temp file, but dont cleanup images: still needed for annotation
         os.remove(filename)
 
-        dc.status = job.desired_status
-        dc.save()
+        doc.status = job.desired_status
+        doc.save()
 
         if django_settings.DISABLE_ANNOTATION:
             # skip directly to annotated
             logger.warning(f"Skipping annotation for {job.document.filename}")
-            dc.status = DocumentStatus.annotated.value
-            dc.save()
+            doc.status = DocumentStatus.annotated.value
+            doc.save()
         else:
-            dc.annotate()
+            doc.annotate()
 
     if job.kind == DocumentJob.Kind.annotate:
-        logger.debug(f"Annotating {dc.pages.count()} pages...")
-        for page in dc.pages.all():
+        logger.debug(f"Annotating {doc.pages.count()} pages...")
+        for page in doc.pages.all():
             with open(page.temp_path, mode="r+b") as tmp_f:
                 text, metadata = annotate(tmp_f.read(), settings)
                 setattrs(page, text=text, metadata=metadata)
                 page.save()
 
-        logger.debug(f"Annotating {dc.pages.count()} pages...done")
+        logger.debug(f"Annotating {doc.pages.count()} pages...done")
         logger.debug("Freeing up /tmp image files...")
 
-        for page in dc.pages.all():
+        for page in doc.pages.all():
             os.remove(page.temp_path)
             page.temp_path = None
             page.save()
 
         logger.debug("Freeing up /tmp image files...done")
 
-        dc.status = job.desired_status
-        dc.save()
+        doc.status = job.desired_status
+        doc.save()

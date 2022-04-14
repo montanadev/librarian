@@ -5,11 +5,11 @@ import axios from "axios";
 
 export class Api {
   getDocuments(
-    createdAfter: Date | null = null
+    updatedAfter: Date | null = null
   ): Promise<ResourceModel<DocumentModel>> {
     return axios
       .get("/api/documents/", {
-        params: { created_after: createdAfter, limit: 100 },
+        params: { updated_after: updatedAfter, limit: 100 },
       })
       .then((d) => d.data);
   }
