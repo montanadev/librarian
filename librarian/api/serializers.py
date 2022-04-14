@@ -24,7 +24,6 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
     def get_matches(obj):
         return obj.matches
 
-
     @staticmethod
     def get_folder(obj):
         return obj.document.folder.id
@@ -42,6 +41,19 @@ class SetupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Settings
         fields = "__all__"
+
+
+class DemoSetupSerializer(serializers.ModelSerializer):
+    google_cloud_api_key = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_google_cloud_api_key(obj):
+        # DEMO shouldnt leak gcv key
+        return ""
+
+    class Meta:
+        model = Settings
+        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_path")
 
 
 class FolderSerializer(serializers.ModelSerializer):

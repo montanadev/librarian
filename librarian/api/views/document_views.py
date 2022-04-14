@@ -4,13 +4,15 @@ from django.conf import settings
 from django.contrib.postgres.search import SearchHeadline, SearchQuery
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import (ListAPIView, RetrieveAPIView,
                                      RetrieveUpdateDestroyAPIView,
                                      get_object_or_404, ListCreateAPIView, DestroyAPIView)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from librarian.api.models import Document, DocumentPageImage, Settings, Tag
+from librarian.api.permissions import DisableDemo
 from librarian.api.serializers import (DocumentPageTextSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
@@ -33,6 +35,7 @@ class DocumentListView(ListAPIView):
 class DocumentView(RetrieveUpdateDestroyAPIView):
     serializer_class = DocumentSerializer
     queryset = Document.objects.all()
+    permission_classes = [DisableDemo]
 
     def destroy(self, request, *args, **kwargs):
         document = self.get_object()
@@ -110,6 +113,7 @@ class DocumentTitleSearchView(ListAPIView):
 
 class DocumentTagsView(ListCreateAPIView):
     serializer_class = DocumentTagSerializer
+    permission_classes = [DisableDemo]
 
     def get_queryset(self):
         return Tag.objects.filter(documents__id=self.kwargs['pk'])
@@ -133,6 +137,8 @@ class DocumentTagsView(ListCreateAPIView):
 
 
 class DocumentTagDetailView(DestroyAPIView):
+    permission_classes = [DisableDemo]
+
     def destroy(self, request, *args, **kwargs):
         tag = get_object_or_404(Tag, id=kwargs['tag_id'])
         tag.documents.remove(kwargs['pk'])
@@ -145,6 +151,7 @@ class DocumentTagDetailView(DestroyAPIView):
 
 
 @api_view(["POST"])
+@permission_classes([DisableDemo])
 def document_create(request, filename):
     data = request.data['file'].read()
     doc_hash = md5_for_bytes(data)
