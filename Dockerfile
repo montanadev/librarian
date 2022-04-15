@@ -7,14 +7,14 @@ RUN cd client && \
     npm i && \
     npm run build
 
+
 FROM python:3.9-slim
 
 EXPOSE 8000
 
-
 WORKDIR /srv
 COPY . /srv
-COPY --from=js /srv/client/build /srv/librarian/static
+COPY --from=js /srv/client/build /srv/client/build
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN apt-get update && \
@@ -29,4 +29,4 @@ RUN poetry install
 # see https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
 COPY policy.xml /etc/ImageMagick-6/policy.xml
 
-CMD ["bash", "-c", "cd /srv && make migrate && supervisord"]
+CMD ["bash", "-c", "cd /srv && make collectstatic && make migrate && supervisord"]

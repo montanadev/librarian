@@ -4,7 +4,6 @@ from django.contrib import admin
 from django.urls import path
 
 from librarian.api.views import document_views, folder_views, settings_views, tag_views
-from librarian.api.views.static_views import index
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -37,11 +36,6 @@ urlpatterns = [
     path("api/folders/<int:pk>", folder_views.FolderDetailView.as_view(), name="folder-detail"),
     path("api/folders/<int:pk>/document", folder_views.FolderAddDocumentView.as_view(), name="folder-add-document"),
     path("api/folders/<int:pk>/document/<int:doc_id>", folder_views.FolderDocumentDetailView.as_view(), name="folder-document-detail"),
-    #
-    # static file endpoints
-    #
-    path("<path:resource>", index),
-    path("", index),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

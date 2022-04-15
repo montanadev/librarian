@@ -15,6 +15,9 @@ migrate:
 makemigrations:
 	poetry run ./manage.py makemigrations
 
+collectstatic:
+	poetry run ./manage.py collectstatic
+
 test:
 	poetry run ./manage.py test
 
