@@ -5,7 +5,7 @@
 node_modules/
 *.pyc
 build/
-static/
+staticfiles/
 service-account.json
 local-storage/*.pdf
 local-storage/*.jpg
