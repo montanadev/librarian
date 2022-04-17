@@ -25,7 +25,6 @@ function Viewer() {
     );
   }
   const [zoom, setZoom] = useState(localZoom);
-  const documentRef = useRef<any>();
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
@@ -64,7 +63,6 @@ function Viewer() {
       .deleteDocument(documentId)
       .then(() => {
         queryClient.invalidateQueries("folders");
-        queryClient.invalidateQueries("document");
         queryClient.invalidateQueries("tags");
       })
       .then(() => history.push("/"));
