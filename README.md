@@ -16,7 +16,7 @@ Features
 
 Check out a demo at https://librarian-demo.montanadev.com
 
-![demo](demo.gif)
+## Installation
 
 ## Contributing
 
