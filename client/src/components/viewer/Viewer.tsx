@@ -25,15 +25,15 @@ function Viewer() {
     );
   }
   const [zoom, setZoom] = useState(localZoom);
-  const documentRef = useRef<any>();
   const queryClient = useQueryClient();
   const api = new Api();
   const history = useHistory();
   const document = useQuery<DocumentModel>(["document", documentId], () =>
     api.getDocumentById(documentId)
   );
-  const documentTags = useQuery<ResourceModel<TagModel>>("document-tags", () =>
-    api.getTagsByDocumentId(documentId)
+  const documentTags = useQuery<ResourceModel<TagModel>>(
+    ["document-tags", documentId],
+    () => api.getTagsByDocumentId(documentId)
   );
   const globalTags = useQuery<ResourceModel<TagModel>>("tags", () =>
     api.getTags()
@@ -63,7 +63,6 @@ function Viewer() {
       .deleteDocument(documentId)
       .then(() => {
         queryClient.invalidateQueries("folders");
-        queryClient.invalidateQueries("document");
         queryClient.invalidateQueries("tags");
       })
       .then(() => history.push("/"));
