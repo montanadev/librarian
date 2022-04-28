@@ -2,7 +2,6 @@ import logging
 import os
 import tempfile
 
-import libnfs
 from django.apps import apps
 from django.db import models
 
@@ -44,11 +43,7 @@ class Document(models.Model):
                 return f.read()
 
         if settings.storage_mode == "nfs":
-            nfs = libnfs.NFS(settings.storage_path)
-            nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
-            b = nfs_f.read()
-            nfs_f.close()
-            return b
+            return None
 
         raise Exception(
             f"Storage mode {settings.storage_mode} not recognized, quitting"

@@ -4,7 +4,6 @@ import subprocess
 import tempfile
 from datetime import datetime
 
-import libnfs
 from django.conf import settings as django_settings
 from django.utils import timezone
 
@@ -72,12 +71,7 @@ def _run(job: DocumentJob):
             ) as tmp_f:
                 local_f.write(bytearray(tmp_f.read()))
         elif settings.storage_mode == "nfs":
-            # read temp file into nfs
-            nfs = libnfs.NFS(settings.storage_path)
-            nfs_f = nfs.open("/" + doc.filename, mode="wb")
-            with open(doc.temp_path, "rb") as tmp_f:
-                nfs_f.write(bytearray(tmp_f.read()))
-            nfs_f.close()
+            pass
         else:
             raise Exception(
                 f"Storage mode {settings.storage_mode} not recognized, quitting"
