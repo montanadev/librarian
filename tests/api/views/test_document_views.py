@@ -5,6 +5,7 @@ from rest_framework.test import APIClient
 
 from librarian.api.models import (Document, DocumentPageImage, DocumentStatus,
                                   Folder, Settings)
+from librarian.api.views.document_views import text_search
 from tests.helpers import reverse
 
 
@@ -256,3 +257,417 @@ class TestDocumentViews(TestCase):
         url = reverse("document-tags", args=(doc_response.json()['id'],))
         tag_list = self.client.get(url)
         self.assertEqual(tag_list.json()['count'], 0)
+
+    def test_document_text_search(self):
+        client = APIClient()
+
+        # url = reverse('document-text-search')
+        # url_with_query_parameters = url + "?q=file"
+        # response = client.get(url_with_query_parameters)
+        # self.assertEqual(response.status_code, 200)
+
+        fake_metadata = {'faceAnnotations': [],
+                         'fullTextAnnotation': {'pages': [{'blocks': [{'blockType': 1,
+                                                                       'boundingBox': {'normalizedVertices': [],
+                                                                                       'vertices': [{'x': 120,
+                                                                                                     'y': 151},
+                                                                                                    {'x': 373,
+                                                                                                     'y': 147},
+                                                                                                    {'x': 373,
+                                                                                                     'y': 179},
+                                                                                                    {'x': 121,
+                                                                                                     'y': 183}]},
+                                                                       'confidence': 0.0,
+                                                                       'paragraphs': [
+                                                                           {'boundingBox': {'normalizedVertices': [],
+                                                                                            'vertices': [{'x': 120,
+                                                                                                          'y': 151},
+                                                                                                         {'x': 373,
+                                                                                                          'y': 147},
+                                                                                                         {'x': 373,
+                                                                                                          'y': 179},
+                                                                                                         {'x': 121,
+                                                                                                          'y': 183}]},
+                                                                            'confidence': 0.0,
+                                                                            'property': {'detectedLanguages': [
+                                                                                {'confidence': 1.0,
+                                                                                 'languageCode': 'en'}]},
+                                                                            'words': [{'boundingBox': {
+                                                                                'normalizedVertices': [],
+                                                                                'vertices': [{'x': 120,
+                                                                                              'y': 151},
+                                                                                             {'x': 240,
+                                                                                              'y': 149},
+                                                                                             {'x': 240,
+                                                                                              'y': 181},
+                                                                                             {'x': 121,
+                                                                                              'y': 183}]},
+                                                                                'confidence': 0.0,
+                                                                                'property': {
+                                                                                    'detectedLanguages': [
+                                                                                        {'confidence': 0.0,
+                                                                                         'languageCode': 'en'}]},
+                                                                                'symbols': [{'boundingBox': {
+                                                                                    'normalizedVertices': [],
+                                                                                    'vertices': [{'x': 120,
+                                                                                                  'y': 151},
+                                                                                                 {'x': 139,
+                                                                                                  'y': 151},
+                                                                                                 {'x': 139,
+                                                                                                  'y': 174},
+                                                                                                 {'x': 120,
+                                                                                                  'y': 174}]},
+                                                                                    'confidence': 0.0,
+                                                                                    'property': {
+                                                                                        'detectedLanguages': [
+                                                                                            {
+                                                                                                'confidence': 0.0,
+                                                                                                'languageCode': 'en'}]},
+                                                                                    'text': 'D'},
+                                                                                    {'boundingBox': {
+                                                                                        'normalizedVertices': [],
+                                                                                        'vertices': [
+                                                                                            {'x': 145,
+                                                                                             'y': 157},
+                                                                                            {'x': 160,
+                                                                                             'y': 157},
+                                                                                            {'x': 160,
+                                                                                             'y': 174},
+                                                                                            {'x': 145,
+                                                                                             'y': 174}]},
+                                                                                        'confidence': 0.0,
+                                                                                        'property': {
+                                                                                            'detectedLanguages': [
+                                                                                                {
+                                                                                                    'confidence': 0.0,
+                                                                                                    'languageCode': 'en'}]},
+                                                                                        'text': 'u'},
+                                                                                    {'boundingBox': {
+                                                                                        'normalizedVertices': [],
+                                                                                        'vertices': [
+                                                                                            {'x': 165,
+                                                                                             'y': 157},
+                                                                                            {'x': 189,
+                                                                                             'y': 157},
+                                                                                            {'x': 189,
+                                                                                             'y': 174},
+                                                                                            {'x': 165,
+                                                                                             'y': 174}]},
+                                                                                        'confidence': 0.0,
+                                                                                        'property': {
+                                                                                            'detectedLanguages': [
+                                                                                                {
+                                                                                                    'confidence': 0.0,
+                                                                                                    'languageCode': 'en'}]},
+                                                                                        'text': 'm'},
+                                                                                    {'boundingBox': {
+                                                                                        'normalizedVertices': [],
+                                                                                        'vertices': [
+                                                                                            {'x': 195,
+                                                                                             'y': 158},
+                                                                                            {'x': 219,
+                                                                                             'y': 158},
+                                                                                            {'x': 219,
+                                                                                             'y': 175},
+                                                                                            {'x': 195,
+                                                                                             'y': 175}]},
+                                                                                        'confidence': 0.0,
+                                                                                        'property': {
+                                                                                            'detectedLanguages': [
+                                                                                                {
+                                                                                                    'confidence': 0.0,
+                                                                                                    'languageCode': 'en'}]},
+                                                                                        'text': 'm'},
+                                                                                    {'boundingBox': {
+                                                                                        'normalizedVertices': [],
+                                                                                        'vertices': [
+                                                                                            {'x': 223,
+                                                                                             'y': 157},
+                                                                                            {'x': 240,
+                                                                                             'y': 157},
+                                                                                            {'x': 240,
+                                                                                             'y': 181},
+                                                                                            {'x': 223,
+                                                                                             'y': 181}]},
+                                                                                        'confidence': 0.0,
+                                                                                        'property': {
+                                                                                            'detectedBreak': {
+                                                                                                'isPrefix': False,
+                                                                                                'type': 1},
+                                                                                            'detectedLanguages': [
+                                                                                                {
+                                                                                                    'confidence': 0.0,
+                                                                                                    'languageCode': 'en'}]},
+                                                                                        'text': 'y'}]},
+                                                                                {'boundingBox': {
+                                                                                    'normalizedVertices': [],
+                                                                                    'vertices': [{'x': 253,
+                                                                                                  'y': 151},
+                                                                                                 {'x': 315,
+                                                                                                  'y': 150},
+                                                                                                 {'x': 315,
+                                                                                                  'y': 174},
+                                                                                                 {'x': 253,
+                                                                                                  'y': 175}]},
+                                                                                    'confidence': 0.0,
+                                                                                    'property': {
+                                                                                        'detectedLanguages': [
+                                                                                            {'confidence': 0.0,
+                                                                                             'languageCode': 'en'}]},
+                                                                                    'symbols': [{'boundingBox': {
+                                                                                        'normalizedVertices': [],
+                                                                                        'vertices': [{'x': 253,
+                                                                                                      'y': 151},
+                                                                                                     {'x': 271,
+                                                                                                      'y': 151},
+                                                                                                     {'x': 271,
+                                                                                                      'y': 174},
+                                                                                                     {'x': 253,
+                                                                                                      'y': 174}]},
+                                                                                        'confidence': 0.0,
+                                                                                        'property': {
+                                                                                            'detectedLanguages': [
+                                                                                                {
+                                                                                                    'confidence': 0.0,
+                                                                                                    'languageCode': 'en'}]},
+                                                                                        'text': 'P'},
+                                                                                        {'boundingBox': {
+                                                                                            'normalizedVertices': [],
+                                                                                            'vertices': [
+                                                                                                {'x': 275,
+                                                                                                 'y': 151},
+                                                                                                {'x': 294,
+                                                                                                 'y': 151},
+                                                                                                {'x': 294,
+                                                                                                 'y': 174},
+                                                                                                {'x': 275,
+                                                                                                 'y': 174}]},
+                                                                                            'confidence': 0.0,
+                                                                                            'property': {
+                                                                                                'detectedLanguages': [
+                                                                                                    {
+                                                                                                        'confidence': 0.0,
+                                                                                                        'languageCode': 'en'}]},
+                                                                                            'text': 'D'},
+                                                                                        {'boundingBox': {
+                                                                                            'normalizedVertices': [],
+                                                                                            'vertices': [
+                                                                                                {'x': 299,
+                                                                                                 'y': 151},
+                                                                                                {'x': 315,
+                                                                                                 'y': 151},
+                                                                                                {'x': 315,
+                                                                                                 'y': 174},
+                                                                                                {'x': 299,
+                                                                                                 'y': 174}]},
+                                                                                            'confidence': 0.0,
+                                                                                            'property': {
+                                                                                                'detectedBreak': {
+                                                                                                    'isPrefix': False,
+                                                                                                    'type': 1},
+                                                                                                'detectedLanguages': [
+                                                                                                    {
+                                                                                                        'confidence': 0.0,
+                                                                                                        'languageCode': 'en'}]},
+                                                                                            'text': 'F'}]},
+                                                                                {'boundingBox': {
+                                                                                    'normalizedVertices': [],
+                                                                                    'vertices': [{'x': 327,
+                                                                                                  'y': 151},
+                                                                                                 {'x': 373,
+                                                                                                  'y': 150},
+                                                                                                 {'x': 373,
+                                                                                                  'y': 174},
+                                                                                                 {'x': 327,
+                                                                                                  'y': 175}]},
+                                                                                    'confidence': 0.0,
+                                                                                    'property': {
+                                                                                        'detectedLanguages': [
+                                                                                            {'confidence': 0.0,
+                                                                                             'languageCode': 'en'}]},
+                                                                                    'symbols': [{'boundingBox': {
+                                                                                        'normalizedVertices': [],
+                                                                                        'vertices': [{'x': 327,
+                                                                                                      'y': 151},
+                                                                                                     {'x': 338,
+                                                                                                      'y': 151},
+                                                                                                     {'x': 338,
+                                                                                                      'y': 174},
+                                                                                                     {'x': 327,
+                                                                                                      'y': 174}]},
+                                                                                        'confidence': 0.0,
+                                                                                        'property': {
+                                                                                            'detectedLanguages': [
+                                                                                                {
+                                                                                                    'confidence': 0.0,
+                                                                                                    'languageCode': 'en'}]},
+                                                                                        'text': 'f'},
+                                                                                        {'boundingBox': {
+                                                                                            'normalizedVertices': [],
+                                                                                            'vertices': [
+                                                                                                {'x': 340,
+                                                                                                 'y': 151},
+                                                                                                {'x': 344,
+                                                                                                 'y': 151},
+                                                                                                {'x': 344,
+                                                                                                 'y': 174},
+                                                                                                {'x': 340,
+                                                                                                 'y': 174}]},
+                                                                                            'confidence': 0.0,
+                                                                                            'property': {
+                                                                                                'detectedLanguages': [
+                                                                                                    {
+                                                                                                        'confidence': 0.0,
+                                                                                                        'languageCode': 'en'}]},
+                                                                                            'text': 'i'},
+                                                                                        {'boundingBox': {
+                                                                                            'normalizedVertices': [],
+                                                                                            'vertices': [
+                                                                                                {'x': 350,
+                                                                                                 'y': 151},
+                                                                                                {'x': 354,
+                                                                                                 'y': 151},
+                                                                                                {'x': 354,
+                                                                                                 'y': 174},
+                                                                                                {'x': 350,
+                                                                                                 'y': 174}]},
+                                                                                            'confidence': 0.0,
+                                                                                            'property': {
+                                                                                                'detectedLanguages': [
+                                                                                                    {
+                                                                                                        'confidence': 0.0,
+                                                                                                        'languageCode': 'en'}]},
+                                                                                            'text': 'l'},
+                                                                                        {'boundingBox': {
+                                                                                            'normalizedVertices': [],
+                                                                                            'vertices': [
+                                                                                                {'x': 358,
+                                                                                                 'y': 157},
+                                                                                                {'x': 373,
+                                                                                                 'y': 157},
+                                                                                                {'x': 373,
+                                                                                                 'y': 175},
+                                                                                                {'x': 358,
+                                                                                                 'y': 175}]},
+                                                                                            'confidence': 0.0,
+                                                                                            'property': {
+                                                                                                'detectedBreak': {
+                                                                                                    'isPrefix': False,
+                                                                                                    'type': 5},
+                                                                                                'detectedLanguages': [
+                                                                                                    {
+                                                                                                        'confidence': 0.0,
+                                                                                                        'languageCode': 'en'}]},
+                                                                                            'text': 'e'}]}]}],
+                                                                       'property': {
+                                                                           'detectedLanguages': [{'confidence': 1.0,
+                                                                                                  'languageCode': 'en'}]}}],
+                                                           'confidence': 0.0,
+                                                           'height': 1754,
+                                                           'property': {'detectedLanguages': [{'confidence': 1.0,
+                                                                                               'languageCode': 'en'}]},
+                                                           'width': 1240}],
+                                                'text': 'Dummy PDF file\n'},
+                         'labelAnnotations': [],
+                         'landmarkAnnotations': [],
+                         'localizedObjectAnnotations': [],
+                         'logoAnnotations': [],
+                         'textAnnotations': [{'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 120, 'y': 149},
+                                                                            {'x': 373, 'y': 149},
+                                                                            {'x': 373, 'y': 183},
+                                                                            {'x': 120, 'y': 183}]},
+                                              'confidence': 0.0,
+                                              'description': 'Dummy PDF file\n',
+                                              'locale': 'en',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 120, 'y': 151},
+                                                                            {'x': 240, 'y': 149},
+                                                                            {'x': 240, 'y': 181},
+                                                                            {'x': 121, 'y': 183}]},
+                                              'confidence': 0.0,
+                                              'description': 'Dummy',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 253, 'y': 151},
+                                                                            {'x': 315, 'y': 150},
+                                                                            {'x': 315, 'y': 174},
+                                                                            {'x': 253, 'y': 175}]},
+                                              'confidence': 0.0,
+                                              'description': 'PDF',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 327, 'y': 151},
+                                                                            {'x': 373, 'y': 150},
+                                                                            {'x': 373, 'y': 174},
+                                                                            {'x': 327, 'y': 175}]},
+                                              'confidence': 0.0,
+                                              'description': 'file',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 227, 'y': 251},
+                                                                            {'x': 273, 'y': 250},
+                                                                            {'x': 273, 'y': 274},
+                                                                            {'x': 227, 'y': 275}]},
+                                              'confidence': 0.0,
+                                              'description': 'file',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0},
+                                             {'boundingPoly': {'normalizedVertices': [],
+                                                               'vertices': [{'x': 327, 'y': 151},
+                                                                            {'x': 373, 'y': 150},
+                                                                            {'x': 373, 'y': 174},
+                                                                            {'x': 327, 'y': 175}]},
+                                              'confidence': 0.0,
+                                              'description': 'file',
+                                              'locale': '',
+                                              'locations': [],
+                                              'mid': '',
+                                              'properties': [],
+                                              'score': 0.0,
+                                              'topicality': 0.0}]}
+
+        q = "file"
+
+        vertices = text_search(fake_metadata, q)
+        self.assertEqual(len(vertices), 4)
+        self.assertEqual(len(vertices[0]), 4)
+        self.assertEqual(vertices[0][0]['x'], 120)
+        self.assertEqual(vertices[0][1]['y'], 149)
+        self.assertEqual(vertices[2][0]['x'], 227)
+
+        q = 'nothing'
+        description = text_search(fake_metadata, q)
+        self.assertEqual(description, [])
+
+        q = "fil"
+        vertices = text_search(fake_metadata, q)
+        self.assertEqual(len(vertices), 4)
+        self.assertEqual(len(vertices[0]), 4)
+        self.assertEqual(vertices[0][0]['x'], 120)
+        self.assertEqual(vertices[0][1]['y'], 149)
+        self.assertEqual(vertices[2][0]['x'], 227)
