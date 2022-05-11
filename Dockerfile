@@ -10,6 +10,8 @@ RUN cd client && \
 
 FROM python:3.9-slim
 
+ENV LIBRARIAN_WORKERS 2
+
 EXPOSE 8000
 
 WORKDIR /srv
