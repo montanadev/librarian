@@ -30,6 +30,7 @@ LOGGING = {
 
 INSTALLED_APPS = [
     "librarian.api",
+    "ddtrace.contrib.django",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
