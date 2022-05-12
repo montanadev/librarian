@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.postgres.search import SearchHeadline, SearchQuery
@@ -153,8 +154,17 @@ class DocumentTagDetailView(DestroyAPIView):
 @api_view(["POST"])
 @permission_classes([DisableDemo])
 def document_create(request, filename):
+    start_time = datetime.now()
+    logger.debug(f"Reading data...")
     data = request.data['file'].read()
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.debug(f"Reading data...done in {duration}s")
+
+    start_time = datetime.now()
+    logger.debug(f"MD5ing data...")
     doc_hash = md5_for_bytes(data)
+    duration = (datetime.now() - start_time).total_seconds()
+    logger.debug(f"MD5ing data...done in {duration}s")
 
     if Document.objects.filter(hash=doc_hash).exists() and not settings.ALLOW_REUPLOAD:
         logger.warning("Document hash already uploaded, skipping")
