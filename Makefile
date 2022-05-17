@@ -1,4 +1,4 @@
-.PHONY: run run-worker shell migrate makemigrations test test-coverage
+.PHONY: run run-worker shell migrate makemigrations test test-coverage export-requirements
 
 run:
 	./manage.py runserver
@@ -23,3 +23,6 @@ test:
 
 test-coverage:
 	coverage run ./manage.py test && coverage xml
+
+export-requirements:
+	poetry export -f requirements.txt --output requirements.txt --without-hashes
