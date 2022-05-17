@@ -1,25 +1,25 @@
 .PHONY: run run-worker shell migrate makemigrations test test-coverage
 
 run:
-	poetry run ./manage.py runserver
+	./manage.py runserver
 
 run-worker:
-	poetry run ./manage.py worker
+	./manage.py worker
 
 shell:
-	poetry run ./manage.py shell
+	./manage.py shell
 
 migrate:
-	poetry run ./manage.py migrate
+	./manage.py migrate
 
 makemigrations:
-	poetry run ./manage.py makemigrations
+	./manage.py makemigrations
 
 collectstatic:
-	poetry run ./manage.py collectstatic
+	./manage.py collectstatic
 
 test:
-	poetry run ./manage.py test
+	./manage.py test
 
 test-coverage:
-	poetry run coverage run ./manage.py test && poetry run coverage xml
+	coverage run ./manage.py test && coverage xml

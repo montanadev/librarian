@@ -29,4 +29,4 @@ RUN poetry install
 # see https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
 COPY policy.xml /etc/ImageMagick-6/policy.xml
 
-CMD ["bash", "-c", "cd /srv && make collectstatic && make migrate && supervisord"]
+CMD ["bash", "-c", "cd /srv && poetry run make collectstatic && poetry run make migrate && supervisord"]
