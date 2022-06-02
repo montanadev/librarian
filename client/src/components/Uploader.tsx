@@ -11,6 +11,7 @@ import { Loading } from "./Loading";
 import { toastError } from "../utils/toasts";
 
 const Uploader = () => {
+  console.log("Renderinguploader ")
   const api = new Api();
   const fifteenMinutesAgo = new Date(Date.now() - 1000 * 60 * 15);
   const [updatedAfter] = useState(fifteenMinutesAgo);
@@ -45,6 +46,7 @@ const Uploader = () => {
 
   return (
     <>
+    <p>Upload here</p>
       <div {...getRootProps()} className="Uploader">
         <input {...(getInputProps() as any)} />
         <p />

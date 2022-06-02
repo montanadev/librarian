@@ -104,6 +104,8 @@ class DocumentTextSearchView(ListAPIView):
             .filter(matches__contains='<b>') \
             .defer('text')
 
+        import pdb; pdb.set_trace()
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
