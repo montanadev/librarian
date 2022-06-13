@@ -19,20 +19,6 @@ from librarian.utils.hash import md5_for_bytes
 
 logger = logging.getLogger(__name__)
 
-def text_search(metadata, q):
-    textAnnotations = metadata['textAnnotations']
-
-    bounding_vertices = []
-
-    for item in textAnnotations:
-        #I believe these would return the "file" vertices, but I think in that instance, we would not need the first statement
-        # if item['description'] == q:
-        #     bounding_vertices.append(item['boundingPoly']['vertices'])
-        # if item['description'].startswith(q):
-        #     bounding_vertices.append(item['boundingPoly']['vertices'])
-        if q in item['description']:
-            bounding_vertices.append(item['boundingPoly']['vertices'])
-    return bounding_vertices
 
 class DocumentListView(ListAPIView):
     serializer_class = DocumentSerializer
