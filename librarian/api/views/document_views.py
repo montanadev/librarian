@@ -168,3 +168,9 @@ def document_create(request, filename):
     dc.persist_to_filestore(data)
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
+
+def document_combine(request, doc_id_list):
+
+    Document.objects.filter()
+
+    return JsonResponse(status=status.HTTP_200_OK)
