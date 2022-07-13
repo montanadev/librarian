@@ -90,7 +90,8 @@ class DocumentTextSearchView(ListAPIView):
             .filter(matches__contains='<b>') \
             .defer('text')
 
-        import pdb; pdb.set_trace()
+        import pdb;
+        pdb.set_trace()
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -169,8 +170,11 @@ def document_create(request, filename):
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
 
-def document_combine(request, doc_id_list):
 
-    Document.objects.filter()
+def document_combine(request, doc_ids):
+    '''
+    for id in doc_ids:
+        Document.objects.filter(id)
+        '''
 
     return JsonResponse(status=status.HTTP_200_OK)
