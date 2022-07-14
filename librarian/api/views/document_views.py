@@ -170,7 +170,8 @@ def document_create(request, filename):
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
 
-
+@api_view(["POST"])
+@permission_classes([DisableDemo])
 def document_combine(request, doc_ids):
     '''
     for id in doc_ids:
