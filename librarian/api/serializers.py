@@ -6,13 +6,14 @@ from librarian.api.models import Document, DocumentPageImage, Tag
 from librarian.api.models.folder import Folder
 from librarian.api.models.settings import Settings
 
+
 def text_search(metadata, q):
     textAnnotations = metadata['textAnnotations']
 
     bounding_vertices = []
 
     for item in textAnnotations:
-        #I believe these would return the "file" vertices, but I think in that instance, we would not need the first statement
+        # I believe these would return the "file" vertices, but I think in that instance, we would not need the first statement
         # if item['description'] == q:
         #     bounding_vertices.append(item['boundingPoly']['vertices'])
         # if item['description'].startswith(q):
@@ -20,6 +21,7 @@ def text_search(metadata, q):
         if q.lower() in item['description'].lower():
             bounding_vertices.append(item['boundingPoly']['vertices'])
     return bounding_vertices
+
 
 class DocumentSerializer(serializers.ModelSerializer):
     # drf bug: see https://stackoverflow.com/a/27079355/11241039
@@ -38,9 +40,6 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
 
     def get_bounding_boxes(self, obj):
         return text_search(json.loads(obj.metadata), self.request.query_params['q'])
-
-
-
 
     @staticmethod
     def get_matches(obj):

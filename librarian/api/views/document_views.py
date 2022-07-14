@@ -170,12 +170,18 @@ def document_create(request, filename):
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
 
+
+# curl -X POST -d '{"doc_ids": [1, 2, 3]}' http://0.0.0.0:8000/api/documents/combine
+
 @api_view(["POST"])
 @permission_classes([DisableDemo])
-def document_combine(request, doc_ids):
+def document_combine(request):
+    # alternatively, you can query for the doc ids directory
+    # docs = Document.objects.filter(id__in=[1, 2, 3])
+
     '''
     for id in doc_ids:
         Document.objects.filter(id)
         '''
 
-    return JsonResponse(status=status.HTTP_200_OK)
+    return JsonResponse(data={}, status=status.HTTP_200_OK)
