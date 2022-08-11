@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.conf import settings
@@ -16,6 +17,7 @@ from librarian.api.permissions import DisableDemo
 from librarian.api.serializers import (DocumentPageTextSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
+
 
 logger = logging.getLogger(__name__)
 
@@ -177,11 +179,15 @@ def document_create(request, filename):
 @permission_classes([DisableDemo])
 def document_combine(request):
     # alternatively, you can query for the doc ids directory
-    # docs = Document.objects.filter(id__in=[1, 2, 3])
+    data = json.loads(request.body)
 
-    '''
-    for id in doc_ids:
-        Document.objects.filter(id)
-        '''
+    docs = Document.objects.filter(id__in=data['doc_ids'])
+
+
+    if len(docs) != len(data['doc_ids']) or len(docs) == 0:
+        return JsonResponse(data={}, status=status.HTTP_400_BAD_REQUEST)
+
+    docs.delete()
+    Document.objects.create(filename="data['name']")
 
     return JsonResponse(data={}, status=status.HTTP_200_OK)
