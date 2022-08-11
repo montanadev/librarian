@@ -74,6 +74,10 @@ class DocumentDataView(RetrieveAPIView):
 class DocumentMergeView(ListAPIView):
     serializer_class = DocumentSerializer
 
+    def get_queryset(self):
+        #initial pass, need to revisit
+        return Document.objects.filter(filename__icontains=self.request.(filename="data['name']"))
+
 
 class DocumentTextSearchView(ListAPIView):
     serializer_class = DocumentPageTextSerializer
@@ -96,8 +100,8 @@ class DocumentTextSearchView(ListAPIView):
             .filter(matches__contains='<b>') \
             .defer('text')
 
-        import pdb;
-        pdb.set_trace()
+        '''import pdb;
+        pdb.set_trace()'''
 
         page = self.paginate_queryset(queryset)
         if page is not None:
