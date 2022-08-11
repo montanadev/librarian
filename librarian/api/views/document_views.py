@@ -71,6 +71,9 @@ class DocumentDataView(RetrieveAPIView):
             status=status.HTTP_200_OK,
         )
 
+class DocumentMergeView(ListAPIView):
+    serializer_class = DocumentSerializer
+
 
 class DocumentTextSearchView(ListAPIView):
     serializer_class = DocumentPageTextSerializer
@@ -193,11 +196,11 @@ def document_combine(request):
 
     docs = Document.objects.filter(id__in=data['doc_ids'])
 
-
+    import pdb; pdb.set_trace()
     if len(docs) != len(data['doc_ids']) or len(docs) == 0:
         return JsonResponse(data={}, status=status.HTTP_400_BAD_REQUEST)
 
     docs.delete()
     Document.objects.create(filename="data['name']")
-
+e
     return JsonResponse(data={}, status=status.HTTP_200_OK)
