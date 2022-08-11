@@ -117,17 +117,33 @@ Tools used to build Librarian
 * poetry
 * [libnfs](https://github.com/sahlberg/libnfs)
 * imagemagick
+* postgres
+* openssl
 
 You can install some of these on macOS via Homebrew
 
 ```
-$ brew install node python@3.9 poetry libnfs imagemagick 
+$ brew install node python@3.9 poetry libnfs imagemagick postgres openssl
 ```
 
 For the backend
 
 ```bash
+# on Macs with the M1/2 chip, you may encounter gcrpio issues, use the following command to install
+$ LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/opt/libnfs/lib ${LDFLAGS}" \
+  CPPFLAGS="-I/opt/homebrew/opt/libnfs/include -I/opt/homebrew/opt/openssl@3/include ${CPPFLAGS}" \
+  GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 \
+  GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 \
+    poetry install
+
+# for everyone else
+$ poetry install
+
+$ createdb librarian
+# run database migrations (if postgres isnt running, start with `brew services start postgres`)
 $ make migrate
+
+# start the server
 $ make run
 ```
 
