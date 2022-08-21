@@ -5,13 +5,24 @@ from rest_framework.test import APIClient
 from librarian.api.models.settings import Settings
 
 
-class TestConfigViews(TestCase):
-    def test_config_create(self):
+class TestSettingsViews(TestCase):
+    def test_settings_create_invalid(self):
         client = APIClient()
         test_data = {
             "google_cloud_api_key": "{}",
             "storage_path": "10.0.1.1/volume1/test",
-            "storage_mode": "nfs",
+            "storage_mode": "bogus",
+        }
+
+        response = client.post(reverse("settings"), test_data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_settings_create(self):
+        client = APIClient()
+        test_data = {
+            "google_cloud_api_key": "{}",
+            "storage_path": "10.0.1.1/volume1/test",
+            "storage_mode": Settings.StorageModes.NFS,
         }
 
         # request is sending data to the model
@@ -33,7 +44,14 @@ class TestConfigViews(TestCase):
         self.assertEqual(settings_data.storage_path, test_data["storage_path"])
         self.assertEqual(settings_data.storage_mode, test_data["storage_mode"])
 
-    def test_config_get(self):
+    def test_default_settings_enum_repr(self):
+        settings = Settings.create_default()
+        # django TextChoices are notoriously difficult to work with -- verify that text choice strings
+        # are stored to the db correctly
+        self.assertEqual(settings.StorageModes.LOCAL, "local")
+        self.assertEqual(settings.storage_mode, settings.StorageModes.LOCAL)
+
+    def test_settings_get(self):
         client = APIClient()
 
         url = reverse("settings")
