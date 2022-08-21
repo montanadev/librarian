@@ -37,26 +37,26 @@ def get_or_create_settings_view(request):
         if storage_mode not in Settings.StorageModes.all():
             return JsonResponse({"reason": "storage mode not recognized"}, status=status.HTTP_400_BAD_REQUEST)
 
-        settings = None
+        storage_settings = None
         if storage_mode == Settings.StorageModes.LOCAL:
-            settings = StorageSettingsLocal(
-                storage_path=data.get("storage_path")
+            storage_settings = StorageSettingsLocal.objects.create(
+                storage_path=data.get("storage_settings").get("storage_path")
             )
         if storage_mode == Settings.StorageModes.NFS:
-            settings = StorageSettingsNFS(
-                storage_path=data.get("storage_path")
+            storage_settings = StorageSettingsNFS.objects.create(
+                storage_path=data.get("storage_settings").get("storage_path")
             )
         if storage_mode == Settings.StorageModes.S3:
-            settings = StorageSettingsS3(
-                aws_access_key_id=data.get("aws_access_key_id"),
-                aws_secret_access_key=data.get("aws_secret_access_key"),
-                bucket=data.get("bucket")
+            storage_settings = StorageSettingsS3.objects.create(
+                aws_access_key_id=data.get("storage_settings").get("aws_access_key_id"),
+                aws_secret_access_key=data.get("storage_settings").get("aws_secret_access_key"),
+                bucket=data.get("storage_settings").get("bucket")
             )
 
         settings = Settings.objects.create(
             google_cloud_api_key=data.get("google_cloud_api_key", None),
             storage_mode=storage_mode,
-            storage_settings=settings
+            storage_settings=storage_settings,
         )
 
         return JsonResponse(data=SetupSerializer(settings).data)

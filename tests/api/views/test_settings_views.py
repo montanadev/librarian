@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 
+from librarian.api.models import StorageSettingsLocal
 from librarian.api.models.settings import Settings
 
 
@@ -10,7 +11,7 @@ class TestSettingsViews(TestCase):
         client = APIClient()
         test_data = {
             "google_cloud_api_key": "{}",
-            "storage_path": "10.0.1.1/volume1/test",
+            "storage_settings": {},
             "storage_mode": "bogus",
         }
 
@@ -21,7 +22,9 @@ class TestSettingsViews(TestCase):
         client = APIClient()
         test_data = {
             "google_cloud_api_key": "{}",
-            "storage_path": "10.0.1.1/volume1/test",
+            "storage_settings": {
+                "storage_path": "10.0.1.1/volume1/test",
+            },
             "storage_mode": Settings.StorageModes.NFS,
         }
 
@@ -41,7 +44,7 @@ class TestSettingsViews(TestCase):
         self.assertEqual(
             settings_data.google_cloud_api_key, test_data["google_cloud_api_key"]
         )
-        self.assertEqual(settings_data.storage_path, test_data["storage_path"])
+        self.assertEqual(settings_data.storage_settings.storage_path, test_data["storage_settings"]["storage_path"])
         self.assertEqual(settings_data.storage_mode, test_data["storage_mode"])
 
     def test_default_settings_enum_repr(self):
@@ -68,7 +71,8 @@ class TestSettingsViews(TestCase):
             self.assertEqual(response.status_code, 403)
 
             # shouldn't leak google_cloud_api_key
-            Settings.objects.create(google_cloud_api_key='sensitive')
+            Settings.objects.create(google_cloud_api_key='sensitive',
+                                    storage_settings=StorageSettingsLocal.objects.create(storage_path="/tmp"))
             response = client.get(url)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json()['google_cloud_api_key'], '')

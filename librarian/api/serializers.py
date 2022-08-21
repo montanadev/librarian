@@ -45,6 +45,7 @@ class SetupSerializer(serializers.ModelSerializer):
 
 class DemoSetupSerializer(serializers.ModelSerializer):
     google_cloud_api_key = serializers.SerializerMethodField()
+    storage_settings = StorageSettingsSerializer()
 
     @staticmethod
     def get_google_cloud_api_key(obj):
@@ -53,7 +54,7 @@ class DemoSetupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Settings
-        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_path")
+        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_settings")
 
 
 class FolderSerializer(serializers.ModelSerializer):

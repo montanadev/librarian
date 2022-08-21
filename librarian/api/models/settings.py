@@ -42,3 +42,8 @@ class Settings(models.Model):
             local_settings = StorageSettingsLocal.objects.create(storage_path='/tmp')
 
         return cls.objects.create(storage_settings=local_settings, storage_mode=cls.StorageModes.LOCAL)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["storage_settings_type", "storage_settings_id"])
+        ]
