@@ -1,7 +1,8 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from librarian.api.models import Document, DocumentPageImage, Tag
+from librarian.api.models import Document, DocumentPageImage, Tag, StorageSettingsLocal, StorageSettingsNFS, \
+    StorageSettingsS3
 from librarian.api.models.folder import Folder
 from librarian.api.models.settings import Settings
 
@@ -37,14 +38,48 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
         fields = ("id", "document", "document_filename", "folder", "page_number", "matches")
 
 
+class StorageSettingsRelatedField(serializers.RelatedField):
+    queryset = Settings.objects.all()
+
+    def to_representation(self, value):
+        if type(value) == StorageSettingsLocal:
+            return StorageSettingsLocalSerializer(value).data
+        if type(value) == StorageSettingsNFS:
+            return StorageSettingsNFSSerializer(value).data
+        if type(value) == StorageSettingsS3:
+            return StorageSettingsS3Serializer(value).data
+        raise Exception('Unexpected type of tagged object')
+
+
 class SetupSerializer(serializers.ModelSerializer):
+    storage_settings = StorageSettingsRelatedField()
+
     class Meta:
         model = Settings
-        fields = "__all__"
+        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_settings")
+
+
+class StorageSettingsLocalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StorageSettingsLocal
+        exclude = ('id',)
+
+
+class StorageSettingsNFSSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StorageSettingsNFS
+        exclude = ('id',)
+
+
+class StorageSettingsS3Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = StorageSettingsS3
+        exclude = ('id',)
 
 
 class DemoSetupSerializer(serializers.ModelSerializer):
     google_cloud_api_key = serializers.SerializerMethodField()
+    storage_settings = StorageSettingsRelatedField()
 
     @staticmethod
     def get_google_cloud_api_key(obj):
@@ -53,7 +88,7 @@ class DemoSetupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Settings
-        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_path")
+        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_settings")
 
 
 class FolderSerializer(serializers.ModelSerializer):
@@ -86,7 +121,6 @@ class FolderSerializer(serializers.ModelSerializer):
     def update_document_to_folder_links(folder, docs):
         with transaction.atomic():
             doc_objs = Document.objects.filter(id__in=[d['id'] for d in docs])
-
             for doc_obj in doc_objs:
                 doc_obj.folder = folder
                 doc_obj.save()

@@ -1,8 +1,6 @@
 import logging
-import os
 import tempfile
 
-import libnfs
 from django.apps import apps
 from django.db import models
 
@@ -30,30 +28,6 @@ class Document(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def get_bytes_from_filestore(self, settings):
-        if self.status == DocumentStatus.created.value:
-            # document hasn't persisted yet, return temp path
-            with open(self.temp_path, mode="rb") as f:
-                logger.warning(f"Tried to access {self.filename} before persist, returning temp path")
-                return f.read()
-
-        if settings.storage_mode == "local":
-            logger.debug(f"Returning data from {os.path.join(settings.storage_path, self.filestore_path)}")
-            with open(os.path.join(settings.storage_path, self.filestore_path), mode="rb") as f:
-                return f.read()
-
-        if settings.storage_mode == "nfs":
-            nfs = libnfs.NFS(settings.storage_path)
-            nfs_f = nfs.open("/" + self.filestore_path, mode="rb")
-            b = nfs_f.read()
-            nfs_f.close()
-            return b
-
-        raise Exception(
-            f"Storage mode {settings.storage_mode} not recognized, quitting"
-        )
-
 
     @classmethod
     def create_from_filename(cls, filename, hash):

@@ -29,6 +29,7 @@ function App() {
                   <Link to={"/"}>Upload</Link>
                 </Menu.Item>
                 <Menu.Item
+                  data-cy="settings"
                   onClick={() => setSettingsModalOpen(true)}
                   key="settings"
                 >
