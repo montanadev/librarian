@@ -25,14 +25,11 @@ class TestSettingsViews(TestCase):
             "storage_settings": {
                 "storage_path": "10.0.1.1/volume1/test",
             },
-            "storage_mode": Settings.StorageModes.NFS,
+            "storage_mode": str(Settings.StorageModes.NFS),
         }
 
         # request is sending data to the model
-        url = reverse("settings")
-        url_with_query_parameters = url + "?hello=world"
-
-        response = client.post(url_with_query_parameters, test_data, format="json")
+        response = client.post(reverse("settings"), test_data, format="json")
         self.assertEqual(response.status_code, 200)
 
         settings = Settings.objects.all()
@@ -56,10 +53,25 @@ class TestSettingsViews(TestCase):
 
     def test_settings_get(self):
         client = APIClient()
+        test_data = {
+            "google_cloud_api_key": "{}",
+            "storage_settings": {
+                "storage_path": "10.0.1.1/volume1/test",
+            },
+            "storage_mode": str(Settings.StorageModes.NFS),
+        }
+
+        # request is sending data to the model
+        response = client.post(reverse("settings"), test_data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        # add the id from the create to make the test_data equal to the response
+        test_data['id'] = response.json()['id']
 
         url = reverse("settings")
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(test_data, response.json())
 
     def test_disable_demo_mode(self):
         client = APIClient()

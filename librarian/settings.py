@@ -3,6 +3,7 @@ import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.apps import apps
 from env_utils import get_bool, get_env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,12 @@ LOGGING = {
     "root": {
         "handlers": ["console"],
         "level": "DEBUG",
+    },
+    'loggers': {
+        'ddtrace': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
     },
 }
 
@@ -105,7 +112,7 @@ USE_TZ = True
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5000000000  # 5GB
 
-MEDIA_URL= "/media/"
+MEDIA_URL = "/media/"
 STATIC_URL = "/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "client", "build"),)
