@@ -11,7 +11,6 @@ interface Props {
   onClose: () => void;
 }
 
-
 export function SettingsModal({ visible, onClose }: Props) {
   const api = new Api();
 
@@ -21,6 +20,11 @@ export function SettingsModal({ visible, onClose }: Props) {
     return null;
   }
 
-  return <SettingsInternalModal visible={visible} onClose={onClose} data={settings.data} />;
+  return (
+    <SettingsInternalModal
+      visible={visible}
+      onClose={onClose}
+      data={settings.data}
+    />
+  );
 }
-

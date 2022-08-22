@@ -7,7 +7,7 @@ import {
   StorageModes,
   StorageSettingsLocal,
   StorageSettingsNFS,
-  StorageSettingsS3
+  StorageSettingsS3,
 } from "../../models/Settings";
 
 const { TextArea } = Input;
@@ -18,7 +18,11 @@ interface internalProps {
   onClose: () => void;
 }
 
-export function SettingsInternalModal({ visible, onClose, data }: internalProps) {
+export function SettingsInternalModal({
+  visible,
+  onClose,
+  data,
+}: internalProps) {
   const api = new Api();
 
   const queryClient = useQueryClient();
@@ -27,19 +31,22 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
   const storageMode = data.storage_mode ?? StorageModes[0];
   if (storageMode === "nfs") {
     storageOptions = {
-      storage_path: (data.storage_settings as StorageSettingsNFS)?.storage_path
+      storage_path: (data.storage_settings as StorageSettingsNFS)?.storage_path,
     };
   }
   if (storageMode === "local") {
     storageOptions = {
-      storage_path: (data.storage_settings as StorageSettingsLocal)?.storage_path
+      storage_path: (data.storage_settings as StorageSettingsLocal)
+        ?.storage_path,
     };
   }
   if (storageMode === "s3") {
     storageOptions = {
       bucket: (data.storage_settings as StorageSettingsS3)?.bucket,
-      aws_access_key_id: (data.storage_settings as StorageSettingsS3)?.aws_access_key_id,
-      aws_secret_access_key: (data.storage_settings as StorageSettingsS3)?.aws_secret_access_key
+      aws_access_key_id: (data.storage_settings as StorageSettingsS3)
+        ?.aws_access_key_id,
+      aws_secret_access_key: (data.storage_settings as StorageSettingsS3)
+        ?.aws_secret_access_key,
     };
   }
 
@@ -47,8 +54,8 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
     defaultValues: {
       google_cloud_api_key: data.google_cloud_api_key,
       storage_mode: storageMode,
-      storage_settings: storageOptions
-    }
+      storage_settings: storageOptions,
+    },
   });
 
   const storageModeWatch = watch("storage_mode");
@@ -72,13 +79,12 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
           )}
         >
           Submit
-        </Button>
+        </Button>,
       ]}
     >
       <form>
         <h3>Storage Mode</h3>
         <Controller
-
           name="storage_mode"
           control={control}
           render={({ field }: any) => (
@@ -96,7 +102,7 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
         <br />
         <br />
 
-        {storageModeWatch === "local" || storageModeWatch === "nfs" ?
+        {storageModeWatch === "local" || storageModeWatch === "nfs" ? (
           <>
             <h3>Storage Path</h3>
             <Controller
@@ -106,16 +112,22 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
                 <Input {...field} className="w-full" type="text" />
               )}
             />
-          </> : null}
+          </>
+        ) : null}
 
-        {storageModeWatch === "s3" ?
+        {storageModeWatch === "s3" ? (
           <>
             <h3>AWS Access Key Id</h3>
             <Controller
               name={"storage_settings.aws_access_key_id"}
               control={control}
               render={({ field }: any) => (
-                <Input {...field} className="w-full" data-cy="settings-aws-access-key-id" type="text" />
+                <Input
+                  {...field}
+                  className="w-full"
+                  data-cy="settings-aws-access-key-id"
+                  type="text"
+                />
               )}
             />
 
@@ -124,7 +136,12 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
               name={"storage_settings.aws_secret_access_key"}
               control={control}
               render={({ field }: any) => (
-                <Input {...field} className="w-full" data-cy="settings-aws-secret-access-key" type="text" />
+                <Input
+                  {...field}
+                  className="w-full"
+                  data-cy="settings-aws-secret-access-key"
+                  type="text"
+                />
               )}
             />
 
@@ -133,11 +150,16 @@ export function SettingsInternalModal({ visible, onClose, data }: internalProps)
               name={"storage_settings.bucket"}
               control={control}
               render={({ field }: any) => (
-                <Input {...field} className="w-full" data-cy="settings-aws-bucket" type="text" />
+                <Input
+                  {...field}
+                  className="w-full"
+                  data-cy="settings-aws-bucket"
+                  type="text"
+                />
               )}
             />
-          </> : null}
-
+          </>
+        ) : null}
 
         <br />
         <br />

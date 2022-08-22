@@ -18,6 +18,9 @@ export interface SettingsModel {
   version: number;
   google_cloud_api_key: string;
   storage_mode: typeof StorageModes[number];
-  storage_settings: StorageSettingsLocal | StorageSettingsNFS | StorageSettingsS3;
+  storage_settings:
+    | StorageSettingsLocal
+    | StorageSettingsNFS
+    | StorageSettingsS3;
   secret_key: string;
 }
