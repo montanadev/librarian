@@ -205,6 +205,7 @@ def document_combine(request):
         return JsonResponse(data={}, status=status.HTTP_400_BAD_REQUEST)
 
     docs.delete()
-    Document.objects.create(filename="data['name']")
-e
-    return JsonResponse(data={}, status=status.HTTP_200_OK)
+    combined = Document.objects.create(filename="data['name']")
+
+#need to test and check the data being returned...
+    return JsonResponse(data=DocumentSerializer(combined).data, status=status.HTTP_200_OK)
