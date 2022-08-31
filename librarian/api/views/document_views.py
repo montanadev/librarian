@@ -76,7 +76,7 @@ class DocumentMergeView(ListAPIView):
 
     def get_queryset(self):
         #initial pass, need to revisit
-        return Document.objects.filter(filename__icontains=self.request.(filename="data['name']"))
+        return Document.objects.filter(filename__icontains=self.request.get(filename="data['name']"))
 
 
 class DocumentTextSearchView(ListAPIView):
@@ -198,9 +198,11 @@ def document_combine(request):
     # alternatively, you can query for the doc ids directory
     data = json.loads(request.body)
 
+    import pdb;
+    pdb.set_trace()
     docs = Document.objects.filter(id__in=data['doc_ids'])
 
-    import pdb; pdb.set_trace()
+
     if len(docs) != len(data['doc_ids']) or len(docs) == 0:
         return JsonResponse(data={}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -208,4 +210,5 @@ def document_combine(request):
     combined = Document.objects.create(filename="data['name']")
 
 #need to test and check the data being returned...
+    #should be able to use the existing Document Serializer?
     return JsonResponse(data=DocumentSerializer(combined).data, status=status.HTTP_200_OK)
