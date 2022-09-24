@@ -5,3 +5,6 @@ from .document_page_image import *
 from .document_job import *
 from .document import *
 from .tag import *
+from .storage_settings_local import *
+from .storage_settings_nfs import *
+from .storage_settings_s3 import *

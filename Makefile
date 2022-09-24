@@ -1,28 +1,25 @@
-.PHONY: run run-worker shell migrate makemigrations test test-coverage export-requirements
+.PHONY: run run-worker shell migrate makemigrations test test-coverage
 
 run:
-	./manage.py runserver
+	poetry run ./manage.py runserver
 
 run-worker:
-	./manage.py worker
+	poetry run ./manage.py worker
 
 shell:
-	./manage.py shell
+	poetry run ./manage.py shell
 
 migrate:
-	./manage.py migrate
+	poetry run ./manage.py migrate
 
 makemigrations:
-	./manage.py makemigrations
+	poetry run ./manage.py makemigrations
 
 collectstatic:
-	./manage.py collectstatic
+	poetry run ./manage.py collectstatic
 
 test:
-	./manage.py test
+	poetry run ./manage.py test
 
 test-coverage:
-	coverage run ./manage.py test && coverage xml
-
-export-requirements:
-	poetry export -f requirements.txt --output requirements.txt --without-hashes
+	poetry run coverage run ./manage.py test && poetry run coverage xml

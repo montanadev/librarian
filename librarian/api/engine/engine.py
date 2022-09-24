@@ -7,6 +7,7 @@ from datetime import datetime
 from django.conf import settings as django_settings
 from django.utils import timezone
 
+from librarian.api.engine.storage import storage
 from librarian.api.models import DocumentJob
 from librarian.api.models import DocumentPageImage, DocumentStatus, Settings, SourceContentTypes
 from librarian.utils.attrs import setattrs
@@ -62,20 +63,10 @@ def _run(job: DocumentJob):
             logger.debug(f"Pdf converted and saved to {doc.temp_path}")
 
         logger.debug(f"Persistence mode {settings.storage_mode}")
-        if settings.storage_mode == "local":
-            dest = os.path.join(settings.storage_path, doc.filename)
-            logger.debug(f"Persisting to {dest}")
-            # TODO - no need to open / write, just move from temp to filestore path
-            with open(dest, mode="wb") as local_f, open(
-                    doc.temp_path, "rb"
-            ) as tmp_f:
-                local_f.write(bytearray(tmp_f.read()))
-        elif settings.storage_mode == "nfs":
-            pass
-        else:
-            raise Exception(
-                f"Storage mode {settings.storage_mode} not recognized, quitting"
-            )
+
+        # move from temp to durable filestore path
+        with open(doc.temp_path, "rb") as tmp_f:
+            storage.write(settings, doc, tmp_f.read())
 
         # cleanup temp file
         os.remove(doc.temp_path)
@@ -100,7 +91,7 @@ def _run(job: DocumentJob):
         # write source file bytes to disk for imagemagick
         file, filename = tempfile.mkstemp()
         with open(file, "w+b") as f:
-            f.write(doc.get_bytes_from_filestore(settings))
+            f.write(storage.read(settings, doc))
 
         cmd = (
             f"convert -density 150 {filename} -quality 90 {output_dir}/output.png"

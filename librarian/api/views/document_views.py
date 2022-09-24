@@ -13,6 +13,7 @@ from rest_framework.generics import (ListAPIView, RetrieveAPIView,
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from librarian.api.engine.storage import storage
 from librarian.api.models import Document, DocumentPageImage, Settings, Tag
 from librarian.api.permissions import DisableDemo
 from librarian.api.serializers import (DocumentPageTextSerializer,
@@ -62,8 +63,8 @@ class DocumentDataView(RetrieveAPIView):
         if not settings:
             return JsonResponse({"reason": "settings not created yet"}, status=status.HTTP_400_BAD_REQUEST)
 
-        dc = self.get_object()
-        data = dc.get_bytes_from_filestore(settings)
+        doc = self.get_object()
+        data = storage.read(settings, doc)
 
         return HttpResponse(
             bytes(data),
