@@ -64,7 +64,7 @@ export function SettingsInternalModal({
     <Modal
       visible={visible}
       onCancel={onClose}
-      title="Setup Wizard"
+      title="Settings"
       footer={[
         <Button onClick={onClose}>Return</Button>,
         <Button

@@ -1,10 +1,7 @@
-import { Input } from "antd";
 import { Api } from "../../utils/Api";
 import { useQuery } from "react-query";
 import { SettingsModel } from "../../models/Settings";
 import { SettingsInternalModal } from "./SettingsInternalModal";
-
-const { TextArea } = Input;
 
 interface Props {
   visible: boolean;

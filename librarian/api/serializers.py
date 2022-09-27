@@ -56,7 +56,7 @@ class SetupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Settings
-        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_settings")
+        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_settings", "dismissed_setup_wizard")
 
 
 class StorageSettingsLocalSerializer(serializers.ModelSerializer):
@@ -77,18 +77,13 @@ class StorageSettingsS3Serializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
-class DemoSetupSerializer(serializers.ModelSerializer):
+class DemoSetupSerializer(SetupSerializer):
     google_cloud_api_key = serializers.SerializerMethodField()
-    storage_settings = StorageSettingsRelatedField()
 
     @staticmethod
     def get_google_cloud_api_key(obj):
         # DEMO shouldnt leak gcv key
         return ""
-
-    class Meta:
-        model = Settings
-        fields = ("id", "google_cloud_api_key", "storage_mode", "storage_settings")
 
 
 class FolderSerializer(serializers.ModelSerializer):

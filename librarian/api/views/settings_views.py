@@ -11,7 +11,7 @@ from librarian.api.permissions import DisableDemo
 from librarian.api.serializers import SetupSerializer, DemoSetupSerializer
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET", "PUT", "POST"])
 @permission_classes([DisableDemo])
 def get_or_create_settings_view(request):
     if request.method == "GET":
@@ -23,6 +23,20 @@ def get_or_create_settings_view(request):
             return JsonResponse(data=DemoSetupSerializer(settings).data)
 
         return JsonResponse(data=SetupSerializer(settings).data)
+
+    if request.method == "PUT":
+        try:
+            settings = Settings.objects.get()
+        except Settings.DoesNotExist:
+            settings = Settings.create_default()
+
+        data = json.loads(request.body)
+        if data.get('dismissed_setup_wizard', None) is not None:
+            settings.dismissed_setup_wizard = data.get('dismissed_setup_wizard')
+            settings.save()
+
+        return JsonResponse(data=SetupSerializer(settings).data)
+
 
     if request.method == "POST":
         # delete previous settings, if they exist

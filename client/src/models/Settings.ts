@@ -23,4 +23,5 @@ export interface SettingsModel {
     | StorageSettingsNFS
     | StorageSettingsS3;
   secret_key: string;
+  dismissed_setup_wizard: boolean;
 }

@@ -24,6 +24,9 @@ class Settings(models.Model):
 
     storage_mode = models.CharField(max_length=20, choices=StorageModes.choices, default=StorageModes.LOCAL)
 
+    # walkthrough flag
+    dismissed_setup_wizard = models.BooleanField(default=False)
+
     # generic storage settings object
     storage_settings_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     storage_settings_id = models.PositiveIntegerField()

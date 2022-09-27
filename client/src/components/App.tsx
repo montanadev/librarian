@@ -9,8 +9,9 @@ import SearchResults from "./search/SearchResults";
 import Uploader from "./Uploader";
 import Viewer from "./viewer/Viewer";
 import { SearchBox } from "./search/SearchBox";
+import { SetupWizard } from "./modals/SetupWizard";
 
-const { Header, Content } = Layout;
+const { Header } = Layout;
 
 function App() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -21,6 +22,7 @@ function App() {
     return (
       <>
         <div className="flex">
+          <SetupWizard />
           <Sidebar />
           <div style={{ height: "100vh", width: "100%" }}>
             <Header className="header AppHeader">
