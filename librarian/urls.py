@@ -24,6 +24,7 @@ urlpatterns = [
     # document endpoints
     #
     path("api/documents/", document_views.DocumentListView.as_view()),
+    path("api/documents/combine", document_views.document_combine, name="document-combine"),
     path("api/documents/<str:filename>", document_views.document_create, name="document-create"),
     path("api/documents/<int:pk>/details", document_views.DocumentView.as_view(), name="document-detail"),
     path("api/documents/<int:pk>/tags", document_views.DocumentTagsView.as_view(), name="document-tags"),

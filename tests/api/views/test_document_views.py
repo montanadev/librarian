@@ -1,3 +1,4 @@
+import json
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from rest_framework import status
@@ -5,14 +6,17 @@ from rest_framework.test import APIClient
 
 from librarian.api.models import (Document, DocumentPageImage, DocumentStatus,
                                   Folder, Settings)
+from librarian.api.serializers import text_search
 from tests.helpers import reverse
 
 
 class TestDocumentViews(TestCase):
     def setUp(self):
         self.client = APIClient()
-
         self.file = SimpleUploadedFile("file.jpg", None, content_type="application/pdf")
+        self.fake_metadata = json.dumps({
+            'textAnnotations': {}
+        })
 
         Settings.create_default()
 
@@ -91,11 +95,12 @@ class TestDocumentViews(TestCase):
             document=doc_a,
             page_number=1,
             text="my egg is dirty, please may i have a new one",
+            metadata=self.fake_metadata
         )
 
         doc_b = Document.objects.create(filename="b", folder=Folder.objects.create())
         doc_b_page_1 = DocumentPageImage.objects.create(
-            document=doc_b, page_number=1, text="this omelette is eggcellent"
+            document=doc_b, page_number=1, text="this omelette is eggcellent", metadata=self.fake_metadata
         )
 
         url = reverse("document-text-search", query_params={"q": "egg"})
@@ -256,3 +261,35 @@ class TestDocumentViews(TestCase):
         url = reverse("document-tags", args=(doc_response.json()['id'],))
         tag_list = self.client.get(url)
         self.assertEqual(tag_list.json()['count'], 0)
+
+    def test_document_text_search(self):
+        client = APIClient()
+
+        # url = reverse('document-text-search')
+        # url_with_query_parameters = url + "?q=file"
+        # response = client.get(url_with_query_parameters)
+        # self.assertEqual(response.status_code, 200)
+
+        with open('tests/fixtures/ocr_metadata.json', 'r') as f:
+            fake_metadata = json.loads(f.read())
+
+        q = "file"
+
+        vertices = text_search(fake_metadata, q)
+        self.assertEqual(len(vertices), 4)
+        self.assertEqual(len(vertices[0]), 4)
+        self.assertEqual(vertices[0][0]['x'], 120)
+        self.assertEqual(vertices[0][1]['y'], 149)
+        self.assertEqual(vertices[2][0]['x'], 227)
+
+        q = 'nothing'
+        description = text_search(fake_metadata, q)
+        self.assertEqual(description, [])
+
+        q = "fil"
+        vertices = text_search(fake_metadata, q)
+        self.assertEqual(len(vertices), 4)
+        self.assertEqual(len(vertices[0]), 4)
+        self.assertEqual(vertices[0][0]['x'], 120)
+        self.assertEqual(vertices[0][1]['y'], 149)
+        self.assertEqual(vertices[2][0]['x'], 227)

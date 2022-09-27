@@ -136,6 +136,14 @@ $ LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/opt/libnfs/lib ${LD
   GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 \
     poetry install
 
+# the LD/CPPFLAGS may need to be adjusted based on where brew installs libnfs openssl
+# ex.
+# LDFLAGS=-L/opt/homebrew/opt/openssl@3/lib\ -L/usr/local/Cellar/libnfs/5.0.2/lib \
+# CPPFLAGS="-I/usr/local/Cellar/libnfs/5.0.2/include -I/opt/homebrew/opt/openssl@3/include ${CPPFLAGS}" \
+# GRPC_PYTHON_BUILD_SYSTEM_ZLIB=1 \
+# GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1 \
+#   poetry install
+
 # for everyone else
 $ poetry install
 
