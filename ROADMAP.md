@@ -21,7 +21,7 @@
 ## Beta
 
 - [ ] <500 page pdfs are viewable
-- [ ] single REST call to check status of multiple uploads
+- [x] single REST call to check status of multiple uploads
 
 ## Nice to haves
 

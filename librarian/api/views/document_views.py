@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime
 
@@ -18,6 +19,7 @@ from librarian.api.permissions import DisableDemo
 from librarian.api.serializers import (DocumentPageTextSerializer,
                                        DocumentSerializer, DocumentTagSerializer)
 from librarian.utils.hash import md5_for_bytes
+
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +72,13 @@ class DocumentDataView(RetrieveAPIView):
             status=status.HTTP_200_OK,
         )
 
+class DocumentMergeView(ListAPIView):
+    serializer_class = DocumentSerializer
+
+    def get_queryset(self):
+        #initial pass, need to revisit
+        return Document.objects.filter(filename__icontains=self.request.get(filename="data['name']"))
+
 
 class DocumentTextSearchView(ListAPIView):
     serializer_class = DocumentPageTextSerializer
@@ -91,6 +100,9 @@ class DocumentTextSearchView(ListAPIView):
             .filter(matches__isnull=False) \
             .filter(matches__contains='<b>') \
             .defer('text')
+
+        '''import pdb;
+        pdb.set_trace()'''
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -177,3 +189,27 @@ def document_create(request, filename):
     dc.persist_to_filestore(data)
 
     return JsonResponse(data=DocumentSerializer(dc).data, status=status.HTTP_200_OK)
+
+
+# curl -X POST -d '{"doc_ids": [1, 2, 3]}' http://0.0.0.0:8000/api/documents/combine
+
+@api_view(["POST"])
+@permission_classes([DisableDemo])
+def document_combine(request):
+    # alternatively, you can query for the doc ids directory
+    data = json.loads(request.body)
+
+    import pdb;
+    pdb.set_trace()
+    docs = Document.objects.filter(id__in=data['doc_ids'])
+
+
+    if len(docs) != len(data['doc_ids']) or len(docs) == 0:
+        return JsonResponse(data={}, status=status.HTTP_400_BAD_REQUEST)
+
+    docs.delete()
+    combined = Document.objects.create(filename="data['name']")
+
+#need to test and check the data being returned...
+    #should be able to use the existing Document Serializer?
+    return JsonResponse(data=DocumentSerializer(combined).data, status=status.HTTP_200_OK)

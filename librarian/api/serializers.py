@@ -1,10 +1,27 @@
 from django.db import transaction
 from rest_framework import serializers
+import json
 
 from librarian.api.models import Document, DocumentPageImage, Tag, StorageSettingsLocal, StorageSettingsNFS, \
     StorageSettingsS3
 from librarian.api.models.folder import Folder
 from librarian.api.models.settings import Settings
+
+
+def text_search(metadata, q):
+    textAnnotations = metadata['textAnnotations']
+
+    bounding_vertices = []
+
+    for item in textAnnotations:
+        # I believe these would return the "file" vertices, but I think in that instance, we would not need the first statement
+        # if item['description'] == q:
+        #     bounding_vertices.append(item['boundingPoly']['vertices'])
+        # if item['description'].startswith(q):
+        #     bounding_vertices.append(item['boundingPoly']['vertices'])
+        if q.lower() in item['description'].lower():
+            bounding_vertices.append(item['boundingPoly']['vertices'])
+    return bounding_vertices
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -20,6 +37,10 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
     folder = serializers.SerializerMethodField()
     document_filename = serializers.SerializerMethodField()
     matches = serializers.SerializerMethodField()
+    bounding_boxes = serializers.SerializerMethodField()
+
+    def get_bounding_boxes(self, obj):
+        return text_search(json.loads(obj.metadata), self.context['request'].query_params['q'])
 
     @staticmethod
     def get_matches(obj):
@@ -35,7 +56,7 @@ class DocumentPageTextSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DocumentPageImage
-        fields = ("id", "document", "document_filename", "folder", "page_number", "matches")
+        fields = ("id", "document", "document_filename", "folder", "page_number", "matches", "bounding_boxes")
 
 
 class StorageSettingsRelatedField(serializers.RelatedField):
