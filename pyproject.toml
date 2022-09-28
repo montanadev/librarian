@@ -20,7 +20,7 @@ gunicorn = "^20.1.0"
 whitenoise = "^6.0.0"
 ddtrace = "^1.1.2"
 boto3 = "^1.24.56"
-
+protobuf= "3.20.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^6.3.2"

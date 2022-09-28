@@ -22,7 +22,7 @@ function App() {
   const api = new Api();
   const queryClient = useQueryClient();
   const settings = useQuery<SettingsModel>("settings", api.getSettings);
-  const [disableWizard, _] = useQueryParam("disableWizard", BooleanParam);
+  const [disableWizard, _] = useQueryParam("disableWizard");
 
   // withSidebar embeds the sidebar into the rendered component.
   // needed to inform the sidebar what is currently selected

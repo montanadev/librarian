@@ -54,6 +54,7 @@ class TestSettingsViews(TestCase):
     def test_settings_get(self):
         client = APIClient()
         test_data = {
+            "dismissed_setup_wizard": False,
             "google_cloud_api_key": "{}",
             "storage_settings": {
                 "storage_path": "10.0.1.1/volume1/test",
