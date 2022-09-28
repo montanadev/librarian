@@ -37,7 +37,6 @@ def get_or_create_settings_view(request):
 
         return JsonResponse(data=SetupSerializer(settings).data)
 
-
     if request.method == "POST":
         # delete previous settings, if they exist
         Settings.objects.all().delete()
@@ -46,6 +45,8 @@ def get_or_create_settings_view(request):
         StorageSettingsS3.objects.all().delete()
 
         data = json.loads(request.body)
+
+        dismissed_setup_wizard = data.get('dismissed_setup_wizard', False)
 
         storage_mode = data.get("storage_mode", None)
         if storage_mode not in Settings.StorageModes.all():
@@ -71,6 +72,7 @@ def get_or_create_settings_view(request):
             google_cloud_api_key=data.get("google_cloud_api_key", None),
             storage_mode=storage_mode,
             storage_settings=storage_settings,
+            dismissed_setup_wizard=dismissed_setup_wizard,
         )
 
         return JsonResponse(data=SetupSerializer(settings).data)

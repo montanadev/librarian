@@ -1,41 +1,31 @@
-import { Button, Input, Modal, Select, Space, Typography, Radio } from "antd";
+import { Button, Input, Modal, Radio, Space, Typography } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { Api } from "../../utils/Api";
-import { useQuery, useQueryClient } from "react-query";
-import {
-  SettingsModel,
-  StorageModes,
-  StorageSettingsLocal,
-  StorageSettingsNFS,
-  StorageSettingsS3,
-} from "../../models/Settings";
+import { useQueryClient } from "react-query";
 import { useState } from "react";
+import { SettingsModel } from "../../models/Settings";
 
 const { Link, Title, Paragraph, Text } = Typography;
 
 const { TextArea } = Input;
 
-export function SetupWizard() {
-  const [visible, setVisible] = useState(false);
-  const [storageMode, setStorageMode] = useState("local");
+interface SetupWizardProps {
+  visible: boolean;
+  onClose: () => void;
+  settings: SettingsModel;
+}
 
-  const onClose = () => {
-    setVisible(false);
-  };
-
+export function SetupWizard({ onClose, visible, settings }: SetupWizardProps) {
   const api = new Api();
-
-  const settings = useQuery<SettingsModel>("settings", api.getSettings);
-
-  const { handleSubmit, control, watch } = useForm();
-
-  if (settings.isLoading || !settings.data) {
-    return null;
-  }
+  const queryClient = useQueryClient();
+  const [storageMode, setStorageMode] = useState(settings.storage_mode);
+  const { handleSubmit, control, watch } = useForm({
+    defaultValues: settings,
+  });
 
   return (
     <Modal
-      visible={!settings.data.dismissed_setup_wizard}
+      visible={visible}
       onCancel={onClose}
       title={
         <Typography>
@@ -47,17 +37,20 @@ export function SetupWizard() {
         </Typography>
       }
       footer={[
-        <Button onClick={onClose}>Dismiss</Button>,
+        <Button data-cy="settings-close" onClick={onClose}>
+          Dismiss
+        </Button>,
         <Button
           data-cy="settings-submit"
           type="primary"
           htmlType="submit"
-          // onClick={handleSubmit((d) =>
-          //   api
-          //     .writeSettings(d)
-          //     .then(() => queryClient.invalidateQueries("settings"))
-          //     .then(() => onClose())
-          // )}
+          onClick={handleSubmit((d) => {
+            d.storage_mode = storageMode;
+            api
+              .writeSettings(d)
+              .then(() => queryClient.invalidateQueries("settings"))
+              .then(() => onClose());
+          })}
         >
           Save
         </Button>,
@@ -126,7 +119,7 @@ export function SetupWizard() {
                   )}
                 </Paragraph>
               </Radio>
-              <Radio value="s3">
+              <Radio value="s3" data-cy="storage-mode-s3">
                 <Title level={5}>S3</Title>
                 <Paragraph>
                   Choose this to bring your own Amazon S3 bucket.
@@ -139,7 +132,12 @@ export function SetupWizard() {
                         name={"storage_settings.aws_access_key_id"}
                         control={control}
                         render={({ field }: any) => (
-                          <Input {...field} className="w-full" type="text" />
+                          <Input
+                            {...field}
+                            className="w-full"
+                            type="text"
+                            data-cy="settings-aws-access-key-id"
+                          />
                         )}
                       />
 
@@ -148,7 +146,12 @@ export function SetupWizard() {
                         name={"storage_settings.aws_secret_access_key"}
                         control={control}
                         render={({ field }: any) => (
-                          <Input {...field} className="w-full" type="text" />
+                          <Input
+                            {...field}
+                            className="w-full"
+                            type="text"
+                            data-cy="settings-aws-secret-access-key"
+                          />
                         )}
                       />
 
@@ -157,7 +160,12 @@ export function SetupWizard() {
                         name={"storage_settings.bucket"}
                         control={control}
                         render={({ field }: any) => (
-                          <Input {...field} className="w-full" type="text" />
+                          <Input
+                            {...field}
+                            className="w-full"
+                            type="text"
+                            data-cy="settings-aws-bucket"
+                          />
                         )}
                       />
                     </>

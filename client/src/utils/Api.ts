@@ -64,6 +64,13 @@ export class Api {
       .catch(toastErrorHandler);
   }
 
+  dismissSetupWizard() {
+    return axios
+      .put("/api/settings", { dismissed_setup_wizard: true })
+      .then((d) => d.data)
+      .catch(toastErrorHandler);
+  }
+
   createFolder(folderName: string) {
     return axios
       .post("/api/folders/", { name: folderName, documents: [] })

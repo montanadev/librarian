@@ -1,4 +1,4 @@
-.PHONY: run run-worker shell migrate makemigrations test test-coverage
+.PHONY: run run-worker shell migrate makemigrations test test-coverage erase-reset
 
 run:
 	poetry run ./manage.py runserver
@@ -23,3 +23,8 @@ test:
 
 test-coverage:
 	poetry run coverage run ./manage.py test && poetry run coverage xml
+
+erase-reset:
+	dropdb librarian
+	createdb librarian
+	make migrate

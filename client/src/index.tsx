@@ -6,14 +6,18 @@ import "react-toastify/dist/ReactToastify.css";
 import App from "./components/App";
 import { HashRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryParamProvider } from "use-query-params";
+import { ReactRouter5Adapter } from "use-query-params/adapters/react-router-5";
 
 const queryClient = new QueryClient();
 
 ReactDOM.render(
   <HashRouter>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <QueryParamProvider adapter={ReactRouter5Adapter}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </QueryParamProvider>
   </HashRouter>,
   document.getElementById("root")
 );
