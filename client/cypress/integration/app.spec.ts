@@ -1,7 +1,6 @@
 describe("Librarian", () => {
   beforeEach(() => {
     cy.visit("http://localhost:3000?noWizard=true");
-    cy.get('[data-cy="settings-close"]').click({ force: true });
   });
 
   it("should upload and render a pdf", () => {
